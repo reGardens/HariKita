@@ -167,10 +167,15 @@ const router = createRouter({
 
 // Navigation guard for CMS slug validation and ACL check
 router.beforeEach(async (to, from, next) => {
-  if (to.params.slug && to.path.startsWith('/cms/')) {
+  // Skip guard for non-CMS routes
+  if (!to.path.startsWith('/cms/') || !to.params.slug) {
+    return next()
+  }
+
+  try {
     const exists = await weddingRegistryService.exists(to.params.slug)
     if (!exists) {
-      return next({ path: '/cms/dashboard', query: { error: 'not-found' } })
+      return next({ path: '/', query: { error: 'not-found' } })
     }
     // Set active slug in store if changed
     if (store.state.wedding.activeSlug !== to.params.slug) {
@@ -193,6 +198,9 @@ router.beforeEach(async (to, from, next) => {
         return next({ name: 'cms-dashboard', params: { slug: to.params.slug }, query: { error: 'unauthorized-feature' } })
       }
     }
+  } catch (e) {
+    // API not available (SPA-only mode) - redirect to home
+    return next({ path: '/' })
   }
   next()
 })
