@@ -10,15 +10,9 @@ const routes = [
     path: '/',
     redirect: '/cms/dashboard'
   },
-  // Wedding Selector (accessible via /cms/weddings)
   {
     path: '/cms',
     redirect: '/cms/dashboard'
-  },
-  {
-    path: '/cms/weddings',
-    name: 'cms-selector',
-    component: () => import('../Pages/Cms/views/WeddingSelectorView.vue')
   },
   // CMS with slug context
   {
@@ -175,7 +169,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.params.slug && to.path.startsWith('/cms/')) {
     const exists = await weddingRegistryService.exists(to.params.slug)
     if (!exists) {
-      return next({ name: 'cms-selector', query: { error: 'not-found' } })
+      return next({ path: '/cms/dashboard', query: { error: 'not-found' } })
     }
     // Set active slug in store if changed
     if (store.state.wedding.activeSlug !== to.params.slug) {

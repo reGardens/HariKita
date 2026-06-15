@@ -446,18 +446,9 @@ function isFeatureEnabled(wedding, featureKey) {
 
             <!-- User's Weddings -->
             <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-bold tracking-tight">
-                        Undangan Pernikahan Saya
-                    </h2>
-                    <a
-                        href="/cms/weddings"
-                        class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
-                    >
-                        <IconComponent name="Plus" class="h-3.5 w-3.5" />
-                        Buat Undangan
-                    </a>
-                </div>
+                <h2 class="text-xl font-bold tracking-tight">
+                    Undangan Pernikahan Saya
+                </h2>
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <div
                         v-for="wedding in recentWeddings"
