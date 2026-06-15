@@ -1,0 +1,1 @@
+import{d as a}from"./urlEncoder-B-OrPKBO.js";import{f as o}from"./aos-DJCujbpg.js";function n(){const e=new URLSearchParams(window.location.search).get("to")||"";return{guestName:o(a(e))}}export{n as u};

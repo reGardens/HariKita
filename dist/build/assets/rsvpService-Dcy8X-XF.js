@@ -1,0 +1,1 @@
+import{b as a}from"./aos-DJCujbpg.js";const p={async getAll(s){return(await a.get(`/api/wedding/${s}/rsvp`)).data},async create(s,e){return(await a.post(`/api/wedding/${s}/rsvp`,e)).data},async updateStatus(s,e,t){return(await a.put(`/api/wedding/${s}/rsvp/${e}/status`,{status:t})).data}};export{p as r};
