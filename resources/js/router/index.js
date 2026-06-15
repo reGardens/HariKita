@@ -8,7 +8,8 @@ const InvitationLayout = () => import('../Pages/Landing/invitation/layouts/Invit
 const routes = [
   {
     path: '/',
-    redirect: '/cms/dashboard'
+    name: 'home',
+    component: () => import('../Pages/Landing/HomePage.vue')
   },
   {
     path: '/cms',
