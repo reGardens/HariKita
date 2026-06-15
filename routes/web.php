@@ -26,8 +26,6 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated Admin Routes (super-admin only)
 Route::middleware(['auth', 'role:super-admin'])->group(function () {
-    // CMS Dashboard
-    Route::get('/cms/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('cms.dashboard');
 
     // Templates CRUD (Admin Write Actions)
     Route::prefix('cms/templates')->group(function () {
@@ -70,6 +68,8 @@ Route::middleware(['auth', 'role:super-admin'])->group(function () {
 
 // Authenticated General Routes (Accessible by all roles)
 Route::middleware('auth')->group(function () {
+    // Dashboard (accessible to all — data is filtered server-side by role)
+    Route::get('/cms/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('cms.dashboard');
     Route::get('/cms/templates', [\App\Http\Controllers\Admin\TemplateController::class, 'index'])->name('cms.templates.index');
 });
 

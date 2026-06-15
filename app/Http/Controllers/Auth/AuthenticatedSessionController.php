@@ -42,11 +42,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->hasRole('super-admin')) {
-            return redirect()->route('cms.dashboard');
-        }
-
-        return \Inertia\Inertia::location('/cms');
+        return redirect()->route('cms.dashboard');
     }
 
     /**

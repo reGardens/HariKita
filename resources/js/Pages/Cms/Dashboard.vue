@@ -11,6 +11,7 @@ defineOptions({ layout: CmsLayout });
 const { t, locale } = useI18n();
 
 const props = defineProps({
+    isSuperAdmin: { type: Boolean, default: false },
     totalUsers: { type: Number, default: 0 },
     totalRoles: { type: Number, default: 0 },
     totalWeddings: { type: Number, default: 0 },
@@ -97,153 +98,245 @@ function isFeatureEnabled(wedding, featureKey) {
                 {{ t("common.welcome") }}, {{ currentUser?.name }}!
             </h1>
             <p class="text-muted-foreground mt-1">
-                Panel Super Admin WeddingApp. Kelola performa, pengguna, dan template secara terpusat.
+                <span v-if="isSuperAdmin">Panel Super Admin WeddingApp. Kelola performa, pengguna, dan template secara terpusat.</span>
+                <span v-else>Selamat datang di WeddingApp. Kelola undangan pernikahan Anda di sini.</span>
             </p>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div
-                v-for="card in cards"
-                :key="card.label"
-                class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
-            >
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-muted-foreground">{{
-                            card.label
-                        }}</span>
-                        <IconComponent
-                            :name="card.icon"
-                            class="h-5 w-5 text-emerald-600 dark:text-emerald-400"
-                        />
-                    </div>
-                    <p class="text-3xl font-bold tracking-tight">{{ card.value }}</p>
-                </div>
-                <p class="text-xs text-muted-foreground mt-2">{{ card.desc }}</p>
-            </div>
-        </div>
-
-        <!-- Weddings Section (Cards Grid) -->
-        <div class="space-y-4">
-            <h2 class="text-xl font-bold tracking-tight">Daftar Undangan Aktif</h2>
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- ===== SUPER ADMIN VIEW ===== -->
+        <template v-if="isSuperAdmin">
+            <!-- Stats Grid -->
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div
-                    v-for="wedding in recentWeddings"
-                    :key="wedding.id"
-                    class="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                    v-for="card in cards"
+                    :key="card.label"
+                    class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
                 >
-                    <div class="space-y-3">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <h3 class="font-bold text-base text-foreground line-clamp-1">
-                                    {{ wedding.label }}
-                                </h3>
-                                <p class="text-xs font-mono text-muted-foreground">/wedding/{{ wedding.slug }}</p>
-                            </div>
-                            <span class="inline-flex items-center justify-center p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
-                                <IconComponent name="Heart" class="h-5 w-5" />
-                            </span>
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-muted-foreground">{{ card.label }}</span>
+                            <IconComponent
+                                :name="card.icon"
+                                class="h-5 w-5 text-emerald-600 dark:text-emerald-400"
+                            />
                         </div>
+                        <p class="text-3xl font-bold tracking-tight">{{ card.value }}</p>
+                    </div>
+                    <p class="text-xs text-muted-foreground mt-2">{{ card.desc }}</p>
+                </div>
+            </div>
 
-                        <div class="border-t border-border/60 pt-3 space-y-2 text-xs">
-                            <div class="flex justify-between">
-                                <span class="text-muted-foreground">Pemilik:</span>
-                                <span class="font-medium text-right line-clamp-1 w-2/3">
-                                    {{ wedding.user ? wedding.user.name : '-' }}
+            <!-- Weddings Section (Admin sees all) -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold tracking-tight">Daftar Undangan Aktif</h2>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                        v-for="wedding in recentWeddings"
+                        :key="wedding.id"
+                        class="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-bold text-base text-foreground line-clamp-1">
+                                        {{ wedding.label }}
+                                    </h3>
+                                    <p class="text-xs font-mono text-muted-foreground">/wedding/{{ wedding.slug }}</p>
+                                </div>
+                                <span class="inline-flex items-center justify-center p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+                                    <IconComponent name="Heart" class="h-5 w-5" />
                                 </span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-muted-foreground">Email Pemilik:</span>
-                                <span class="font-medium text-right line-clamp-1 w-2/3">
-                                    {{ wedding.user ? wedding.user.email : '-' }}
+
+                            <div class="border-t border-border/60 pt-3 space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-muted-foreground">Pemilik:</span>
+                                    <span class="font-medium text-right line-clamp-1 w-2/3">
+                                        {{ wedding.user ? wedding.user.name : '-' }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-muted-foreground">Email Pemilik:</span>
+                                    <span class="font-medium text-right line-clamp-1 w-2/3">
+                                        {{ wedding.user ? wedding.user.email : '-' }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between pt-1">
+                                    <span class="text-muted-foreground">Status Undangan:</span>
+                                    <Badge class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Aktif</Badge>
+                                </div>
+                            </div>
+
+                            <!-- Mini stats -->
+                            <div class="grid grid-cols-2 gap-2 text-center bg-muted/40 rounded-lg p-2 mt-2">
+                                <div>
+                                    <p class="text-[10px] text-muted-foreground uppercase font-semibold">Tamu</p>
+                                    <p class="text-sm font-bold text-foreground">{{ wedding.guests_count }}</p>
+                                </div>
+                                <div class="border-l border-border">
+                                    <p class="text-[10px] text-muted-foreground uppercase font-semibold">RSVP</p>
+                                    <p class="text-sm font-bold text-foreground">{{ wedding.rsvps_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border/60">
+                            <a
+                                :href="`/wedding/${wedding.slug}`"
+                                target="_blank"
+                                class="flex-1 text-center py-1.5 px-3 rounded-lg border border-border hover:bg-muted text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <IconComponent name="Eye" class="h-3.5 w-3.5" />
+                                Lihat Live
+                            </a>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5"
+                                @click="showDetail(wedding)"
+                            >
+                                <IconComponent name="InfoCircle" class="h-3.5 w-3.5" />
+                                Detail
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="recentWeddings.length === 0" class="text-center py-12 border border-dashed rounded-xl text-muted-foreground bg-card">
+                    Belum ada data pernikahan/undangan.
+                </div>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-2">
+                <!-- Recent Users Table -->
+                <div class="rounded-xl border border-border bg-card overflow-hidden">
+                    <div class="p-5 border-b border-border flex items-center justify-between">
+                        <h2 class="font-semibold text-lg">Pengguna Terbaru</h2>
+                        <span class="text-xs text-muted-foreground">5 Registrasi Terakhir</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Nama</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Peran</TableHead>
+                                    <TableHead>Terdaftar</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow v-for="u in recentUsers" :key="u.id">
+                                    <TableCell class="font-medium text-sm">{{ u.name }}</TableCell>
+                                    <TableCell class="text-sm">{{ u.email }}</TableCell>
+                                    <TableCell>
+                                        <Badge
+                                            v-for="role in u.roles"
+                                            :key="role"
+                                            class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs px-1.5 py-0.5 rounded"
+                                        >
+                                            {{ role }}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell class="text-xs text-muted-foreground">{{ formatDate(u.created_at) }}</TableCell>
+                                </TableRow>
+                                <TableRow v-if="recentUsers.length === 0">
+                                    <TableCell colspan="4" class="text-center py-6 text-sm text-muted-foreground">Belum ada data pengguna.</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ===== REGULAR USER VIEW ===== -->
+        <template v-else>
+            <!-- User's Wedding Stats -->
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-muted-foreground">Undangan Saya</span>
+                        <IconComponent name="Heart" class="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <p class="text-3xl font-bold tracking-tight">{{ totalWeddings }}</p>
+                    <p class="text-xs text-muted-foreground mt-2">Total undangan yang Anda buat</p>
+                </div>
+                <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-muted-foreground">Total Tamu</span>
+                        <IconComponent name="Users" class="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <p class="text-3xl font-bold tracking-tight">{{ recentWeddings.reduce((sum, w) => sum + w.guests_count, 0) }}</p>
+                    <p class="text-xs text-muted-foreground mt-2">Tamu di semua undangan Anda</p>
+                </div>
+                <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-muted-foreground">Total RSVP</span>
+                        <IconComponent name="CircleCheck" class="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <p class="text-3xl font-bold tracking-tight">{{ recentWeddings.reduce((sum, w) => sum + w.rsvps_count, 0) }}</p>
+                    <p class="text-xs text-muted-foreground mt-2">Konfirmasi kehadiran tamu</p>
+                </div>
+            </div>
+
+            <!-- User's Weddings -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold tracking-tight">Undangan Pernikahan Saya</h2>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                        v-for="wedding in recentWeddings"
+                        :key="wedding.id"
+                        class="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-bold text-base text-foreground line-clamp-1">{{ wedding.label }}</h3>
+                                    <p class="text-xs font-mono text-muted-foreground">/wedding/{{ wedding.slug }}</p>
+                                </div>
+                                <span class="inline-flex items-center justify-center p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+                                    <IconComponent name="Heart" class="h-5 w-5" />
                                 </span>
                             </div>
-                            <div class="flex justify-between pt-1">
-                                <span class="text-muted-foreground">Status Undangan:</span>
-                                <Badge class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Aktif</Badge>
+
+                            <!-- Mini stats -->
+                            <div class="grid grid-cols-2 gap-2 text-center bg-muted/40 rounded-lg p-2 mt-2">
+                                <div>
+                                    <p class="text-[10px] text-muted-foreground uppercase font-semibold">Tamu</p>
+                                    <p class="text-sm font-bold text-foreground">{{ wedding.guests_count }}</p>
+                                </div>
+                                <div class="border-l border-border">
+                                    <p class="text-[10px] text-muted-foreground uppercase font-semibold">RSVP</p>
+                                    <p class="text-sm font-bold text-foreground">{{ wedding.rsvps_count }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Mini stats -->
-                        <div class="grid grid-cols-2 gap-2 text-center bg-muted/40 rounded-lg p-2 mt-2">
-                            <div>
-                                <p class="text-[10px] text-muted-foreground uppercase font-semibold">Tamu</p>
-                                <p class="text-sm font-bold text-foreground">{{ wedding.guests_count }}</p>
-                            </div>
-                            <div class="border-l border-border">
-                                <p class="text-[10px] text-muted-foreground uppercase font-semibold">RSVP</p>
-                                <p class="text-sm font-bold text-foreground">{{ wedding.rsvps_count }}</p>
-                            </div>
+                        <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border/60">
+                            <a
+                                :href="`/wedding/${wedding.slug}`"
+                                target="_blank"
+                                class="flex-1 text-center py-1.5 px-3 rounded-lg border border-border hover:bg-muted text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <IconComponent name="Eye" class="h-3.5 w-3.5" />
+                                Lihat Live
+                            </a>
+                            <a
+                                :href="`/cms/${wedding.slug}/dashboard`"
+                                class="flex-1 text-center py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <IconComponent name="Edit" class="h-3.5 w-3.5" />
+                                Kelola
+                            </a>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border/60">
-                        <a
-                            :href="`/wedding/${wedding.slug}`"
-                            target="_blank"
-                            class="flex-1 text-center py-1.5 px-3 rounded-lg border border-border hover:bg-muted text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                        >
-                            <IconComponent name="Eye" class="h-3.5 w-3.5" />
-                            Lihat Live
-                        </a>
-                        <Button
-                            variant="default"
-                            size="sm"
-                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5"
-                            @click="showDetail(wedding)"
-                        >
-                            <IconComponent name="InfoCircle" class="h-3.5 w-3.5" />
-                            Detail
-                        </Button>
-                    </div>
+                </div>
+                <div v-if="recentWeddings.length === 0" class="text-center py-16 border border-dashed rounded-xl text-muted-foreground bg-card">
+                    <span class="text-4xl block mb-3">💒</span>
+                    <p class="font-medium">Belum ada undangan</p>
+                    <p class="text-sm mt-1">Hubungi admin untuk membuat undangan pernikahan Anda.</p>
                 </div>
             </div>
-            <div v-if="recentWeddings.length === 0" class="text-center py-12 border border-dashed rounded-xl text-muted-foreground bg-card">
-                Belum ada data pernikahan/undangan.
-            </div>
-        </div>
-
-        <div class="grid gap-6 lg:grid-cols-2">
-            <!-- Recent Users Table -->
-            <div class="rounded-xl border border-border bg-card overflow-hidden">
-                <div class="p-5 border-b border-border flex items-center justify-between">
-                    <h2 class="font-semibold text-lg">Pengguna Terbaru</h2>
-                    <span class="text-xs text-muted-foreground">5 Registrasi Terakhir</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nama</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Peran</TableHead>
-                                <TableHead>Terdaftar</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow v-for="u in recentUsers" :key="u.id">
-                                <TableCell class="font-medium text-sm">{{ u.name }}</TableCell>
-                                <TableCell class="text-sm">{{ u.email }}</TableCell>
-                                <TableCell>
-                                    <Badge
-                                        v-for="role in u.roles"
-                                        :key="role"
-                                        class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs px-1.5 py-0.5 rounded"
-                                    >
-                                        {{ role }}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell class="text-xs text-muted-foreground">{{ formatDate(u.created_at) }}</TableCell>
-                            </TableRow>
-                            <TableRow v-if="recentUsers.length === 0">
-                                <TableCell colspan="4" class="text-center py-6 text-sm text-muted-foreground">Belum ada data pengguna.</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </div>
-            </div>
-        </div>
+        </template>
     </div>
 
     <!-- Detail Modal -->
