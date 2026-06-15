@@ -8,8 +8,7 @@ const InvitationLayout = () => import('../Pages/Landing/invitation/layouts/Invit
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: () => import('../Pages/Landing/HomePage.vue')
+    redirect: '/cms/dashboard'
   },
   {
     path: '/cms',
@@ -172,35 +171,30 @@ router.beforeEach(async (to, from, next) => {
     return next()
   }
 
-  try {
-    const exists = await weddingRegistryService.exists(to.params.slug)
-    if (!exists) {
-      return next({ path: '/', query: { error: 'not-found' } })
+  const exists = await weddingRegistryService.exists(to.params.slug)
+  if (!exists) {
+    return next({ path: '/cms/dashboard', query: { error: 'not-found' } })
+  }
+  // Set active slug in store if changed
+  if (store.state.wedding.activeSlug !== to.params.slug) {
+    if (store.state.wedding.registry.length === 0) {
+      await store.dispatch('wedding/fetchRegistry')
     }
-    // Set active slug in store if changed
-    if (store.state.wedding.activeSlug !== to.params.slug) {
-      if (store.state.wedding.registry.length === 0) {
-        await store.dispatch('wedding/fetchRegistry')
-      }
-      await store.dispatch('wedding/setActiveWedding', to.params.slug)
-    }
+    await store.dispatch('wedding/setActiveWedding', to.params.slug)
+  }
 
-    // Ensure user profile is loaded to perform ACL check
-    if (!store.state.wedding.userProfile) {
-      await store.dispatch('wedding/fetchUserProfile')
-    }
+  // Ensure user profile is loaded to perform ACL check
+  if (!store.state.wedding.userProfile) {
+    await store.dispatch('wedding/fetchUserProfile')
+  }
 
-    // Check meta-based ACL (undangan sub-sections use meta.featureKey)
-    const requiredFeature = to.meta?.featureKey
-    if (requiredFeature) {
-      const allowedFeatures = store.getters['wedding/allowedFeatures'] || []
-      if (!allowedFeatures.includes(requiredFeature)) {
-        return next({ name: 'cms-dashboard', params: { slug: to.params.slug }, query: { error: 'unauthorized-feature' } })
-      }
+  // Check meta-based ACL (undangan sub-sections use meta.featureKey)
+  const requiredFeature = to.meta?.featureKey
+  if (requiredFeature) {
+    const allowedFeatures = store.getters['wedding/allowedFeatures'] || []
+    if (!allowedFeatures.includes(requiredFeature)) {
+      return next({ name: 'cms-dashboard', params: { slug: to.params.slug }, query: { error: 'unauthorized-feature' } })
     }
-  } catch (e) {
-    // API not available (SPA-only mode) - redirect to home
-    return next({ path: '/' })
   }
   next()
 })
