@@ -5,6 +5,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
+        "build:spa": "vite build --config vite.config.spa.js",
+        "pages:build": "vite build --config vite.config.spa.js",
         "test": "vitest run",
         "test:watch": "vitest"
     },
