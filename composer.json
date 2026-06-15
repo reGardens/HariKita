@@ -5,7 +5,7 @@
     "keywords": ["laravel", "vue", "cms", "landing-page", "inertia"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0||^11.0",
         "laravel/tinker": "^2.9",
