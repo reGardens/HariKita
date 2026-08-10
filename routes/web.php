@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
 
     // Wedding Editor Routes (Undangan Digital)
     Route::prefix('cms/{slug}/undangan')->group(function () {
+        Route::get('/pesan-wa', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'pesanWa'])->name('cms.undangan.pesan-wa');
         Route::get('/tema', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'tema'])->name('cms.undangan.tema');
         Route::get('/rsvp', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'rsvp'])->name('cms.undangan.rsvp');
         Route::get('/acara', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'acara'])->name('cms.undangan.acara');

@@ -30,6 +30,19 @@ class WeddingEditorController extends Controller
     }
 
     /**
+     * Template Pesan WhatsApp page
+     */
+    public function pesanWa(string $slug): Response
+    {
+        $wedding = $this->getWedding($slug);
+
+        return Inertia::render('Cms/Undangan/PesanWa', [
+            'wedding' => $wedding,
+            'slug' => $slug,
+        ]);
+    }
+
+    /**
      * Tema & Template page
      */
     public function tema(string $slug): Response
