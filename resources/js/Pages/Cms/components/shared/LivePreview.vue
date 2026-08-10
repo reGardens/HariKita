@@ -1,12 +1,10 @@
 <template>
-    <div class="live-preview-container">
-        <!-- iPhone Mockup Frame -->
+    <div class="live-preview-wrapper">
+        <!-- iPhone Frame -->
         <div class="iphone-frame">
-            <!-- Dynamic Island -->
             <div class="iphone-island"></div>
-            <!-- Screen -->
             <div class="iphone-screen">
-                <div class="iphone-viewport">
+                <div class="iphone-viewport" ref="viewportRef">
                     <component
                         v-if="resolvedTemplate"
                         :is="resolvedTemplate"
@@ -23,18 +21,22 @@
                     </div>
                 </div>
             </div>
-            <!-- Home Indicator -->
             <div class="iphone-home-indicator"></div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed, watch, shallowRef } from "vue";
+import { computed, watch, shallowRef, ref, nextTick } from "vue";
 import { useStore } from "vuex";
 import { getTemplate } from "@/Pages/Landing/invitation/templates/index.js";
 
+const props = defineProps({
+    section: { type: String, default: "cover" },
+});
+
 const store = useStore();
+const viewportRef = ref(null);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 const templateId = computed(() => store.getters["template/selectedId"]);
@@ -72,42 +74,70 @@ async function loadTemplate(id) {
     }
 }
 
+// Scroll to relevant section when prop changes
+watch(
+    () => props.section,
+    async (section) => {
+        await nextTick();
+        if (!viewportRef.value) return;
+        // Try to find section element by data attribute or tag
+        const sectionIndex = {
+            cover: 0,
+            events: 1,
+            story: 2,
+            gallery: 3,
+            countdown: 4,
+            rsvp: 5,
+            gift: 6,
+            wishes: 7,
+            wishlist: 7,
+            guests: 1,
+        };
+        const idx = sectionIndex[section] || 0;
+        const sections = viewportRef.value.querySelectorAll("section, footer");
+        if (sections[idx]) {
+            sections[idx].scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
+    },
+    { immediate: true },
+);
+
 watch(templateId, (id) => loadTemplate(id), { immediate: true });
 </script>
 
 <style scoped>
-.live-preview-container {
-    position: sticky;
-    top: 1rem;
+.live-preview-wrapper {
     display: flex;
     justify-content: center;
-    padding: 0.5rem 0;
+    width: 100%;
 }
 
-/* iPhone 15-style frame */
 .iphone-frame {
-    width: 280px;
-    height: 572px;
+    width: 100%;
+    max-width: 260px;
+    aspect-ratio: 9 / 19.5;
     background: #1c1c1e;
-    border-radius: 3rem;
-    padding: 0.5rem;
+    border-radius: 2.5rem;
+    padding: 0.4rem;
     box-shadow:
-        0 30px 60px -12px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-        0 0 0 3px #2c2c2e inset;
+        0 20px 50px -10px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 0 0 2.5px #2c2c2e inset;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
-/* Dynamic Island */
 .iphone-island {
-    width: 85px;
-    height: 22px;
+    width: 70px;
+    height: 18px;
     background: #000;
-    border-radius: 20px;
+    border-radius: 16px;
     position: absolute;
-    top: 12px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -116,7 +146,7 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 .iphone-screen {
     flex: 1;
     background: #fff;
-    border-radius: 2.5rem;
+    border-radius: 2.1rem;
     overflow: hidden;
     position: relative;
 }
@@ -124,8 +154,8 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 .iphone-viewport {
     width: 390px;
     height: 844px;
-    transform: scale(0.645);
     transform-origin: top left;
+    transform: scale(var(--viewport-scale, 0.6));
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -135,13 +165,12 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     display: none;
 }
 
-/* Home Indicator */
 .iphone-home-indicator {
-    width: 120px;
-    height: 4px;
+    width: 90px;
+    height: 3px;
     background: #636366;
     border-radius: 2px;
-    margin: 6px auto 4px;
+    margin: 5px auto 3px;
 }
 
 .iphone-placeholder {
@@ -152,8 +181,36 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     height: 100%;
     gap: 0.75rem;
     color: #9ca3af;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     text-align: center;
-    padding: 2rem;
+    padding: 1.5rem;
+}
+
+/* Responsive scaling */
+@media (min-width: 1280px) {
+    .iphone-frame {
+        max-width: 240px;
+    }
+    .iphone-viewport {
+        --viewport-scale: 0.56;
+    }
+}
+
+@media (max-width: 1279px) {
+    .iphone-frame {
+        max-width: 220px;
+    }
+    .iphone-viewport {
+        --viewport-scale: 0.52;
+    }
+}
+
+@media (max-width: 768px) {
+    .iphone-frame {
+        max-width: 200px;
+    }
+    .iphone-viewport {
+        --viewport-scale: 0.47;
+    }
 }
 </style>

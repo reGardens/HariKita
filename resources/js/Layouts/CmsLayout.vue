@@ -21,6 +21,22 @@ const showLivePreview = computed(() => {
     return url.includes("/undangan/");
 });
 
+// Determine which section to scroll to in preview based on current page
+const currentSection = computed(() => {
+    const url = page.url || "";
+    if (url.includes("/undangan/tema")) return "cover";
+    if (url.includes("/undangan/rsvp")) return "rsvp";
+    if (url.includes("/undangan/acara")) return "events";
+    if (url.includes("/undangan/love-story")) return "story";
+    if (url.includes("/undangan/tamu")) return "guests";
+    if (url.includes("/undangan/amplop")) return "gift";
+    if (url.includes("/undangan/galeri")) return "gallery";
+    if (url.includes("/undangan/countdown")) return "countdown";
+    if (url.includes("/undangan/ucapan")) return "wishes";
+    if (url.includes("/undangan/wishlist")) return "wishlist";
+    return "cover";
+});
+
 const sidebarOpen = ref(false);
 const profileOpen = ref(false);
 const profileDropdownRef = ref(null);
@@ -258,16 +274,16 @@ function logout() {
             </header>
 
             <main class="flex-1 min-h-0 overflow-auto overflow-x-hidden">
-                <div class="flex flex-col xl:flex-row h-full">
+                <div class="flex flex-col xl:flex-row xl:h-full">
                     <div class="flex-1 overflow-y-auto p-6">
                         <slot />
                     </div>
-                    <!-- Live Preview iPhone Mockup -->
+                    <!-- Live Preview iPhone Mockup — sticky on desktop, below form on mobile -->
                     <div
                         v-if="showLivePreview"
-                        class="xl:w-[320px] xl:border-l border-t xl:border-t-0 border-border bg-muted/30 flex items-start justify-center p-4"
+                        class="xl:w-[320px] xl:border-l border-t xl:border-t-0 border-border bg-muted/30 xl:sticky xl:top-0 xl:h-screen xl:overflow-y-auto flex items-start justify-center p-4"
                     >
-                        <LivePreview />
+                        <LivePreview :section="currentSection" />
                     </div>
                 </div>
             </main>
