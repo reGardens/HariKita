@@ -7,7 +7,7 @@
                     <h2 class="section-title">Generate Text</h2>
                     <p class="section-desc">
                         Salin template, kirim ke klien, lalu paste hasil isian
-                        untuk auto-fill form
+                        untuk auto-fill semua form
                     </p>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <label class="field-label">2. Paste Hasil Isian Klien</label>
                 <textarea
                     v-model="clientResponse"
-                    rows="12"
+                    rows="16"
                     class="field-input field-textarea"
                     placeholder="Paste jawaban klien di sini..."
                 ></textarea>
@@ -49,7 +49,7 @@
                     <span v-else>⚡ Fill Semua Form</span>
                 </button>
                 <span v-if="filled" class="save-ok"
-                    >✅ Data berhasil di-fill ke form terkait!</span
+                    >✅ Semua form berhasil terisi!</span
                 >
             </div>
 
@@ -58,25 +58,12 @@
                 <div class="loading-bar-inner"></div>
             </div>
 
-            <!-- Filled menus info -->
-            <div v-if="filledMenus.length > 0" class="field-group">
-                <label class="field-label">Menu yang ter-update</label>
-                <div class="badge-list">
-                    <span
-                        v-for="menu in filledMenus"
-                        :key="menu"
-                        class="menu-badge"
-                        >✅ {{ menu }}</span
-                    >
-                </div>
-            </div>
-
             <!-- Parsed Preview -->
             <div
                 v-if="parsedData && Object.keys(parsedData).length > 0"
                 class="field-group"
             >
-                <label class="field-label">Data yang Terdeteksi</label>
+                <label class="field-label">Data yang Terdeteksi & Terisi</label>
                 <div class="parsed-preview">
                     <div
                         v-for="(value, key) in parsedData"
@@ -97,6 +84,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import axios from "axios";
 import "./section.css";
 
 const store = useStore();
@@ -105,22 +93,41 @@ const filled = ref(false);
 const filling = ref(false);
 const clientResponse = ref("");
 const parsedData = ref(null);
-const filledMenus = ref([]);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 
-// Template yang dikirim ke klien untuk diisi
 const templateText = `Mohon isi data berikut untuk undangan pernikahan Anda:
 
+═══ DATA MEMPELAI ═══
 Nama Lengkap Mempelai Pria:
 Nama Panggilan Pria:
 Nama Lengkap Mempelai Wanita:
 Nama Panggilan Wanita:
+
+═══ INFORMASI ACARA ═══
+Nama Acara (misal: Akad Nikah):
 Tanggal Acara (contoh: 15 Agustus 2026):
 Waktu Acara (contoh: 08:00 - 11:00 WIB):
 Nama Tempat/Gedung:
 Alamat Lengkap:
 Link Google Maps (opsional):
+Dress Code (opsional):
+
+═══ COUNTDOWN ═══
+Tanggal & Waktu Pernikahan (contoh: 2026-08-15 08:00):
+
+═══ AMPLOP DIGITAL ═══
+Nama Bank:
+Nomor Rekening:
+Atas Nama Rekening:
+Alamat Rumah Pengantin Pria:
+Alamat Rumah Pengantin Wanita:
+
+═══ LIVE STREAMING (opsional) ═══
+Link Live Streaming:
+
+═══ PESAN TAMBAHAN ═══
+Ucapan/Pesan untuk tamu:
 
 Silakan isi dan kirim kembali ke kami. Terima kasih! 🙏`;
 
@@ -129,11 +136,21 @@ const labelMap = {
     groomNickname: "Nama Panggilan Pria",
     brideFullName: "Nama Lengkap Wanita",
     brideNickname: "Nama Panggilan Wanita",
+    eventName: "Nama Acara",
     eventDate: "Tanggal Acara",
     eventTime: "Waktu Acara",
     venueName: "Nama Tempat",
     venueAddress: "Alamat Lengkap",
     mapsLink: "Link Google Maps",
+    dressCode: "Dress Code",
+    countdownDatetime: "Countdown",
+    bankName: "Nama Bank",
+    bankNumber: "Nomor Rekening",
+    bankHolder: "Atas Nama Rekening",
+    groomAddress: "Alamat Pengantin Pria",
+    brideAddress: "Alamat Pengantin Wanita",
+    streamingLink: "Link Streaming",
+    message: "Pesan Tambahan",
 };
 
 function copyTemplate() {
@@ -159,104 +176,136 @@ function parseClientResponse(text) {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
-        const nextLine = i + 1 < lines.length ? lines[i + 1]?.trim() : "";
+        if (!line || line.startsWith("═")) continue;
 
-        // Match "Label: Value" or "Label:\nValue"
-        if (line.match(/nama lengkap.*pria/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.groomFullName = val;
-        } else if (
-            line.match(/nama panggilan.*pria/i) ||
-            line.match(/panggilan pria/i)
-        ) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.groomNickname = val;
-        } else if (line.match(/nama lengkap.*wanita/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.brideFullName = val;
-        } else if (
-            line.match(/nama panggilan.*wanita/i) ||
-            line.match(/panggilan wanita/i)
-        ) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.brideNickname = val;
-        } else if (line.match(/tanggal/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.eventDate = val;
-        } else if (line.match(/waktu/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.eventTime = val;
-        } else if (line.match(/nama tempat|gedung/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.venueName = val;
-        } else if (line.match(/alamat lengkap/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val) data.venueAddress = val;
-        } else if (line.match(/google maps|maps/i)) {
-            const val = extractValue(line) || nextLine;
-            if (val && val.startsWith("http")) data.mapsLink = val;
-        }
+        const val = extractValue(line);
+        const nextVal = i + 1 < lines.length ? lines[i + 1]?.trim() : "";
+        const resolved =
+            val ||
+            (nextVal && !nextVal.startsWith("═") && !nextVal.includes(":")
+                ? nextVal
+                : "");
+
+        if (!resolved) continue;
+
+        if (line.match(/nama lengkap.*pria/i)) data.groomFullName = resolved;
+        else if (line.match(/panggilan.*pria/i)) data.groomNickname = resolved;
+        else if (line.match(/nama lengkap.*wanita/i))
+            data.brideFullName = resolved;
+        else if (line.match(/panggilan.*wanita/i))
+            data.brideNickname = resolved;
+        else if (line.match(/nama acara/i)) data.eventName = resolved;
+        else if (line.match(/tanggal acara/i)) data.eventDate = resolved;
+        else if (line.match(/waktu acara/i)) data.eventTime = resolved;
+        else if (line.match(/nama tempat|gedung/i)) data.venueName = resolved;
+        else if (line.match(/alamat lengkap/i)) data.venueAddress = resolved;
+        else if (line.match(/google maps/i) && resolved.match(/http/i))
+            data.mapsLink = resolved;
+        else if (line.match(/dress code/i)) data.dressCode = resolved;
+        else if (line.match(/tanggal.*waktu.*pernikahan|countdown/i))
+            data.countdownDatetime = resolved;
+        else if (line.match(/nama bank/i)) data.bankName = resolved;
+        else if (line.match(/nomor rekening/i)) data.bankNumber = resolved;
+        else if (line.match(/atas nama/i)) data.bankHolder = resolved;
+        else if (line.match(/alamat.*pengantin pria|alamat rumah.*pria/i))
+            data.groomAddress = resolved;
+        else if (line.match(/alamat.*pengantin wanita|alamat rumah.*wanita/i))
+            data.brideAddress = resolved;
+        else if (
+            line.match(/link.*streaming|live streaming/i) &&
+            resolved.match(/http/i)
+        )
+            data.streamingLink = resolved;
+        else if (line.match(/ucapan|pesan.*tamu|pesan tambahan/i))
+            data.message = resolved;
     }
 
     return data;
 }
 
 function extractValue(line) {
-    const parts = line.split(":");
-    if (parts.length >= 2) {
-        const val = parts.slice(1).join(":").trim();
-        if (val && !val.match(/^(contoh|opsional|\()/i)) return val;
-    }
-    return "";
+    const colonIdx = line.indexOf(":");
+    if (colonIdx === -1) return "";
+    const val = line.slice(colonIdx + 1).trim();
+    if (!val || val.match(/^(\(contoh|misal|opsional)/i)) return "";
+    return val;
 }
 
 async function parseAndFill() {
     if (!clientResponse.value.trim()) return;
-
     filling.value = true;
-    filledMenus.value = [];
+    parsedData.value = null;
 
     const data = parseClientResponse(clientResponse.value);
     parsedData.value = data;
 
-    // Simulate processing delay for UX
-    await new Promise((r) => setTimeout(r, 800));
-
-    // Fill couple data via API
-    if (data.groomFullName || data.brideFullName) {
-        const couplePayload = {
-            groom: {
-                fullName: data.groomFullName || "",
-                nickname: data.groomNickname || "",
-            },
-            bride: {
-                fullName: data.brideFullName || "",
-                nickname: data.brideNickname || "",
-            },
-        };
-        await store.dispatch("couple/saveCouple", couplePayload);
-        filledMenus.value.push("Informasi Pasangan");
+    const slug = activeSlug.value;
+    if (!slug) {
+        filling.value = false;
+        return;
     }
 
-    // Fill event data via API
-    if (data.eventDate || data.venueName || data.venueAddress) {
-        const eventPayload = {
-            name: "Akad Nikah",
-            date: data.eventDate || "",
-            start_time: data.eventTime || "",
-            location_name: data.venueName || "",
-            address: data.venueAddress || "",
-            maps_url: data.mapsLink || "",
-        };
-        await store.dispatch("events/saveEvent", eventPayload);
-        filledMenus.value.push("Informasi Acara");
-    }
+    try {
+        // 1. Save Couple
+        if (data.groomFullName || data.brideFullName) {
+            await axios.post(`/api/wedding/${slug}/couple`, {
+                groom_full_name: data.groomFullName || "",
+                groom_nickname: data.groomNickname || "",
+                bride_full_name: data.brideFullName || "",
+                bride_nickname: data.brideNickname || "",
+            });
+        }
 
-    filling.value = false;
-    filled.value = true;
-    setTimeout(() => {
-        filled.value = false;
-    }, 3000);
+        // 2. Save Event
+        if (data.eventDate || data.venueName || data.venueAddress) {
+            await axios.post(`/api/wedding/${slug}/events`, {
+                name: data.eventName || "Akad Nikah",
+                date: data.eventDate || "",
+                start_time: data.eventTime || "",
+                location_name: data.venueName || "",
+                address: data.venueAddress || "",
+                maps_url: data.mapsLink || "",
+                dress_code: data.dressCode || "",
+            });
+        }
+
+        // 3. Save Settings (countdown, streaming, amplop, message)
+        const settingsPayload = {};
+        if (data.countdownDatetime)
+            settingsPayload.countdownDatetime = data.countdownDatetime;
+        if (data.streamingLink)
+            settingsPayload.streamingUrl = data.streamingLink;
+        if (data.message) settingsPayload.customMessage = data.message;
+        if (data.bankName || data.bankNumber) {
+            settingsPayload.amplopAccounts = [
+                {
+                    type: "bank",
+                    bankName: data.bankName || "",
+                    number: data.bankNumber || "",
+                    name: data.bankHolder || "",
+                },
+            ];
+        }
+        if (data.groomAddress || data.brideAddress) {
+            settingsPayload.amplopAddresses = {
+                groom: { fullAddress: data.groomAddress || "" },
+                bride: { fullAddress: data.brideAddress || "" },
+            };
+        }
+
+        if (Object.keys(settingsPayload).length > 0) {
+            await axios.post(`/api/wedding/${slug}/settings`, settingsPayload);
+        }
+
+        filled.value = true;
+        setTimeout(() => {
+            filled.value = false;
+        }, 4000);
+    } catch (e) {
+        alert("Gagal menyimpan beberapa data. Silakan cek dan isi manual.");
+    } finally {
+        filling.value = false;
+    }
 }
 
 onMounted(() => {
@@ -275,14 +324,12 @@ onMounted(() => {
     padding: 1rem;
     overflow-x: auto;
 }
-
 .dark .template-box {
     background: hsl(240 10% 12%);
     border-color: hsl(240 5% 20%);
 }
-
 .template-preview {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     white-space: pre-wrap;
     word-break: break-word;
     color: var(--foreground, #374151);
@@ -290,18 +337,15 @@ onMounted(() => {
     margin: 0;
     line-height: 1.6;
 }
-
 .dark .template-preview {
     color: #e5e7eb;
 }
-
 .action-bar {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
 }
-
 .parsed-preview {
     display: flex;
     flex-direction: column;
@@ -311,35 +355,29 @@ onMounted(() => {
     border-radius: 0.5rem;
     padding: 1rem;
 }
-
 .dark .parsed-preview {
     background: hsl(150 20% 10%);
     border-color: hsl(150 30% 20%);
 }
-
 .parsed-item {
     display: flex;
     gap: 0.75rem;
     font-size: 0.8rem;
     align-items: baseline;
 }
-
 .parsed-key {
     font-weight: 600;
     color: var(--muted-foreground, #6b7280);
-    min-width: 140px;
+    min-width: 160px;
     flex-shrink: 0;
 }
-
 .parsed-value {
     color: var(--foreground, #111827);
     font-weight: 500;
 }
-
 .dark .parsed-value {
     color: #f9fafb;
 }
-
 .loading-bar {
     width: 100%;
     height: 4px;
@@ -347,7 +385,6 @@ onMounted(() => {
     border-radius: 2px;
     overflow: hidden;
 }
-
 .loading-bar-inner {
     height: 100%;
     width: 40%;
@@ -355,7 +392,6 @@ onMounted(() => {
     border-radius: 2px;
     animation: loading-slide 1s ease-in-out infinite;
 }
-
 @keyframes loading-slide {
     0% {
         transform: translateX(-100%);
@@ -363,27 +399,5 @@ onMounted(() => {
     100% {
         transform: translateX(350%);
     }
-}
-
-.badge-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.menu-badge {
-    padding: 0.375rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-}
-
-.dark .menu-badge {
-    background: hsl(160 40% 15%);
-    color: #6ee7b7;
-    border-color: hsl(160 40% 25%);
 }
 </style>

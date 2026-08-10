@@ -43,6 +43,14 @@ const menuGroups = computed(() => {
     const wedding = page.props.wedding;
     const slug = wedding?.slug || "";
 
+    // Detect which menus have data filled (from Inertia shared props)
+    const weddingData = page.props.weddingData || {};
+    const hasCouple = !!weddingData.couple;
+    const hasEvents = !!(weddingData.events && weddingData.events.length > 0);
+    const hasGuests = !!(weddingData.guests && weddingData.guests.length > 0);
+    const hasMedia = !!(weddingData.media && weddingData.media.length > 0);
+    const hasSettings = !!weddingData.settings;
+
     return [
         {
             label: locale.value === "id" ? "Navigasi Utama" : "Main Navigation",
@@ -118,6 +126,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/tema`,
                     icon: "Palette",
                     visible: !!slug,
+                    filled: hasSettings,
                 },
                 {
                     label: "RSVP Online",
@@ -133,6 +142,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/acara`,
                     icon: "Calendar",
                     visible: !!slug,
+                    filled: hasEvents,
                 },
                 {
                     label: "Love Story",
@@ -311,6 +321,11 @@ const visibleGroups = computed(() =>
                         class="h-4 w-4 flex-shrink-0"
                     />
                     <span class="truncate">{{ item.label }}</span>
+                    <span
+                        v-if="item.filled"
+                        class="ml-auto w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"
+                        title="Data terisi"
+                    ></span>
                 </Link>
             </template>
         </template>

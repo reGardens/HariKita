@@ -34,6 +34,15 @@ class HandleInertiaRequests extends Middleware
 
         if ($user && !$user->hasRole('super-admin')) {
             $wedding = \App\Models\Wedding::where('user_id', $user->id)->first(['id', 'slug', 'label']);
+            if ($wedding) {
+                $weddingData = [
+                    'couple' => $wedding->couple()->exists(),
+                    'events' => $wedding->events()->count() > 0,
+                    'guests' => $wedding->guests()->count() > 0,
+                    'media' => $wedding->media()->count() > 0,
+                    'settings' => \App\Models\Setting::where('wedding_id', $wedding->id)->exists(),
+                ];
+            }
         }
 
         return [
@@ -51,6 +60,7 @@ class HandleInertiaRequests extends Middleware
                 'slug' => $wedding->slug,
                 'label' => $wedding->label,
             ] : null,
+            'weddingData' => $weddingData ?? null,
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
