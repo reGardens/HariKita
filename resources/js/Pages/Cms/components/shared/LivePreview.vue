@@ -1,27 +1,27 @@
 <template>
     <div class="live-preview-wrapper">
-        <!-- iPhone Mockup using real image -->
         <div class="mockup-container">
             <img
                 src="/images/iphone-mockup.png"
                 alt="iPhone"
                 class="mockup-image"
             />
-            <!-- Screen content overlay -->
-            <div class="mockup-screen" ref="viewportRef">
-                <component
-                    v-if="resolvedTemplate"
-                    :is="resolvedTemplate"
-                    :couple="coupleData"
-                    :events="eventsData"
-                    :settings="settingsData"
-                    :media="mediaData"
-                    :slug="activeSlug"
-                    :template-record="templateRecord"
-                />
-                <div v-else class="mockup-placeholder">
-                    <span class="text-3xl">💒</span>
-                    <p>Pilih template untuk melihat preview</p>
+            <div class="mockup-screen">
+                <div class="screen-viewport" ref="viewportRef">
+                    <component
+                        v-if="resolvedTemplate"
+                        :is="resolvedTemplate"
+                        :couple="coupleData"
+                        :events="eventsData"
+                        :settings="settingsData"
+                        :media="mediaData"
+                        :slug="activeSlug"
+                        :template-record="templateRecord"
+                    />
+                    <div v-else class="mockup-placeholder">
+                        <span class="text-3xl">💒</span>
+                        <p>Pilih template untuk melihat preview</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,7 +76,6 @@ async function loadTemplate(id) {
     }
 }
 
-// Scroll to relevant section when prop changes
 watch(
     () => props.section,
     async (section) => {
@@ -132,22 +131,29 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     z-index: 2;
 }
 
-/* Screen area positioned inside the mockup image */
 .mockup-screen {
     position: absolute;
-    /* Adjust these values to match your mockup image's screen area */
-    top: 3.8%;
-    left: 5.8%;
-    width: 88.4%;
-    height: 92.5%;
-    border-radius: 2rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: none;
+    top: 3.5%;
+    left: 6%;
+    width: 88%;
+    height: 93%;
+    border-radius: 1.8rem;
+    overflow: hidden;
     z-index: 1;
 }
 
-.mockup-screen::-webkit-scrollbar {
+.screen-viewport {
+    width: 390px;
+    height: 844px;
+    transform: scale(var(--vp-scale));
+    transform-origin: top left;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    --vp-scale: 0.63;
+}
+
+.screen-viewport::-webkit-scrollbar {
     display: none;
 }
 
@@ -156,6 +162,7 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: 100%;
     height: 100%;
     gap: 0.75rem;
     color: #9ca3af;
@@ -165,22 +172,28 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     background: #f9fafb;
 }
 
-/* Responsive sizing */
 @media (min-width: 1280px) {
     .mockup-container {
         max-width: 260px;
     }
+    .screen-viewport {
+        --vp-scale: 0.58;
+    }
 }
-
 @media (max-width: 1279px) {
     .mockup-container {
         max-width: 240px;
     }
+    .screen-viewport {
+        --vp-scale: 0.54;
+    }
 }
-
 @media (max-width: 768px) {
     .mockup-container {
         max-width: 220px;
+    }
+    .screen-viewport {
+        --vp-scale: 0.49;
     }
 }
 </style>
