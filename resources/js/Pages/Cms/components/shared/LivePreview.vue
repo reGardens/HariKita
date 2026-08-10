@@ -1,27 +1,29 @@
 <template>
     <div class="live-preview-wrapper">
-        <!-- iPhone Frame -->
-        <div class="iphone-frame">
-            <div class="iphone-island"></div>
-            <div class="iphone-screen">
-                <div class="iphone-viewport" ref="viewportRef">
-                    <component
-                        v-if="resolvedTemplate"
-                        :is="resolvedTemplate"
-                        :couple="coupleData"
-                        :events="eventsData"
-                        :settings="settingsData"
-                        :media="mediaData"
-                        :slug="activeSlug"
-                        :template-record="templateRecord"
-                    />
-                    <div v-else class="iphone-placeholder">
-                        <span class="text-3xl">💒</span>
-                        <p>Pilih template untuk melihat preview</p>
-                    </div>
+        <!-- iPhone Mockup using real image -->
+        <div class="mockup-container">
+            <img
+                src="/images/iphone-mockup.png"
+                alt="iPhone"
+                class="mockup-image"
+            />
+            <!-- Screen content overlay -->
+            <div class="mockup-screen" ref="viewportRef">
+                <component
+                    v-if="resolvedTemplate"
+                    :is="resolvedTemplate"
+                    :couple="coupleData"
+                    :events="eventsData"
+                    :settings="settingsData"
+                    :media="mediaData"
+                    :slug="activeSlug"
+                    :template-record="templateRecord"
+                />
+                <div v-else class="mockup-placeholder">
+                    <span class="text-3xl">💒</span>
+                    <p>Pilih template untuk melihat preview</p>
                 </div>
             </div>
-            <div class="iphone-home-indicator"></div>
         </div>
     </div>
 </template>
@@ -80,7 +82,6 @@ watch(
     async (section) => {
         await nextTick();
         if (!viewportRef.value) return;
-        // Try to find section element by data attribute or tag
         const sectionIndex = {
             cover: 0,
             events: 1,
@@ -115,65 +116,42 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     width: 100%;
 }
 
-.iphone-frame {
+.mockup-container {
+    position: relative;
     width: 100%;
-    max-width: 260px;
-    aspect-ratio: 9 / 19.5;
-    background: #1c1c1e;
-    border-radius: 2.5rem;
-    padding: 0.4rem;
-    box-shadow:
-        0 20px 50px -10px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-        0 0 0 2.5px #2c2c2e inset;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    max-width: 280px;
 }
 
-.iphone-island {
-    width: 70px;
-    height: 18px;
-    background: #000;
-    border-radius: 16px;
+.mockup-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    position: relative;
+    z-index: 2;
+}
+
+/* Screen area positioned inside the mockup image */
+.mockup-screen {
     position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-}
-
-.iphone-screen {
-    flex: 1;
-    background: #fff;
-    border-radius: 2.1rem;
-    overflow: hidden;
-    position: relative;
-}
-
-.iphone-viewport {
-    width: 390px;
-    height: 844px;
-    transform-origin: top left;
-    transform: scale(var(--viewport-scale, 0.6));
+    /* Adjust these values to match your mockup image's screen area */
+    top: 3.8%;
+    left: 5.8%;
+    width: 88.4%;
+    height: 92.5%;
+    border-radius: 2rem;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+    z-index: 1;
 }
 
-.iphone-viewport::-webkit-scrollbar {
+.mockup-screen::-webkit-scrollbar {
     display: none;
 }
 
-.iphone-home-indicator {
-    width: 90px;
-    height: 3px;
-    background: #636366;
-    border-radius: 2px;
-    margin: 5px auto 3px;
-}
-
-.iphone-placeholder {
+.mockup-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -184,33 +162,25 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     font-size: 0.8rem;
     text-align: center;
     padding: 1.5rem;
+    background: #f9fafb;
 }
 
-/* Responsive scaling */
+/* Responsive sizing */
 @media (min-width: 1280px) {
-    .iphone-frame {
-        max-width: 240px;
-    }
-    .iphone-viewport {
-        --viewport-scale: 0.56;
+    .mockup-container {
+        max-width: 260px;
     }
 }
 
 @media (max-width: 1279px) {
-    .iphone-frame {
-        max-width: 220px;
-    }
-    .iphone-viewport {
-        --viewport-scale: 0.52;
+    .mockup-container {
+        max-width: 240px;
     }
 }
 
 @media (max-width: 768px) {
-    .iphone-frame {
-        max-width: 200px;
-    }
-    .iphone-viewport {
-        --viewport-scale: 0.47;
+    .mockup-container {
+        max-width: 220px;
     }
 }
 </style>
