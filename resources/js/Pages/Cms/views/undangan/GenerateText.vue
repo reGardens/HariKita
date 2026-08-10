@@ -23,7 +23,7 @@
 
             <!-- Action Buttons -->
             <div class="action-bar">
-                <button type="button" class="btn-save" @click="copyText">
+                <button type="button" class="btn-save" @click="copyTemplate">
                     📋 Salin Template Text
                 </button>
                 <button
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import "./section.css";
 
@@ -91,19 +91,64 @@ const copied = ref(false);
 const showShareModal = ref(false);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+const coupleData = computed(() => store.getters["couple/couple"]);
+const eventsData = computed(() => store.state.events?.items || []);
 const invitationLink = computed(
     () => `${window.location.origin}/wedding/${activeSlug.value || "undangan"}`,
 );
 
+const groomName = computed(
+    () =>
+        coupleData.value?.groom?.nickname ||
+        coupleData.value?.groom?.fullName ||
+        "Mempelai Pria",
+);
+const brideName = computed(
+    () =>
+        coupleData.value?.bride?.nickname ||
+        coupleData.value?.bride?.fullName ||
+        "Mempelai Wanita",
+);
+const eventDate = computed(() => {
+    const ev = eventsData.value[0];
+    if (!ev?.date) return "(tanggal belum diisi)";
+    return new Date(ev.date + "T00:00:00").toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+});
+const eventTime = computed(
+    () => eventsData.value[0]?.start_time || "(waktu belum diisi)",
+);
+const venue = computed(
+    () => eventsData.value[0]?.location_name || "(lokasi belum diisi)",
+);
+
 const generatedText = ref("");
 
-function copyText() {
-    if (!generatedText.value) {
-        alert("Paste teks undangan terlebih dahulu");
-        return;
-    }
+// Generate template from existing data and copy to clipboard
+function copyTemplate() {
+    const template = `Assalamualaikum Wr. Wb.
+
+Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami:
+
+🤵 ${groomName.value} & 👰 ${brideName.value}
+
+📅 ${eventDate.value}
+⏰ ${eventTime.value}
+📍 ${venue.value}
+
+Undangan digital:
+${invitationLink.value}
+
+Atas kehadiran dan doanya, kami ucapkan terima kasih.
+Wassalamualaikum Wr. Wb.`;
+
+    // Copy to clipboard
     const el = document.createElement("textarea");
-    el.value = generatedText.value;
+    el.value = template;
     el.setAttribute("readonly", "");
     el.style.position = "absolute";
     el.style.left = "-9999px";
@@ -112,6 +157,10 @@ function copyText() {
     el.setSelectionRange(0, 99999);
     document.execCommand("copy");
     document.body.removeChild(el);
+
+    // Also paste into textarea for preview
+    generatedText.value = template;
+
     copied.value = true;
     setTimeout(() => {
         copied.value = false;
@@ -120,7 +169,7 @@ function copyText() {
 
 function share(platform) {
     if (!generatedText.value) {
-        alert("Paste teks undangan terlebih dahulu");
+        alert("Paste atau generate teks undangan terlebih dahulu");
         return;
     }
     const text = encodeURIComponent(generatedText.value);
@@ -152,6 +201,13 @@ function share(platform) {
     if (shareUrl) window.open(shareUrl, "_blank");
     showShareModal.value = false;
 }
+
+onMounted(() => {
+    if (activeSlug.value) {
+        store.dispatch("couple/fetchCouple");
+        store.dispatch("events/fetchEvents");
+    }
+});
 </script>
 
 <style scoped>
