@@ -87,6 +87,14 @@ import { useStore } from "vuex";
 import axios from "axios";
 import "./section.css";
 
+// Ensure CSRF token is sent with requests
+axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+axios.defaults.withCredentials = true;
+const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+if (csrfMeta)
+    axios.defaults.headers.common["X-CSRF-TOKEN"] =
+        csrfMeta.getAttribute("content");
+
 const store = useStore();
 const copiedTemplate = ref(false);
 const filled = ref(false);
@@ -302,7 +310,11 @@ async function parseAndFill() {
             filled.value = false;
         }, 4000);
     } catch (e) {
-        alert("Gagal menyimpan beberapa data. Silakan cek dan isi manual.");
+        console.error("Fill error:", e.response?.data || e.message);
+        alert(
+            "Gagal: " +
+                (e.response?.data?.message || e.message || "Cek console"),
+        );
     } finally {
         filling.value = false;
     }
