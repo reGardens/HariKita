@@ -78,7 +78,10 @@ class SettingApiController extends Controller
         }
 
         $wedding = Wedding::where('slug', $slug)->firstOrFail();
-        $setting = Setting::where('wedding_id', $wedding->id)->firstOrFail();
+        $setting = Setting::firstOrCreate(
+            ['wedding_id' => $wedding->id],
+            ['template_id' => 'batik-elegance']
+        );
 
         return response()->json($this->formatSetting($setting));
     }
@@ -86,22 +89,25 @@ class SettingApiController extends Controller
     public function store(Request $request, $slug)
     {
         $wedding = Wedding::where('slug', $slug)->firstOrFail();
-        $setting = Setting::where('wedding_id', $wedding->id)->firstOrFail();
+        $setting = Setting::firstOrCreate(
+            ['wedding_id' => $wedding->id],
+            ['template_id' => 'batik-elegance']
+        );
 
         $setting->update([
-            'template_id' => $request->input('templateId', 'batik-elegance'),
-            'theme_colors' => $request->input('themeColors', []),
-            'gallery_layout' => $request->input('galleryLayout', 'masonry'),
-            'moderation_enabled' => filter_var($request->input('moderationEnabled', true), FILTER_VALIDATE_BOOLEAN),
-            'password_protected' => filter_var($request->input('passwordProtected', false), FILTER_VALIDATE_BOOLEAN),
-            'password' => $request->input('password', ''),
-            'show_watermark' => filter_var($request->input('showWatermark', true), FILTER_VALIDATE_BOOLEAN),
-            'custom_domain' => $request->input('customDomain', ''),
-            'health_protocol' => $request->input('healthProtocol', ''),
-            'live_stream_url' => $request->input('liveStreamUrl', ''),
-            'shipping_address' => $request->input('shippingAddress', ''),
-            'seo_meta' => $request->input('seoMeta', []),
-            'qris_image_url' => $request->input('qrisImageUrl', ''),
+            'template_id' => $request->input('templateId', $setting->template_id ?? 'batik-elegance'),
+            'theme_colors' => $request->input('themeColors', $setting->theme_colors ?? []),
+            'gallery_layout' => $request->input('galleryLayout', $setting->gallery_layout ?? 'masonry'),
+            'moderation_enabled' => filter_var($request->input('moderationEnabled', $setting->moderation_enabled ?? true), FILTER_VALIDATE_BOOLEAN),
+            'password_protected' => filter_var($request->input('passwordProtected', $setting->password_protected ?? false), FILTER_VALIDATE_BOOLEAN),
+            'password' => $request->input('password', $setting->password ?? ''),
+            'show_watermark' => filter_var($request->input('showWatermark', $setting->show_watermark ?? true), FILTER_VALIDATE_BOOLEAN),
+            'custom_domain' => $request->input('customDomain', $setting->custom_domain ?? ''),
+            'health_protocol' => $request->input('healthProtocol', $setting->health_protocol ?? ''),
+            'live_stream_url' => $request->input('liveStreamUrl', $setting->live_stream_url ?? ''),
+            'shipping_address' => $request->input('shippingAddress', $setting->shipping_address ?? ''),
+            'seo_meta' => $request->input('seoMeta', $setting->seo_meta ?? []),
+            'qris_image_url' => $request->input('qrisImageUrl', $setting->qris_image_url ?? ''),
         ]);
 
         return response()->json($this->formatSetting($setting));
