@@ -3,7 +3,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
+        "dev": "vite --port 5173",
+        "serve": "php artisan serve --port=8090",
         "build": "vite build",
         "test": "vitest run",
         "test:watch": "vitest"

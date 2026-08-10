@@ -28,6 +28,10 @@ const props = defineProps({
     totalCustomTemplates: { type: Number, default: 0 },
     recentWeddings: { type: Array, default: () => [] },
     recentUsers: { type: Array, default: () => [] },
+    // Regular user props
+    wedding: { type: Object, default: null },
+    totalGuests: { type: Number, default: 0 },
+    totalRsvps: { type: Number, default: 0 },
 });
 
 const page = usePage();
@@ -373,27 +377,8 @@ function isFeatureEnabled(wedding, featureKey) {
 
         <!-- ===== REGULAR USER VIEW ===== -->
         <template v-else>
-            <!-- User's Wedding Stats -->
-            <div class="grid gap-4 sm:grid-cols-3">
-                <div
-                    class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
-                >
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-muted-foreground"
-                            >Undangan Saya</span
-                        >
-                        <IconComponent
-                            name="Heart"
-                            class="h-5 w-5 text-emerald-600"
-                        />
-                    </div>
-                    <p class="text-3xl font-bold tracking-tight">
-                        {{ totalWeddings }}
-                    </p>
-                    <p class="text-xs text-muted-foreground mt-2">
-                        Total undangan yang Anda buat
-                    </p>
-                </div>
+            <!-- Stats: Total Tamu & Total RSVP -->
+            <div class="grid gap-4 sm:grid-cols-2">
                 <div
                     class="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
                 >
@@ -407,15 +392,10 @@ function isFeatureEnabled(wedding, featureKey) {
                         />
                     </div>
                     <p class="text-3xl font-bold tracking-tight">
-                        {{
-                            recentWeddings.reduce(
-                                (sum, w) => sum + w.guests_count,
-                                0,
-                            )
-                        }}
+                        {{ totalGuests }}
                     </p>
                     <p class="text-xs text-muted-foreground mt-2">
-                        Tamu di semua undangan Anda
+                        Tamu undangan Anda
                     </p>
                 </div>
                 <div
@@ -431,12 +411,7 @@ function isFeatureEnabled(wedding, featureKey) {
                         />
                     </div>
                     <p class="text-3xl font-bold tracking-tight">
-                        {{
-                            recentWeddings.reduce(
-                                (sum, w) => sum + w.rsvps_count,
-                                0,
-                            )
-                        }}
+                        {{ totalRsvps }}
                     </p>
                     <p class="text-xs text-muted-foreground mt-2">
                         Konfirmasi kehadiran tamu
@@ -444,106 +419,81 @@ function isFeatureEnabled(wedding, featureKey) {
                 </div>
             </div>
 
-            <!-- User's Weddings -->
-            <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight">
-                    Undangan Pernikahan Saya
-                </h2>
-                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <div
-                        v-for="wedding in recentWeddings"
-                        :key="wedding.id"
-                        class="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+            <!-- Single Wedding Card -->
+            <div
+                v-if="wedding"
+                class="rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-all"
+            >
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-foreground">
+                            {{ wedding.label }}
+                        </h3>
+                        <p class="text-xs font-mono text-muted-foreground">
+                            /wedding/{{ wedding.slug }}
+                        </p>
+                    </div>
+                    <span
+                        class="inline-flex items-center justify-center p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
                     >
-                        <div class="space-y-3">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3
-                                        class="font-bold text-base text-foreground line-clamp-1"
-                                    >
-                                        {{ wedding.label }}
-                                    </h3>
-                                    <p
-                                        class="text-xs font-mono text-muted-foreground"
-                                    >
-                                        /wedding/{{ wedding.slug }}
-                                    </p>
-                                </div>
-                                <span
-                                    class="inline-flex items-center justify-center p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
-                                >
-                                    <IconComponent
-                                        name="Heart"
-                                        class="h-5 w-5"
-                                    />
-                                </span>
-                            </div>
+                        <IconComponent name="Heart" class="h-5 w-5" />
+                    </span>
+                </div>
 
-                            <!-- Mini stats -->
-                            <div
-                                class="grid grid-cols-2 gap-2 text-center bg-muted/40 rounded-lg p-2 mt-2"
-                            >
-                                <div>
-                                    <p
-                                        class="text-[10px] text-muted-foreground uppercase font-semibold"
-                                    >
-                                        Tamu
-                                    </p>
-                                    <p
-                                        class="text-sm font-bold text-foreground"
-                                    >
-                                        {{ wedding.guests_count }}
-                                    </p>
-                                </div>
-                                <div class="border-l border-border">
-                                    <p
-                                        class="text-[10px] text-muted-foreground uppercase font-semibold"
-                                    >
-                                        RSVP
-                                    </p>
-                                    <p
-                                        class="text-sm font-bold text-foreground"
-                                    >
-                                        {{ wedding.rsvps_count }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="flex items-center gap-2 mt-4 pt-3 border-t border-border/60"
+                <div
+                    class="grid grid-cols-2 gap-2 text-center bg-muted/40 rounded-lg p-3 mb-4"
+                >
+                    <div>
+                        <p
+                            class="text-[10px] text-muted-foreground uppercase font-semibold"
                         >
-                            <a
-                                :href="`/wedding/${wedding.slug}`"
-                                target="_blank"
-                                class="flex-1 text-center py-1.5 px-3 rounded-lg border border-border hover:bg-muted text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                            >
-                                <IconComponent name="Eye" class="h-3.5 w-3.5" />
-                                Lihat Live
-                            </a>
-                            <a
-                                :href="`/cms/${wedding.slug}/dashboard`"
-                                class="flex-1 text-center py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                            >
-                                <IconComponent
-                                    name="Edit"
-                                    class="h-3.5 w-3.5"
-                                />
-                                Kelola
-                            </a>
-                        </div>
+                            Tamu
+                        </p>
+                        <p class="text-lg font-bold text-foreground">
+                            {{ wedding.guests_count }}
+                        </p>
+                    </div>
+                    <div class="border-l border-border">
+                        <p
+                            class="text-[10px] text-muted-foreground uppercase font-semibold"
+                        >
+                            RSVP
+                        </p>
+                        <p class="text-lg font-bold text-foreground">
+                            {{ wedding.rsvps_count }}
+                        </p>
                     </div>
                 </div>
-                <div
-                    v-if="recentWeddings.length === 0"
-                    class="text-center py-16 border border-dashed rounded-xl text-muted-foreground bg-card"
-                >
-                    <span class="text-4xl block mb-3">💒</span>
-                    <p class="font-medium">Belum ada undangan</p>
-                    <p class="text-sm mt-1">
-                        Hubungi admin untuk membuat undangan pernikahan Anda.
-                    </p>
+
+                <div class="flex items-center gap-3">
+                    <a
+                        :href="`/cms/${wedding.slug}/undangan/tema`"
+                        class="flex-1 text-center py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                        <IconComponent name="Edit" class="h-4 w-4" />
+                        Edit Undangan
+                    </a>
+                    <a
+                        :href="`/wedding/${wedding.slug}`"
+                        target="_blank"
+                        class="flex-1 text-center py-2.5 px-4 rounded-lg border border-border hover:bg-muted text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                        <IconComponent name="Eye" class="h-4 w-4" />
+                        Lihat Demo
+                    </a>
                 </div>
+            </div>
+
+            <!-- Empty State -->
+            <div
+                v-else
+                class="text-center py-16 border border-dashed rounded-xl text-muted-foreground bg-card"
+            >
+                <span class="text-4xl block mb-3">💒</span>
+                <p class="font-medium">Belum ada undangan</p>
+                <p class="text-sm mt-1">
+                    Hubungi admin untuk membuat undangan pernikahan Anda.
+                </p>
             </div>
         </template>
     </div>

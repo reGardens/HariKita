@@ -22,4 +22,12 @@ export default defineConfig({
             '@': '/resources/js',
         },
     },
+    server: {
+        proxy: {
+            '/api': 'http://localhost:8090',
+            '/login': 'http://localhost:8090',
+            '/logout': 'http://localhost:8090',
+            '/cms/dashboard': 'http://localhost:8090',
+        },
+    },
 });

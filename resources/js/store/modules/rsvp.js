@@ -53,6 +53,17 @@ export default {
       }
     },
 
+    async silentFetchRsvps({ commit, rootState }) {
+      const slug = rootState.wedding.activeSlug
+      if (!slug) return
+      try {
+        const items = await rsvpService.getAll(slug)
+        commit('SET_ITEMS', items)
+      } catch {
+        // Silent — no error shown to user during polling
+      }
+    },
+
     async submitRsvp({ commit, rootState }, data) {
       const slug = rootState.wedding.activeSlug
       if (!slug) {

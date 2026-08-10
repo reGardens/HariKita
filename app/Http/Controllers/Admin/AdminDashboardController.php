@@ -23,7 +23,6 @@ class AdminDashboardController extends Controller
         $isSuperAdmin = $user->hasRole('super-admin');
 
         if ($isSuperAdmin) {
-            // Full global stats for super-admin
             $totalUsers = User::count();
             $totalRoles = Role::count();
             $totalWeddings = Wedding::count();
@@ -47,33 +46,30 @@ class AdminDashboardController extends Controller
                     'created_at' => $u->created_at ? $u->created_at->toISOString() : null,
                     'roles' => $u->getRoleNames(),
                 ]);
-        } else {
-            // Regular user sees only their own weddings
-            $totalUsers = null;
-            $totalRoles = null;
-            $totalWeddings = Wedding::where('user_id', $user->id)->count();
-            $activeUsers = null;
-            $totalCustomTemplates = null;
 
-            $recentWeddings = Wedding::with(['user', 'couple', 'events'])
-                ->withCount(['guests', 'rsvps'])
-                ->where('user_id', $user->id)
-                ->latest()
-                ->get()
-                ->map(fn($wedding) => $this->mapWedding($wedding));
-
-            $recentUsers = collect();
+            return Inertia::render('Cms/Dashboard', [
+                'isSuperAdmin' => true,
+                'totalUsers' => $totalUsers,
+                'totalRoles' => $totalRoles,
+                'totalWeddings' => $totalWeddings,
+                'activeUsers' => $activeUsers,
+                'totalCustomTemplates' => $totalCustomTemplates,
+                'recentWeddings' => $recentWeddings,
+                'recentUsers' => $recentUsers,
+            ]);
         }
 
+        // Regular user: single wedding only
+        $wedding = Wedding::with(['user', 'couple', 'events'])
+            ->withCount(['guests', 'rsvps'])
+            ->where('user_id', $user->id)
+            ->first();
+
         return Inertia::render('Cms/Dashboard', [
-            'isSuperAdmin' => $isSuperAdmin,
-            'totalUsers' => $totalUsers,
-            'totalRoles' => $totalRoles,
-            'totalWeddings' => $totalWeddings,
-            'activeUsers' => $activeUsers,
-            'totalCustomTemplates' => $totalCustomTemplates,
-            'recentWeddings' => $recentWeddings,
-            'recentUsers' => $recentUsers,
+            'isSuperAdmin' => false,
+            'wedding' => $wedding ? $this->mapWedding($wedding) : null,
+            'totalGuests' => $wedding ? $wedding->guests_count : 0,
+            'totalRsvps' => $wedding ? $wedding->rsvps_count : 0,
         ]);
     }
 

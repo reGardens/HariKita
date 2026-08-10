@@ -144,7 +144,7 @@
                 </transition>
             </li>
 
-            <!-- Preview Undangan -->
+            <!-- Lihat Demo -->
             <li v-if="activeSlug">
                 <a
                     :href="`/wedding/${activeSlug}`"
@@ -153,9 +153,7 @@
                 >
                     <span class="nav-icon">👁️</span>
                     <span>{{
-                        locale === "id"
-                            ? "Preview Undangan"
-                            : "Preview Invitation"
+                        locale === "id" ? "Lihat Demo" : "View Demo"
                     }}</span>
                     <svg
                         class="w-3 h-3 opacity-50 flex-shrink-0"
