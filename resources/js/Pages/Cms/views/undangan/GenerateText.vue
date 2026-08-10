@@ -11,86 +11,88 @@
                 </div>
             </div>
 
-            <!-- Template Options -->
-            <div class="field-group">
-                <label class="field-label">Pilih Template</label>
-                <div class="tmpl-options">
-                    <button
-                        v-for="(tmpl, idx) in templates"
-                        :key="idx"
-                        type="button"
-                        class="tmpl-btn"
-                        :class="{ 'tmpl-btn--active': selected === idx }"
-                        @click="selected = idx"
-                    >
-                        {{ tmpl.name }}
-                    </button>
-                </div>
-            </div>
-
             <!-- Generated Text -->
             <div class="field-group">
-                <label class="field-label">Hasil Teks</label>
+                <label class="field-label">Teks Undangan</label>
                 <textarea
                     v-model="generatedText"
-                    rows="12"
+                    rows="14"
                     class="field-input field-textarea"
-                    readonly
+                    placeholder="Teks undangan akan otomatis ter-generate dari data yang sudah Anda isi..."
                 ></textarea>
+                <span class="field-hint"
+                    >Anda bisa mengedit teks di atas sebelum membagikan</span
+                >
             </div>
 
             <!-- Action Buttons -->
             <div class="action-bar">
-                <button
-                    type="button"
-                    class="action-btn action-btn--copy"
-                    @click="copyText"
-                >
-                    📋 Salin
+                <button type="button" class="btn-save" @click="copyText">
+                    📋 Salin Teks
                 </button>
                 <button
                     type="button"
-                    class="action-btn action-btn--wa"
-                    @click="share('whatsapp')"
+                    class="btn-save btn-share"
+                    @click="showShareModal = true"
                 >
-                    💬 WhatsApp
+                    🔗 Bagikan
                 </button>
-                <button
-                    type="button"
-                    class="action-btn action-btn--tele"
-                    @click="share('telegram')"
-                >
-                    ✈️ Telegram
-                </button>
-                <button
-                    type="button"
-                    class="action-btn action-btn--email"
-                    @click="share('email')"
-                >
-                    📧 Email
-                </button>
-                <button
-                    type="button"
-                    class="action-btn action-btn--x"
-                    @click="share('x')"
-                >
-                    𝕏 Twitter
-                </button>
+                <span v-if="copied" class="save-ok">✅ Tersalin!</span>
             </div>
+        </div>
 
-            <span v-if="copied" class="save-ok">✅ Tersalin ke clipboard!</span>
+        <!-- Share Modal -->
+        <div
+            v-if="showShareModal"
+            class="modal-overlay"
+            @click.self="showShareModal = false"
+        >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Bagikan Via</h3>
+                    <button @click="showShareModal = false" class="modal-close">
+                        ✕
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button class="share-item" @click="share('whatsapp')">
+                        <span class="share-icon share-icon--wa">💬</span>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="share-item" @click="share('telegram')">
+                        <span class="share-icon share-icon--tele">✈️</span>
+                        <span>Telegram</span>
+                    </button>
+                    <button class="share-item" @click="share('email')">
+                        <span class="share-icon share-icon--email">📧</span>
+                        <span>Email</span>
+                    </button>
+                    <button class="share-item" @click="share('x')">
+                        <span class="share-icon share-icon--x">𝕏</span>
+                        <span>Twitter / X</span>
+                    </button>
+                    <button class="share-item" @click="share('facebook')">
+                        <span class="share-icon share-icon--fb">📘</span>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="share-item" @click="share('line')">
+                        <span class="share-icon share-icon--line">💚</span>
+                        <span>LINE</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import "./section.css";
 
 const store = useStore();
-const selected = ref(0);
 const copied = ref(false);
+const showShareModal = ref(false);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 const coupleData = computed(() => store.getters["couple/couple"]);
@@ -128,73 +130,25 @@ const venue = computed(
     () => eventsData.value[0]?.location_name || "(lokasi belum diisi)",
 );
 
-const templates = [
-    {
-        name: "🕌 Formal",
-        body: `Assalamualaikum Wr. Wb.
+const generatedText = ref("");
+
+function generateDefault() {
+    generatedText.value = `Assalamualaikum Wr. Wb.
 
 Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami:
 
-🤵 {groom} & 👰 {bride}
+🤵 ${groomName.value} & 👰 ${brideName.value}
 
-📅 {date}
-⏰ {time}
-📍 {venue}
+📅 ${eventDate.value}
+⏰ ${eventTime.value}
+📍 ${venue.value}
 
-Undangan digital: {link}
+Undangan digital:
+${invitationLink.value}
 
 Atas kehadiran dan doanya, kami ucapkan terima kasih.
-Wassalamualaikum Wr. Wb.`,
-    },
-    {
-        name: "🌸 Casual",
-        body: `Hai! 👋
-
-Kami mengundangmu ke pernikahan:
-💕 {groom} & {bride} 💕
-
-📅 {date}
-⏰ {time}
-📍 {venue}
-
-Buka undangan: {link}
-
-Ditunggu ya! 🎉`,
-    },
-    {
-        name: "✨ Modern",
-        body: `*Undangan Pernikahan* 💍
-
-{groom} & {bride}
-
-━━━━━━━━━━━
-📅 {date}
-⏰ {time}
-📍 {venue}
-━━━━━━━━━━━
-
-📨 {link}
-
-Terima kasih 🙏`,
-    },
-    {
-        name: "🎊 Singkat",
-        body: `Undangan pernikahan {groom} & {bride} 💒
-📅 {date} ⏰ {time}
-📍 {venue}
-🔗 {link}`,
-    },
-];
-
-const generatedText = computed(() => {
-    return templates[selected.value].body
-        .replace(/\{groom\}/g, groomName.value)
-        .replace(/\{bride\}/g, brideName.value)
-        .replace(/\{date\}/g, eventDate.value)
-        .replace(/\{time\}/g, eventTime.value)
-        .replace(/\{venue\}/g, venue.value)
-        .replace(/\{link\}/g, invitationLink.value);
-});
+Wassalamualaikum Wr. Wb.`;
+}
 
 function copyText() {
     navigator.clipboard.writeText(generatedText.value);
@@ -207,6 +161,9 @@ function copyText() {
 function share(platform) {
     const text = encodeURIComponent(generatedText.value);
     const url = encodeURIComponent(invitationLink.value);
+    const title = encodeURIComponent(
+        `Undangan Pernikahan ${groomName.value} & ${brideName.value}`,
+    );
     let shareUrl = "";
 
     switch (platform) {
@@ -217,99 +174,197 @@ function share(platform) {
             shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
             break;
         case "email":
-            shareUrl = `mailto:?subject=${encodeURIComponent(`Undangan Pernikahan ${groomName.value} & ${brideName.value}`)}&body=${text}`;
+            shareUrl = `mailto:?subject=${title}&body=${text}`;
             break;
         case "x":
             shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
             break;
+        case "facebook":
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+            break;
+        case "line":
+            shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`;
+            break;
     }
 
     if (shareUrl) window.open(shareUrl, "_blank");
+    showShareModal.value = false;
 }
 
-onMounted(() => {
+onMounted(async () => {
     if (activeSlug.value) {
-        store.dispatch("couple/fetchCouple");
-        store.dispatch("events/fetchEvents");
+        await Promise.all([
+            store.dispatch("couple/fetchCouple"),
+            store.dispatch("events/fetchEvents"),
+        ]);
     }
+    generateDefault();
 });
 </script>
 
 <style scoped>
-.tmpl-options {
+.action-bar {
     display: flex;
+    align-items: center;
+    gap: 0.75rem;
     flex-wrap: wrap;
-    gap: 0.5rem;
 }
 
-.tmpl-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border, #d1d5db);
+.btn-share {
+    background: #6366f1;
+}
+.btn-share:hover {
+    background: #4f46e5;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-content {
     background: var(--card, white);
-    font-size: 0.8rem;
-    font-weight: 500;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 360px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.3);
+}
+
+.dark .modal-content {
+    background: hsl(240 10% 12%);
+    border-color: hsl(240 5% 20%);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.dark .modal-header {
+    border-color: hsl(240 5% 20%);
+}
+
+.modal-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--foreground, #111827);
+}
+
+.dark .modal-header h3 {
+    color: #f9fafb;
+}
+
+.modal-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card, #f3f4f6);
+    cursor: pointer;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--foreground, #6b7280);
+}
+
+.dark .modal-close {
+    background: hsl(240 10% 18%);
+    color: #9ca3af;
+}
+
+.modal-body {
+    padding: 1rem 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.share-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 1rem 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--card, #f9fafb);
     cursor: pointer;
     transition: all 0.15s;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: var(--foreground, #374151);
 }
 
-.dark .tmpl-btn {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 25%);
+.dark .share-item {
+    background: hsl(240 10% 14%);
+    border-color: hsl(240 5% 22%);
     color: #e5e7eb;
 }
 
-.tmpl-btn:hover {
+.share-item:hover {
     border-color: #10b981;
+    transform: translateY(-1px);
 }
 
-.tmpl-btn--active {
-    border-color: #10b981;
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.dark .tmpl-btn--active {
-    background: hsl(160 40% 15%);
-    border-color: #10b981;
-    color: #6ee7b7;
-}
-
-.action-bar {
+.share-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
 }
 
-.action-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: white;
-    transition: opacity 0.15s;
+.share-icon--wa {
+    background: #dcfce7;
+}
+.share-icon--tele {
+    background: #dbeafe;
+}
+.share-icon--email {
+    background: #ffedd5;
+}
+.share-icon--x {
+    background: #f3f4f6;
+}
+.share-icon--fb {
+    background: #dbeafe;
+}
+.share-icon--line {
+    background: #dcfce7;
 }
 
-.action-btn:hover {
-    opacity: 0.85;
+.dark .share-icon--wa {
+    background: hsl(140 30% 15%);
 }
-
-.action-btn--copy {
-    background: #6366f1;
+.dark .share-icon--tele {
+    background: hsl(210 30% 15%);
 }
-.action-btn--wa {
-    background: #25d366;
+.dark .share-icon--email {
+    background: hsl(30 30% 15%);
 }
-.action-btn--tele {
-    background: #0088cc;
+.dark .share-icon--x {
+    background: hsl(240 10% 18%);
 }
-.action-btn--email {
-    background: #ea580c;
+.dark .share-icon--fb {
+    background: hsl(210 30% 15%);
 }
-.action-btn--x {
-    background: #1d1d1f;
+.dark .share-icon--line {
+    background: hsl(140 30% 15%);
 }
 </style>
