@@ -30,6 +30,13 @@
                             class="template-swatch"
                             :style="{ background: tmplGradient(tmpl.id) }"
                         >
+                            <img
+                                :src="`/images/templates/${tmpl.id}-thumb.png`"
+                                :alt="tmpl.name"
+                                class="template-thumb-img"
+                                loading="lazy"
+                                @error="$event.target.style.display = 'none'"
+                            />
                             <span class="template-icon">{{
                                 tmplIcon(tmpl.id)
                             }}</span>
@@ -305,3 +312,18 @@ onMounted(async () => {
     populateFromStore();
 });
 </script>
+
+<style scoped>
+.template-thumb-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+.template-swatch {
+    position: relative;
+    overflow: hidden;
+}
+</style>

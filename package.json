@@ -6,6 +6,7 @@
         "dev": "vite --port 5173",
         "serve": "php artisan serve --port=8090",
         "build": "vite build",
+        "generate-thumbnails": "node scripts/generate-thumbnails.js",
         "test": "vitest run",
         "test:watch": "vitest"
     },
