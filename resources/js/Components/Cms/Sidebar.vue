@@ -104,10 +104,10 @@ const menuGroups = computed(() => {
                 {
                     label:
                         locale.value === "id"
-                            ? "Template Pesan WA"
-                            : "WA Message Template",
+                            ? "Generate Text"
+                            : "Generate Text",
                     href: `/cms/${slug}/undangan/pesan-wa`,
-                    icon: "BrandWhatsapp",
+                    icon: "FileText",
                     visible: !!slug,
                 },
                 {

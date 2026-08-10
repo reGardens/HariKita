@@ -2,7 +2,7 @@
 import { Head } from "@inertiajs/vue3";
 import CmsLayout from "@/Layouts/CmsLayout.vue";
 import { useWeddingSlug } from "@/Composables/useWeddingSlug";
-import PesanWaContent from "@/Pages/Cms/views/undangan/PesanWa.vue";
+import GenerateTextContent from "@/Pages/Cms/views/undangan/GenerateText.vue";
 
 defineOptions({ layout: CmsLayout });
 
@@ -12,6 +12,6 @@ useWeddingSlug(props.slug);
 </script>
 
 <template>
-    <Head title="Template Pesan WA" />
-    <PesanWaContent />
+    <Head title="Generate Text" />
+    <GenerateTextContent />
 </template>
