@@ -60,7 +60,8 @@ const BASE_WIDTH = 375;
 function updateScale() {
     if (!containerRef.value) return;
     const containerWidth = containerRef.value.offsetWidth;
-    const screenWidth = containerWidth * 0.78;
+    // Screen visible area ≈ 76% of container width (11% bezel each side + 1% safe margin)
+    const screenWidth = containerWidth * 0.76;
     scale.value = screenWidth / BASE_WIDTH;
 }
 
@@ -188,8 +189,8 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     position: absolute;
     top: 7.5%;
     bottom: 6.5%;
-    left: 11%;
-    right: 11%;
+    left: 12%;
+    right: 12%;
     border-radius: 1.5rem;
     overflow: hidden;
     z-index: 1;
