@@ -1,11 +1,14 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import CmsLayout from "@/Layouts/CmsLayout.vue";
+import { useWeddingSlug } from "@/Composables/useWeddingSlug";
 import GaleriContent from "@/Pages/Cms/views/undangan/Galeri.vue";
 
 defineOptions({ layout: CmsLayout });
 
-defineProps({ wedding: Object, media: Array, slug: String });
+const props = defineProps({ wedding: Object, slug: String, media: Array });
+
+useWeddingSlug(props.slug);
 </script>
 
 <template>

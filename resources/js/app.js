@@ -4,6 +4,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import store from './store';
 
 import '../css/app.css';
 
@@ -82,6 +83,7 @@ createInertiaApp({
         });
 
         app.use(plugin);
+        app.use(store);
         app.mount(el);
         return app;
     },
