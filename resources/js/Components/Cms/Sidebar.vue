@@ -109,14 +109,12 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/tema`,
                     icon: "Palette",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label: "RSVP Online",
                     href: `/cms/${slug}/undangan/rsvp`,
                     icon: "Mail",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -126,14 +124,12 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/acara`,
                     icon: "Calendar",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label: "Love Story",
                     href: `/cms/${slug}/undangan/love-story`,
                     icon: "Book",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -143,7 +139,6 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/tamu`,
                     icon: "UsersGroup",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -153,7 +148,6 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/amplop`,
                     icon: "CreditCard",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -161,14 +155,12 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/galeri`,
                     icon: "Photo",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label: "Countdown",
                     href: `/cms/${slug}/undangan/countdown`,
                     icon: "Clock",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -178,7 +170,6 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/ucapan`,
                     icon: "Message",
                     visible: !!slug,
-                    external: true,
                 },
                 {
                     label:
@@ -188,7 +179,6 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/wishlist`,
                     icon: "Gift",
                     visible: !!slug,
-                    external: true,
                 },
             ],
         },
