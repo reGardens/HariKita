@@ -87,17 +87,11 @@
             </button>
 
             <!-- Alamat Pengiriman Hadiah -->
-            <div
-                style="
-                    margin-top: 1.5rem;
-                    border-top: 1px solid #e5e7eb;
-                    padding-top: 1.5rem;
-                "
-            >
-                <div class="section-header" style="margin-bottom: 1rem">
+            <div class="mt-6 pt-6 border-t border-border">
+                <div class="section-header mb-4">
                     <span class="section-icon">🏠</span>
                     <div>
-                        <h3 class="field-label" style="font-size: 1rem">
+                        <h3 class="field-label text-base">
                             Alamat Pengiriman Hadiah
                         </h3>
                         <p class="section-desc">
@@ -107,25 +101,13 @@
                 </div>
 
                 <!-- Groom Address -->
-                <details class="account-block" style="margin-bottom: 1rem">
+                <details class="account-block mb-4">
                     <summary
-                        style="
-                            cursor: pointer;
-                            font-weight: 600;
-                            font-size: 0.875rem;
-                            color: #374151;
-                        "
+                        class="cursor-pointer font-semibold text-sm text-foreground"
                     >
                         📍 Alamat Mempelai Pria
                     </summary>
-                    <div
-                        style="
-                            margin-top: 0.75rem;
-                            display: flex;
-                            flex-direction: column;
-                            gap: 0.75rem;
-                        "
-                    >
+                    <div class="mt-3 flex flex-col gap-3">
                         <div class="field-group">
                             <label
                                 class="field-label"
@@ -153,11 +135,7 @@
                             />
                         </div>
                         <div
-                            style="
-                                display: grid;
-                                grid-template-columns: 1fr 1fr;
-                                gap: 0.75rem;
-                            "
+                            class="grid grid-cols-2 gap-3"
                         >
                             <div class="field-group">
                                 <label
@@ -205,23 +183,11 @@
                 <!-- Bride Address -->
                 <details class="account-block">
                     <summary
-                        style="
-                            cursor: pointer;
-                            font-weight: 600;
-                            font-size: 0.875rem;
-                            color: #374151;
-                        "
+                        class="cursor-pointer font-semibold text-sm text-foreground"
                     >
                         📍 Alamat Mempelai Wanita
                     </summary>
-                    <div
-                        style="
-                            margin-top: 0.75rem;
-                            display: flex;
-                            flex-direction: column;
-                            gap: 0.75rem;
-                        "
-                    >
+                    <div class="mt-3 flex flex-col gap-3">
                         <div class="field-group">
                             <label
                                 class="field-label"
@@ -249,11 +215,7 @@
                             />
                         </div>
                         <div
-                            style="
-                                display: grid;
-                                grid-template-columns: 1fr 1fr;
-                                gap: 0.75rem;
-                            "
+                            class="grid grid-cols-2 gap-3"
                         >
                             <div class="field-group">
                                 <label
@@ -484,13 +446,17 @@ async function handleSave() {
 
 <style scoped>
 .account-block {
-    border: 1px solid #fef3c7;
+    border: 1px solid var(--border, #e5e7eb);
     border-radius: 0.75rem;
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    background: #fffbf0;
+    background: var(--card, #f9fafb);
+}
+.dark .account-block {
+    background: hsl(240 10% 12%);
+    border-color: hsl(240 5% 20%);
 }
 .account-block-header {
     display: flex;
@@ -506,15 +472,20 @@ async function handleSave() {
     font-weight: 500;
 }
 .btn-add {
-    border: 2px dashed #d1d5db;
+    border: 2px dashed var(--border, #d1d5db);
     border-radius: 0.75rem;
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
-    color: #6b7280;
-    background: white;
+    color: var(--muted-foreground, #6b7280);
+    background: var(--card, white);
     cursor: pointer;
     text-align: center;
     width: 100%;
+}
+.dark .btn-add {
+    background: hsl(240 10% 12%);
+    border-color: hsl(240 5% 25%);
+    color: #9ca3af;
 }
 .btn-add:hover {
     border-color: #ca8a04;
