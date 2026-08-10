@@ -6,75 +6,69 @@
                 <div>
                     <h2 class="section-title">Generate Text</h2>
                     <p class="section-desc">
-                        Paste template teks undangan lalu bagikan
+                        Salin template, kirim ke klien, lalu paste hasil isian
+                        untuk auto-fill form
                     </p>
                 </div>
             </div>
 
-            <!-- Text Area -->
+            <!-- Step 1: Copy Template -->
             <div class="field-group">
+                <label class="field-label">1. Salin Template untuk Klien</label>
+                <div class="template-box">
+                    <pre class="template-preview">{{ templateText }}</pre>
+                </div>
+                <button type="button" class="btn-save" @click="copyTemplate">
+                    📋 Salin Template
+                </button>
+                <span v-if="copiedTemplate" class="save-ok"
+                    >✅ Template tersalin! Kirim ke klien via WA/chat.</span
+                >
+            </div>
+
+            <!-- Step 2: Paste client response -->
+            <div class="field-group">
+                <label class="field-label">2. Paste Hasil Isian Klien</label>
                 <textarea
-                    v-model="generatedText"
-                    rows="14"
+                    v-model="clientResponse"
+                    rows="12"
                     class="field-input field-textarea"
-                    placeholder="Paste teks undangan Anda di sini..."
+                    placeholder="Paste jawaban klien di sini..."
                 ></textarea>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Step 3: Parse & Fill -->
             <div class="action-bar">
-                <button type="button" class="btn-save" @click="copyTemplate">
-                    📋 Salin Template Text
-                </button>
                 <button
                     type="button"
-                    class="btn-save btn-share"
-                    @click="showShareModal = true"
+                    class="btn-save"
+                    @click="parseAndFill"
+                    :disabled="!clientResponse.trim()"
                 >
-                    🔗 Bagikan
+                    ⚡ Fill Semua Form
                 </button>
-                <span v-if="copied" class="save-ok">✅ Tersalin!</span>
+                <span v-if="filled" class="save-ok"
+                    >✅ Data berhasil di-fill ke form terkait!</span
+                >
             </div>
-        </div>
 
-        <!-- Share Modal -->
-        <div
-            v-if="showShareModal"
-            class="modal-overlay"
-            @click.self="showShareModal = false"
-        >
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Bagikan Via</h3>
-                    <button @click="showShareModal = false" class="modal-close">
-                        ✕
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <button class="share-item" @click="share('whatsapp')">
-                        <span class="share-icon share-icon--wa">💬</span>
-                        <span>WhatsApp</span>
-                    </button>
-                    <button class="share-item" @click="share('telegram')">
-                        <span class="share-icon share-icon--tele">✈️</span>
-                        <span>Telegram</span>
-                    </button>
-                    <button class="share-item" @click="share('email')">
-                        <span class="share-icon share-icon--email">📧</span>
-                        <span>Email</span>
-                    </button>
-                    <button class="share-item" @click="share('x')">
-                        <span class="share-icon share-icon--x">𝕏</span>
-                        <span>Twitter / X</span>
-                    </button>
-                    <button class="share-item" @click="share('facebook')">
-                        <span class="share-icon share-icon--fb">📘</span>
-                        <span>Facebook</span>
-                    </button>
-                    <button class="share-item" @click="share('line')">
-                        <span class="share-icon share-icon--line">💚</span>
-                        <span>LINE</span>
-                    </button>
+            <!-- Parsed Preview -->
+            <div
+                v-if="parsedData && Object.keys(parsedData).length > 0"
+                class="field-group"
+            >
+                <label class="field-label">Data yang Terdeteksi</label>
+                <div class="parsed-preview">
+                    <div
+                        v-for="(value, key) in parsedData"
+                        :key="key"
+                        class="parsed-item"
+                    >
+                        <span class="parsed-key">{{
+                            labelMap[key] || key
+                        }}</span>
+                        <span class="parsed-value">{{ value }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,68 +81,43 @@ import { useStore } from "vuex";
 import "./section.css";
 
 const store = useStore();
-const copied = ref(false);
-const showShareModal = ref(false);
+const copiedTemplate = ref(false);
+const filled = ref(false);
+const clientResponse = ref("");
+const parsedData = ref(null);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
-const coupleData = computed(() => store.getters["couple/couple"]);
-const eventsData = computed(() => store.state.events?.items || []);
-const invitationLink = computed(
-    () => `${window.location.origin}/wedding/${activeSlug.value || "undangan"}`,
-);
 
-const groomName = computed(
-    () =>
-        coupleData.value?.groom?.nickname ||
-        coupleData.value?.groom?.fullName ||
-        "Mempelai Pria",
-);
-const brideName = computed(
-    () =>
-        coupleData.value?.bride?.nickname ||
-        coupleData.value?.bride?.fullName ||
-        "Mempelai Wanita",
-);
-const eventDate = computed(() => {
-    const ev = eventsData.value[0];
-    if (!ev?.date) return "(tanggal belum diisi)";
-    return new Date(ev.date + "T00:00:00").toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-});
-const eventTime = computed(
-    () => eventsData.value[0]?.start_time || "(waktu belum diisi)",
-);
-const venue = computed(
-    () => eventsData.value[0]?.location_name || "(lokasi belum diisi)",
-);
+// Template yang dikirim ke klien untuk diisi
+const templateText = `Mohon isi data berikut untuk undangan pernikahan Anda:
 
-const generatedText = ref("");
+Nama Lengkap Mempelai Pria:
+Nama Panggilan Pria:
+Nama Lengkap Mempelai Wanita:
+Nama Panggilan Wanita:
+Tanggal Acara (contoh: 15 Agustus 2026):
+Waktu Acara (contoh: 08:00 - 11:00 WIB):
+Nama Tempat/Gedung:
+Alamat Lengkap:
+Link Google Maps (opsional):
 
-// Generate template from existing data and copy to clipboard
+Silakan isi dan kirim kembali ke kami. Terima kasih! 🙏`;
+
+const labelMap = {
+    groomFullName: "Nama Lengkap Pria",
+    groomNickname: "Nama Panggilan Pria",
+    brideFullName: "Nama Lengkap Wanita",
+    brideNickname: "Nama Panggilan Wanita",
+    eventDate: "Tanggal Acara",
+    eventTime: "Waktu Acara",
+    venueName: "Nama Tempat",
+    venueAddress: "Alamat Lengkap",
+    mapsLink: "Link Google Maps",
+};
+
 function copyTemplate() {
-    const template = `Assalamualaikum Wr. Wb.
-
-Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami:
-
-🤵 ${groomName.value} & 👰 ${brideName.value}
-
-📅 ${eventDate.value}
-⏰ ${eventTime.value}
-📍 ${venue.value}
-
-Undangan digital:
-${invitationLink.value}
-
-Atas kehadiran dan doanya, kami ucapkan terima kasih.
-Wassalamualaikum Wr. Wb.`;
-
-    // Copy to clipboard
     const el = document.createElement("textarea");
-    el.value = template;
+    el.value = templateText;
     el.setAttribute("readonly", "");
     el.style.position = "absolute";
     el.style.left = "-9999px";
@@ -157,49 +126,107 @@ Wassalamualaikum Wr. Wb.`;
     el.setSelectionRange(0, 99999);
     document.execCommand("copy");
     document.body.removeChild(el);
-
-    // Also paste into textarea for preview
-    generatedText.value = template;
-
-    copied.value = true;
+    copiedTemplate.value = true;
     setTimeout(() => {
-        copied.value = false;
-    }, 2500);
+        copiedTemplate.value = false;
+    }, 3000);
 }
 
-function share(platform) {
-    if (!generatedText.value) {
-        alert("Paste atau generate teks undangan terlebih dahulu");
-        return;
-    }
-    const text = encodeURIComponent(generatedText.value);
-    const url = encodeURIComponent(invitationLink.value);
-    const title = encodeURIComponent("Undangan Pernikahan");
-    let shareUrl = "";
+function parseClientResponse(text) {
+    const data = {};
+    const lines = text.split("\n");
 
-    switch (platform) {
-        case "whatsapp":
-            shareUrl = `https://api.whatsapp.com/send?text=${text}`;
-            break;
-        case "telegram":
-            shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
-            break;
-        case "email":
-            shareUrl = `mailto:?subject=${title}&body=${text}`;
-            break;
-        case "x":
-            shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
-            break;
-        case "facebook":
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-            break;
-        case "line":
-            shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`;
-            break;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const nextLine = i + 1 < lines.length ? lines[i + 1]?.trim() : "";
+
+        // Match "Label: Value" or "Label:\nValue"
+        if (line.match(/nama lengkap.*pria/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.groomFullName = val;
+        } else if (
+            line.match(/nama panggilan.*pria/i) ||
+            line.match(/panggilan pria/i)
+        ) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.groomNickname = val;
+        } else if (line.match(/nama lengkap.*wanita/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.brideFullName = val;
+        } else if (
+            line.match(/nama panggilan.*wanita/i) ||
+            line.match(/panggilan wanita/i)
+        ) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.brideNickname = val;
+        } else if (line.match(/tanggal/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.eventDate = val;
+        } else if (line.match(/waktu/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.eventTime = val;
+        } else if (line.match(/nama tempat|gedung/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.venueName = val;
+        } else if (line.match(/alamat lengkap/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val) data.venueAddress = val;
+        } else if (line.match(/google maps|maps/i)) {
+            const val = extractValue(line) || nextLine;
+            if (val && val.startsWith("http")) data.mapsLink = val;
+        }
     }
 
-    if (shareUrl) window.open(shareUrl, "_blank");
-    showShareModal.value = false;
+    return data;
+}
+
+function extractValue(line) {
+    const parts = line.split(":");
+    if (parts.length >= 2) {
+        const val = parts.slice(1).join(":").trim();
+        if (val && !val.match(/^(contoh|opsional|\()/i)) return val;
+    }
+    return "";
+}
+
+function parseAndFill() {
+    if (!clientResponse.value.trim()) return;
+
+    const data = parseClientResponse(clientResponse.value);
+    parsedData.value = data;
+
+    // Fill couple data via API
+    if (data.groomFullName || data.brideFullName) {
+        const couplePayload = {
+            groom: {
+                fullName: data.groomFullName || "",
+                nickname: data.groomNickname || "",
+            },
+            bride: {
+                fullName: data.brideFullName || "",
+                nickname: data.brideNickname || "",
+            },
+        };
+        store.dispatch("couple/saveCouple", couplePayload);
+    }
+
+    // Fill event data via API
+    if (data.eventDate || data.venueName || data.venueAddress) {
+        const eventPayload = {
+            name: "Akad Nikah",
+            date: data.eventDate || "",
+            start_time: data.eventTime || "",
+            location_name: data.venueName || "",
+            address: data.venueAddress || "",
+            maps_url: data.mapsLink || "",
+        };
+        store.dispatch("events/saveEvent", eventPayload);
+    }
+
+    filled.value = true;
+    setTimeout(() => {
+        filled.value = false;
+    }, 3000);
 }
 
 onMounted(() => {
@@ -211,6 +238,33 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.template-box {
+    background: var(--card, #f9fafb);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.dark .template-box {
+    background: hsl(240 10% 12%);
+    border-color: hsl(240 5% 20%);
+}
+
+.template-preview {
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--foreground, #374151);
+    font-family: inherit;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.dark .template-preview {
+    color: #e5e7eb;
+}
+
 .action-bar {
     display: flex;
     align-items: center;
@@ -218,161 +272,41 @@ onMounted(() => {
     flex-wrap: wrap;
 }
 
-.btn-share {
-    background: #6366f1;
-}
-.btn-share:hover {
-    background: #4f46e5;
-}
-
-/* Modal */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
+.parsed-preview {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--card, #f0fdf4);
+    border: 1px solid var(--border, #bbf7d0);
+    border-radius: 0.5rem;
     padding: 1rem;
 }
 
-.modal-content {
-    background: var(--card, white);
-    border: 1px solid var(--border, #e5e7eb);
-    border-radius: 1rem;
-    width: 100%;
-    max-width: 360px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.3);
+.dark .parsed-preview {
+    background: hsl(150 20% 10%);
+    border-color: hsl(150 30% 20%);
 }
 
-.dark .modal-content {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 20%);
-}
-
-.modal-header {
+.parsed-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border, #e5e7eb);
-}
-
-.dark .modal-header {
-    border-color: hsl(240 5% 20%);
-}
-
-.modal-header h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--foreground, #111827);
-}
-
-.dark .modal-header h3 {
-    color: #f9fafb;
-}
-
-.modal-close {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: var(--card, #f3f4f6);
-    cursor: pointer;
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--foreground, #6b7280);
-}
-
-.dark .modal-close {
-    background: hsl(240 10% 18%);
-    color: #9ca3af;
-}
-
-.modal-body {
-    padding: 1rem 1.25rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
+    font-size: 0.8rem;
+    align-items: baseline;
 }
 
-.share-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 1rem 0.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--border, #e5e7eb);
-    background: var(--card, #f9fafb);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 0.75rem;
+.parsed-key {
+    font-weight: 600;
+    color: var(--muted-foreground, #6b7280);
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+.parsed-value {
+    color: var(--foreground, #111827);
     font-weight: 500;
-    color: var(--foreground, #374151);
 }
 
-.dark .share-item {
-    background: hsl(240 10% 14%);
-    border-color: hsl(240 5% 22%);
-    color: #e5e7eb;
-}
-
-.share-item:hover {
-    border-color: #10b981;
-    transform: translateY(-1px);
-}
-
-.share-icon {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.share-icon--wa {
-    background: #dcfce7;
-}
-.share-icon--tele {
-    background: #dbeafe;
-}
-.share-icon--email {
-    background: #ffedd5;
-}
-.share-icon--x {
-    background: #f3f4f6;
-}
-.share-icon--fb {
-    background: #dbeafe;
-}
-.share-icon--line {
-    background: #dcfce7;
-}
-
-.dark .share-icon--wa {
-    background: hsl(140 30% 15%);
-}
-.dark .share-icon--tele {
-    background: hsl(210 30% 15%);
-}
-.dark .share-icon--email {
-    background: hsl(30 30% 15%);
-}
-.dark .share-icon--x {
-    background: hsl(240 10% 18%);
-}
-.dark .share-icon--fb {
-    background: hsl(210 30% 15%);
-}
-.dark .share-icon--line {
-    background: hsl(140 30% 15%);
+.dark .parsed-value {
+    color: #f9fafb;
 }
 </style>
