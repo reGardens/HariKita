@@ -18,10 +18,11 @@
                     v-model="generatedText"
                     rows="14"
                     class="field-input field-textarea"
-                    placeholder="Teks undangan akan otomatis ter-generate dari data yang sudah Anda isi..."
+                    placeholder="Ketik atau paste teks undangan Anda di sini..."
                 ></textarea>
                 <span class="field-hint"
-                    >Anda bisa mengedit teks di atas sebelum membagikan</span
+                    >Tulis atau paste teks undangan, lalu bagikan ke platform
+                    pilihan Anda</span
                 >
             </div>
 
@@ -86,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import "./section.css";
 
@@ -95,60 +96,11 @@ const copied = ref(false);
 const showShareModal = ref(false);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
-const coupleData = computed(() => store.getters["couple/couple"]);
-const eventsData = computed(() => store.state.events?.items || []);
 const invitationLink = computed(
     () => `${window.location.origin}/wedding/${activeSlug.value || "undangan"}`,
 );
 
-const groomName = computed(
-    () =>
-        coupleData.value?.groom?.nickname ||
-        coupleData.value?.groom?.fullName ||
-        "Mempelai Pria",
-);
-const brideName = computed(
-    () =>
-        coupleData.value?.bride?.nickname ||
-        coupleData.value?.bride?.fullName ||
-        "Mempelai Wanita",
-);
-const eventDate = computed(() => {
-    const ev = eventsData.value[0];
-    if (!ev?.date) return "(tanggal belum diisi)";
-    return new Date(ev.date + "T00:00:00").toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-});
-const eventTime = computed(
-    () => eventsData.value[0]?.start_time || "(waktu belum diisi)",
-);
-const venue = computed(
-    () => eventsData.value[0]?.location_name || "(lokasi belum diisi)",
-);
-
 const generatedText = ref("");
-
-function generateDefault() {
-    generatedText.value = `Assalamualaikum Wr. Wb.
-
-Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami:
-
-🤵 ${groomName.value} & 👰 ${brideName.value}
-
-📅 ${eventDate.value}
-⏰ ${eventTime.value}
-📍 ${venue.value}
-
-Undangan digital:
-${invitationLink.value}
-
-Atas kehadiran dan doanya, kami ucapkan terima kasih.
-Wassalamualaikum Wr. Wb.`;
-}
 
 function copyText() {
     navigator.clipboard.writeText(generatedText.value);
@@ -161,9 +113,7 @@ function copyText() {
 function share(platform) {
     const text = encodeURIComponent(generatedText.value);
     const url = encodeURIComponent(invitationLink.value);
-    const title = encodeURIComponent(
-        `Undangan Pernikahan ${groomName.value} & ${brideName.value}`,
-    );
+    const title = encodeURIComponent("Undangan Pernikahan");
     let shareUrl = "";
 
     switch (platform) {
@@ -190,16 +140,6 @@ function share(platform) {
     if (shareUrl) window.open(shareUrl, "_blank");
     showShareModal.value = false;
 }
-
-onMounted(async () => {
-    if (activeSlug.value) {
-        await Promise.all([
-            store.dispatch("couple/fetchCouple"),
-            store.dispatch("events/fetchEvents"),
-        ]);
-    }
-    generateDefault();
-});
 </script>
 
 <style scoped>
