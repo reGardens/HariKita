@@ -15,9 +15,6 @@ Route::get('/', function () {
     return redirect('/cms/dashboard');
 });
 
-// Public Invitation Page (loads the Vue SPA)
-Route::get('/wedding/{slug}', [SpaController::class, 'index'])->name('wedding.invitation');
-
 // Guest Authentication Routes (using the template's Inertia authentication system)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -76,10 +73,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/cms', function () {
         return redirect('/cms/dashboard');
     });
+
+    // Wedding Editor Routes (Undangan Digital)
+    Route::prefix('cms/{slug}/undangan')->group(function () {
+        Route::get('/tema', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'tema'])->name('cms.undangan.tema');
+        Route::get('/rsvp', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'rsvp'])->name('cms.undangan.rsvp');
+        Route::get('/acara', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'acara'])->name('cms.undangan.acara');
+        Route::get('/love-story', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'loveStory'])->name('cms.undangan.love-story');
+        Route::get('/tamu', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'tamu'])->name('cms.undangan.tamu');
+        Route::get('/amplop', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'amplop'])->name('cms.undangan.amplop');
+        Route::get('/galeri', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'galeri'])->name('cms.undangan.galeri');
+        Route::get('/countdown', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'countdown'])->name('cms.undangan.countdown');
+        Route::get('/qr-checkin', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'qrCheckin'])->name('cms.undangan.qr-checkin');
+        Route::get('/streaming', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'streaming'])->name('cms.undangan.streaming');
+        Route::get('/ucapan', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'ucapan'])->name('cms.undangan.ucapan');
+        Route::get('/wishlist', [\App\Http\Controllers\Cms\WeddingEditorController::class, 'wishlist'])->name('cms.undangan.wishlist');
+    });
 });
 
-// Authenticated CMS Wildcard Route (loads the Vue SPA for CMS)
+// Logout + Public invitation SPA
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-    Route::get('/cms/{any?}', [SpaController::class, 'index'])->where('any', '.*')->name('cms');
 });
+
+// Public Invitation (SPA — only for displaying the final invitation)
+Route::get('/wedding/{slug}', [SpaController::class, 'index'])->name('wedding.invitation');
