@@ -258,17 +258,14 @@ function logout() {
             </header>
 
             <main class="flex-1 min-h-0 overflow-auto overflow-x-hidden">
-                <div class="flex h-full">
-                    <div
-                        class="flex-1 overflow-y-auto p-6"
-                        :class="{ 'xl:pr-0': showLivePreview }"
-                    >
+                <div class="flex flex-col xl:flex-row h-full">
+                    <div class="flex-1 overflow-y-auto p-6">
                         <slot />
                     </div>
-                    <!-- Live Preview iPhone Mockup (desktop only, for undangan pages) -->
+                    <!-- Live Preview iPhone Mockup -->
                     <div
                         v-if="showLivePreview"
-                        class="hidden xl:flex w-[320px] border-l border-border bg-muted/30 items-start justify-center overflow-y-auto p-2"
+                        class="xl:w-[320px] xl:border-l border-t xl:border-t-0 border-border bg-muted/30 flex items-start justify-center p-4"
                     >
                         <LivePreview />
                     </div>
