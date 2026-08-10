@@ -118,7 +118,7 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 .mockup-container {
     position: relative;
     width: 100%;
-    max-width: 280px;
+    max-width: 260px;
 }
 
 .mockup-image {
@@ -133,24 +133,28 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 
 .mockup-screen {
     position: absolute;
-    top: 3.5%;
-    left: 6%;
-    width: 88%;
-    height: 93%;
-    border-radius: 1.8rem;
+    top: 2.2%;
+    left: 4.5%;
+    right: 4.5%;
+    bottom: 2.2%;
+    border-radius: 2rem;
     overflow: hidden;
     z-index: 1;
 }
 
 .screen-viewport {
-    width: 390px;
-    height: 844px;
-    transform: scale(var(--vp-scale));
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 375px;
+    height: 812px;
     transform-origin: top left;
+    /* Scale = mockup-screen-width / 375. For ~237px screen width: 237/375 = 0.632 */
+    /* But we need to calculate based on container. Use a safe small scale */
+    transform: scale(0.632);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
-    --vp-scale: 0.63;
 }
 
 .screen-viewport::-webkit-scrollbar {
@@ -162,38 +166,39 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+    width: 375px;
+    height: 812px;
     gap: 0.75rem;
     color: #9ca3af;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     text-align: center;
-    padding: 1.5rem;
+    padding: 2rem;
     background: #f9fafb;
 }
 
-@media (min-width: 1280px) {
-    .mockup-container {
-        max-width: 260px;
-    }
-    .screen-viewport {
-        --vp-scale: 0.58;
-    }
-}
 @media (max-width: 1279px) {
     .mockup-container {
-        max-width: 240px;
+        max-width: 230px;
     }
     .screen-viewport {
-        --vp-scale: 0.54;
+        transform: scale(0.56);
+    }
+    .mockup-placeholder {
+        transform: scale(0.56);
+        transform-origin: top left;
     }
 }
+
 @media (max-width: 768px) {
     .mockup-container {
-        max-width: 220px;
+        max-width: 200px;
     }
     .screen-viewport {
-        --vp-scale: 0.49;
+        transform: scale(0.49);
+    }
+    .mockup-placeholder {
+        transform: scale(0.49);
+        transform-origin: top left;
     }
 }
 </style>
