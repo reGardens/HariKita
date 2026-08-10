@@ -17,7 +17,10 @@ function hasRole(role) {
 function isActive(path) {
     // Exact match for template list page, startsWith for others
     if (path === "/cms/templates") {
-        return page.url === "/cms/templates" || page.url.startsWith("/cms/templates?");
+        return (
+            page.url === "/cms/templates" ||
+            page.url.startsWith("/cms/templates?")
+        );
     }
     return page.url === path || page.url.startsWith(path + "/");
 }
@@ -35,60 +38,174 @@ function toggleMenu(key) {
  * Menu structure with labels (groups) and items.
  * Sub-menus are items with 'children' array.
  */
-const menuGroups = computed(() => [
-    {
-        label: locale.value === "id" ? "Navigasi Utama" : "Main Navigation",
-        items: [
-            {
-                label: t("nav.dashboard"),
-                href: "/cms/dashboard",
-                icon: "LayoutDashboard",
-                visible: true,
-            },
-            {
-                label: locale.value === "id" ? "Template Kustom" : "Custom Templates",
-                href: "/cms/templates",
-                icon: "Template",
-                visible: true,
-            },
-        ],
-    },
-    {
-        label: locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
-        items: [
-            {
-                label: locale.value === "id" ? "Kelola Peran" : "Manage Roles",
-                href: "/cms/roles",
-                icon: "Shield",
-                visible: hasRole("super-admin"),
-            },
-            {
-                label: locale.value === "id" ? "Kelola Pengguna" : "Manage Users",
-                href: "/cms/users",
-                icon: "Users",
-                visible: hasRole("super-admin"),
-            },
-            {
-                label: locale.value === "id" ? "ACL Fitur User" : "User Feature ACL",
-                href: "/cms/acl",
-                icon: "Lock",
-                visible: hasRole("super-admin"),
-            },
-        ],
-    },
-    {
-        label: locale.value === "id" ? "Aplikasi Undangan" : "Wedding App",
-        items: [
-            {
-                label: locale.value === "id" ? "Kembali ke Undangan" : "Back to Weddings",
-                href: "/cms",
-                icon: "Heart",
-                visible: true,
-                external: true,
-            },
-        ],
-    },
-]);
+const menuGroups = computed(() => {
+    // Get wedding slug for regular user (from page props)
+    const wedding = page.props.wedding;
+    const slug = wedding?.slug || "";
+
+    return [
+        {
+            label: locale.value === "id" ? "Navigasi Utama" : "Main Navigation",
+            items: [
+                {
+                    label: t("nav.dashboard"),
+                    href: "/cms/dashboard",
+                    icon: "LayoutDashboard",
+                    visible: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Template Kustom"
+                            : "Custom Templates",
+                    href: "/cms/templates",
+                    icon: "Template",
+                    visible: hasRole("super-admin"),
+                },
+            ],
+        },
+        {
+            label:
+                locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
+            items: [
+                {
+                    label:
+                        locale.value === "id" ? "Kelola Peran" : "Manage Roles",
+                    href: "/cms/roles",
+                    icon: "Shield",
+                    visible: hasRole("super-admin"),
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Kelola Pengguna"
+                            : "Manage Users",
+                    href: "/cms/users",
+                    icon: "Users",
+                    visible: hasRole("super-admin"),
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "ACL Fitur User"
+                            : "User Feature ACL",
+                    href: "/cms/acl",
+                    icon: "Lock",
+                    visible: hasRole("super-admin"),
+                },
+            ],
+        },
+        {
+            label:
+                locale.value === "id"
+                    ? "Undangan Digital"
+                    : "Digital Invitation",
+            items: [
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Tema & Template"
+                            : "Theme & Template",
+                    href: `/cms/${slug}/undangan/tema`,
+                    icon: "Palette",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label: "RSVP Online",
+                    href: `/cms/${slug}/undangan/rsvp`,
+                    icon: "Mail",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Informasi Acara"
+                            : "Event Info",
+                    href: `/cms/${slug}/undangan/acara`,
+                    icon: "Calendar",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label: "Love Story",
+                    href: `/cms/${slug}/undangan/love-story`,
+                    icon: "Book",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Manajemen Tamu"
+                            : "Guest Management",
+                    href: `/cms/${slug}/undangan/tamu`,
+                    icon: "UsersGroup",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Amplop Digital"
+                            : "Digital Envelope",
+                    href: `/cms/${slug}/undangan/amplop`,
+                    icon: "CreditCard",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id" ? "Galeri Foto" : "Photo Gallery",
+                    href: `/cms/${slug}/undangan/galeri`,
+                    icon: "Photo",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label: "Countdown",
+                    href: `/cms/${slug}/undangan/countdown`,
+                    icon: "Clock",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Ucapan & Doa"
+                            : "Wishes & Prayers",
+                    href: `/cms/${slug}/undangan/ucapan`,
+                    icon: "Message",
+                    visible: !!slug,
+                    external: true,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Wishlist Hadiah"
+                            : "Gift Wishlist",
+                    href: `/cms/${slug}/undangan/wishlist`,
+                    icon: "Gift",
+                    visible: !!slug,
+                    external: true,
+                },
+            ],
+        },
+        {
+            label: locale.value === "id" ? "Preview" : "Preview",
+            items: [
+                {
+                    label: locale.value === "id" ? "Lihat Demo" : "View Demo",
+                    href: `/wedding/${slug}`,
+                    icon: "Eye",
+                    visible: !!slug,
+                    external: true,
+                },
+            ],
+        },
+    ];
+});
 
 const visibleGroups = computed(() =>
     menuGroups.value

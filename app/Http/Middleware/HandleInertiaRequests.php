@@ -29,17 +29,28 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $wedding = null;
+
+        if ($user && !$user->hasRole('super-admin')) {
+            $wedding = \App\Models\Wedding::where('user_id', $user->id)->first(['id', 'slug', 'label']);
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'roles' => $request->user()->getRoleNames(),
-                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->getRoleNames(),
+                    'permissions' => $user->getAllPermissions()->pluck('name'),
                 ] : null,
             ],
+            'wedding' => $wedding ? [
+                'slug' => $wedding->slug,
+                'label' => $wedding->label,
+            ] : null,
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
