@@ -116,34 +116,116 @@
             </div>
 
             <!-- RSVP Response List -->
-            <div v-if="rsvpItems.length > 0" class="field-group" style="margin-top:1.5rem">
-                <label class="field-label">Daftar Konfirmasi ({{ rsvpItems.length }})</label>
-                <div style="overflow-x:auto;border:1px solid #e5e7eb;border-radius:.5rem">
-                    <table style="width:100%;font-size:.8rem;border-collapse:collapse">
+            <div
+                v-if="rsvpItems.length > 0"
+                class="field-group"
+                style="margin-top: 1.5rem"
+            >
+                <label class="field-label"
+                    >Daftar Konfirmasi ({{ rsvpItems.length }})</label
+                >
+                <div
+                    style="
+                        overflow-x: auto;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 0.5rem;
+                    "
+                >
+                    <table
+                        style="
+                            width: 100%;
+                            font-size: 0.8rem;
+                            border-collapse: collapse;
+                        "
+                    >
                         <thead>
-                            <tr style="background:#f9fafb;text-align:left">
-                                <th style="padding:.5rem .75rem;font-weight:600">Nama</th>
-                                <th style="padding:.5rem .75rem;font-weight:600">Status</th>
-                                <th style="padding:.5rem .75rem;font-weight:600">Pendamping</th>
-                                <th style="padding:.5rem .75rem;font-weight:600">Waktu</th>
+                            <tr style="background: #f9fafb; text-align: left">
+                                <th
+                                    style="
+                                        padding: 0.5rem 0.75rem;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Nama
+                                </th>
+                                <th
+                                    style="
+                                        padding: 0.5rem 0.75rem;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Status
+                                </th>
+                                <th
+                                    style="
+                                        padding: 0.5rem 0.75rem;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Pendamping
+                                </th>
+                                <th
+                                    style="
+                                        padding: 0.5rem 0.75rem;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Waktu
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in rsvpItems" :key="item.id" style="border-top:1px solid #f3f4f6">
-                                <td style="padding:.5rem .75rem">{{ item.name || '-' }}</td>
-                                <td style="padding:.5rem .75rem">
-                                    <span v-if="item.status === 'hadir'" style="color:#16a34a;font-weight:600">✅ Hadir</span>
-                                    <span v-else-if="item.status === 'tidak_hadir'" style="color:#dc2626;font-weight:600">❌ Tidak</span>
-                                    <span v-else style="color:#9ca3af">{{ item.status }}</span>
+                            <tr
+                                v-for="item in rsvpItems"
+                                :key="item.id"
+                                style="border-top: 1px solid #f3f4f6"
+                            >
+                                <td style="padding: 0.5rem 0.75rem">
+                                    {{ item.name || "-" }}
                                 </td>
-                                <td style="padding:.5rem .75rem">{{ item.companions || 0 }}</td>
-                                <td style="padding:.5rem .75rem;color:#9ca3af">{{ item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-' }}</td>
+                                <td style="padding: 0.5rem 0.75rem">
+                                    <span
+                                        v-if="item.status === 'hadir'"
+                                        style="color: #16a34a; font-weight: 600"
+                                        >✅ Hadir</span
+                                    >
+                                    <span
+                                        v-else-if="
+                                            item.status === 'tidak_hadir'
+                                        "
+                                        style="color: #dc2626; font-weight: 600"
+                                        >❌ Tidak</span
+                                    >
+                                    <span v-else style="color: #9ca3af">{{
+                                        item.status
+                                    }}</span>
+                                </td>
+                                <td style="padding: 0.5rem 0.75rem">
+                                    {{ item.companions || 0 }}
+                                </td>
+                                <td
+                                    style="
+                                        padding: 0.5rem 0.75rem;
+                                        color: #9ca3af;
+                                    "
+                                >
+                                    {{
+                                        item.created_at
+                                            ? new Date(
+                                                  item.created_at,
+                                              ).toLocaleDateString("id-ID")
+                                            : "-"
+                                    }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <!-- Preview -->
+        <div class="section-preview">
             <div class="preview-header">
                 <span class="preview-badge">Live Preview</span>
                 <span class="preview-tmpl-name">Form RSVP</span>
