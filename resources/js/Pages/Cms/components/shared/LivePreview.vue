@@ -1,13 +1,17 @@
 <template>
     <div class="live-preview-wrapper">
-        <div class="mockup-container">
+        <div class="mockup-container" ref="containerRef">
             <img
                 src="/images/iphone-mockup.png"
                 alt="iPhone"
                 class="mockup-image"
             />
             <div class="mockup-screen">
-                <div class="screen-viewport" ref="viewportRef">
+                <div
+                    class="screen-viewport"
+                    ref="viewportRef"
+                    :style="viewportStyle"
+                >
                     <component
                         v-if="resolvedTemplate"
                         :is="resolvedTemplate"
@@ -29,7 +33,15 @@
 </template>
 
 <script setup>
-import { computed, watch, shallowRef, ref, nextTick, onMounted } from "vue";
+import {
+    computed,
+    watch,
+    shallowRef,
+    ref,
+    nextTick,
+    onMounted,
+    onUnmounted,
+} from "vue";
 import { useStore } from "vuex";
 import { getTemplate } from "@/Pages/Landing/invitation/templates/index.js";
 
@@ -38,7 +50,39 @@ const props = defineProps({
 });
 
 const store = useStore();
+const containerRef = ref(null);
 const viewportRef = ref(null);
+const scale = ref(0.5);
+
+const BASE_WIDTH = 375;
+
+// Screen area is 78% of container width based on 1024×1536 mockup
+function updateScale() {
+    if (!containerRef.value) return;
+    const containerWidth = containerRef.value.offsetWidth;
+    const screenWidth = containerWidth * 0.78;
+    scale.value = screenWidth / BASE_WIDTH;
+}
+
+const viewportStyle = computed(() => ({
+    transform: `scale(${scale.value})`,
+    transformOrigin: "top left",
+}));
+
+let resizeObserver;
+onMounted(() => {
+    updateScale();
+    if (window.ResizeObserver && containerRef.value) {
+        resizeObserver = new ResizeObserver(updateScale);
+        resizeObserver.observe(containerRef.value);
+    }
+    window.addEventListener("resize", updateScale);
+});
+
+onUnmounted(() => {
+    if (resizeObserver) resizeObserver.disconnect();
+    window.removeEventListener("resize", updateScale);
+});
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 const templateId = computed(() => store.getters["template/selectedId"]);
@@ -118,9 +162,8 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 .mockup-container {
     position: relative;
     width: 100%;
-    max-width: 260px;
-    /* Force aspect ratio 2:3 matching the image */
-    aspect-ratio: 2 / 3;
+    max-width: 280px;
+    aspect-ratio: 1024 / 1536;
 }
 
 .mockup-image {
@@ -135,24 +178,22 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 }
 
 /*
- * Screen area calculation based on 1024x1536 image:
- * Estimated screen inset from image edges:
- *   top: ~115px / 1536 = 7.5%
- *   bottom: ~100px / 1536 = 6.5%
- *   left: ~115px / 1024 = 11.2%
- *   right: ~115px / 1024 = 11.2%
- * Screen width: 1024 - 230 = 794px → 794/1024 = 77.5%
- * Screen height: 1536 - 215 = 1321px → 1321/1536 = 86%
+ * Screen inset (in %):
+ * left/right: 11% (bezels)
+ * top: 7.5% (bezel + notch area kept but content shows behind)
+ * bottom: 6.5% (home indicator area)
+ * → Screen visible area: 78% wide × 86% tall of container
  */
 .mockup-screen {
     position: absolute;
     top: 7.5%;
     bottom: 6.5%;
-    left: 11.2%;
-    right: 11.2%;
-    border-radius: 1.2rem;
+    left: 11%;
+    right: 11%;
+    border-radius: 1.5rem;
     overflow: hidden;
     z-index: 1;
+    background: white;
 }
 
 .screen-viewport {
@@ -161,9 +202,6 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     left: 0;
     width: 375px;
     height: 812px;
-    transform-origin: top left;
-    /* Container screen width ≈ 260 * 0.775 = 201px → scale = 201/375 = 0.536 */
-    transform: scale(0.536);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -186,25 +224,5 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     text-align: center;
     padding: 2rem;
     background: #f9fafb;
-}
-
-@media (max-width: 1279px) {
-    .mockup-container {
-        max-width: 220px;
-    }
-    /* 220 * 0.775 = 170px → 170/375 = 0.453 */
-    .screen-viewport {
-        transform: scale(0.453);
-    }
-}
-
-@media (max-width: 768px) {
-    .mockup-container {
-        max-width: 190px;
-    }
-    /* 190 * 0.775 = 147px → 147/375 = 0.392 */
-    .screen-viewport {
-        transform: scale(0.392);
-    }
 }
 </style>
