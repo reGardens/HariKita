@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { Link, usePage, router } from "@inertiajs/vue3";
 import IconComponent from "@/Components/IconComponent/IconComponent.vue";
 import Sidebar from "@/Components/Cms/Sidebar.vue";
+import LivePreview from "@/Pages/Cms/components/shared/LivePreview.vue";
 import { useI18n } from "@/Composables/useI18n";
 import { useDarkMode } from "@/Composables/useDarkMode";
 
@@ -13,6 +14,12 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 const user = computed(() => auth.value?.user);
 const userRole = computed(() => user.value?.roles?.[0] || "user");
+
+// Show live preview only on undangan editor pages
+const showLivePreview = computed(() => {
+    const url = page.url || "";
+    return url.includes("/undangan/");
+});
 
 const sidebarOpen = ref(false);
 const profileOpen = ref(false);
@@ -251,7 +258,21 @@ function logout() {
             </header>
 
             <main class="flex-1 min-h-0 overflow-auto overflow-x-hidden">
-                <slot />
+                <div class="flex h-full">
+                    <div
+                        class="flex-1 overflow-y-auto p-6"
+                        :class="{ 'xl:pr-0': showLivePreview }"
+                    >
+                        <slot />
+                    </div>
+                    <!-- Live Preview iPhone Mockup (desktop only, for undangan pages) -->
+                    <div
+                        v-if="showLivePreview"
+                        class="hidden xl:flex w-[320px] border-l border-border bg-muted/30 items-start justify-center overflow-y-auto p-2"
+                    >
+                        <LivePreview />
+                    </div>
+                </div>
             </main>
         </div>
     </div>

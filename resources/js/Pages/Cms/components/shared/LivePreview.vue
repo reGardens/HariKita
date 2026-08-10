@@ -1,10 +1,12 @@
 <template>
     <div class="live-preview-container">
-        <!-- Phone Mockup Frame -->
-        <div class="phone-mockup">
-            <div class="phone-notch"></div>
-            <div class="phone-screen" ref="screenRef">
-                <div class="phone-content">
+        <!-- iPhone Mockup Frame -->
+        <div class="iphone-frame">
+            <!-- Dynamic Island -->
+            <div class="iphone-island"></div>
+            <!-- Screen -->
+            <div class="iphone-screen">
+                <div class="iphone-viewport">
                     <component
                         v-if="resolvedTemplate"
                         :is="resolvedTemplate"
@@ -15,13 +17,14 @@
                         :slug="activeSlug"
                         :template-record="templateRecord"
                     />
-                    <div v-else class="phone-placeholder">
+                    <div v-else class="iphone-placeholder">
                         <span class="text-3xl">💒</span>
                         <p>Pilih template untuk melihat preview</p>
                     </div>
                 </div>
             </div>
-            <div class="phone-home-bar"></div>
+            <!-- Home Indicator -->
+            <div class="iphone-home-indicator"></div>
         </div>
     </div>
 </template>
@@ -36,9 +39,9 @@ const store = useStore();
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 const templateId = computed(() => store.getters["template/selectedId"]);
 const coupleData = computed(() => store.getters["couple/couple"]);
-const eventsData = computed(() => store.state.events.items || []);
+const eventsData = computed(() => store.state.events?.items || []);
 const settingsData = computed(() => store.getters["settings/settings"]);
-const mediaData = computed(() => store.state.media.items || []);
+const mediaData = computed(() => store.state.media?.items || []);
 const templateRecord = computed(
     () => store.getters["template/selectedTemplate"],
 );
@@ -59,7 +62,6 @@ async function loadTemplate(id) {
             resolvedTemplate.value = null;
         }
     } else {
-        // Fallback to universal
         try {
             const mod =
                 await import("@/Pages/Landing/invitation/templates/universal/UniversalTemplate.vue");
@@ -76,70 +78,73 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 <style scoped>
 .live-preview-container {
     position: sticky;
-    top: 1.5rem;
+    top: 1rem;
     display: flex;
     justify-content: center;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
 }
 
-.phone-mockup {
+/* iPhone 15-style frame */
+.iphone-frame {
     width: 280px;
-    height: 560px;
-    background: #1a1a1a;
-    border-radius: 2.5rem;
-    padding: 0.75rem;
+    height: 572px;
+    background: #1c1c1e;
+    border-radius: 3rem;
+    padding: 0.5rem;
     box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 30px 60px -12px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+        0 0 0 3px #2c2c2e inset;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
-.phone-notch {
-    width: 80px;
-    height: 20px;
-    background: #1a1a1a;
-    border-radius: 0 0 1rem 1rem;
-    margin: 0 auto;
+/* Dynamic Island */
+.iphone-island {
+    width: 85px;
+    height: 22px;
+    background: #000;
+    border-radius: 20px;
     position: absolute;
-    top: 0.75rem;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
 }
 
-.phone-screen {
+.iphone-screen {
     flex: 1;
-    background: white;
-    border-radius: 1.75rem;
+    background: #fff;
+    border-radius: 2.5rem;
     overflow: hidden;
     position: relative;
 }
 
-.phone-content {
-    width: 375px;
-    height: 667px;
-    transform: scale(0.68);
+.iphone-viewport {
+    width: 390px;
+    height: 844px;
+    transform: scale(0.645);
     transform-origin: top left;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
 }
 
-.phone-content::-webkit-scrollbar {
+.iphone-viewport::-webkit-scrollbar {
     display: none;
 }
 
-.phone-home-bar {
-    width: 100px;
+/* Home Indicator */
+.iphone-home-indicator {
+    width: 120px;
     height: 4px;
-    background: #666;
+    background: #636366;
     border-radius: 2px;
-    margin: 0.5rem auto 0;
+    margin: 6px auto 4px;
 }
 
-.phone-placeholder {
+.iphone-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
