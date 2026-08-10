@@ -270,10 +270,14 @@ async function parseAndFill() {
         if (data.groomFullName || data.brideFullName) {
             try {
                 await axios.post(`/api/wedding/${slug}/couple`, {
-                    groom_full_name: data.groomFullName || "",
-                    groom_nickname: data.groomNickname || "",
-                    bride_full_name: data.brideFullName || "",
-                    bride_nickname: data.brideNickname || "",
+                    groom: {
+                        fullName: data.groomFullName || "",
+                        nickname: data.groomNickname || "",
+                    },
+                    bride: {
+                        fullName: data.brideFullName || "",
+                        nickname: data.brideNickname || "",
+                    },
                 });
             } catch (e) {
                 errors.push(

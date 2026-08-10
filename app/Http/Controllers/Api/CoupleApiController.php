@@ -48,28 +48,26 @@ class CoupleApiController extends Controller
     public function store(Request $request, $slug)
     {
         $wedding = Wedding::where('slug', $slug)->firstOrFail();
-        $couple = Couple::where('wedding_id', $wedding->id)->firstOrFail();
-
-        $groom = $request->input('groom', []);
-        $bride = $request->input('bride', []);
-
-        $couple->update([
-            'groom_full_name' => $groom['fullName'] ?? '',
-            'groom_nickname' => $groom['nickname'] ?? '',
-            'groom_photo' => $groom['photo'] ?? '',
-            'groom_father_name' => $groom['fatherName'] ?? '',
-            'groom_mother_name' => $groom['motherName'] ?? '',
-            'groom_instagram_url' => $groom['instagramUrl'] ?? '',
-            'groom_child_order' => $groom['childOrder'] ?? '',
-            'bride_full_name' => $bride['fullName'] ?? '',
-            'bride_nickname' => $bride['nickname'] ?? '',
-            'bride_photo' => $bride['photo'] ?? '',
-            'bride_father_name' => $bride['fatherName'] ?? '',
-            'bride_mother_name' => $bride['motherName'] ?? '',
-            'bride_instagram_url' => $bride['instagramUrl'] ?? '',
-            'bride_child_order' => $bride['childOrder'] ?? '',
-            'music_url' => $request->input('musicUrl', ''),
-        ]);
+        $couple = Couple::updateOrCreate(
+            ['wedding_id' => $wedding->id],
+            [
+                'groom_full_name' => $request->input('groom.fullName', ''),
+                'groom_nickname' => $request->input('groom.nickname', ''),
+                'groom_photo' => $request->input('groom.photo', ''),
+                'groom_father_name' => $request->input('groom.fatherName', ''),
+                'groom_mother_name' => $request->input('groom.motherName', ''),
+                'groom_instagram_url' => $request->input('groom.instagramUrl', ''),
+                'groom_child_order' => $request->input('groom.childOrder', ''),
+                'bride_full_name' => $request->input('bride.fullName', ''),
+                'bride_nickname' => $request->input('bride.nickname', ''),
+                'bride_photo' => $request->input('bride.photo', ''),
+                'bride_father_name' => $request->input('bride.fatherName', ''),
+                'bride_mother_name' => $request->input('bride.motherName', ''),
+                'bride_instagram_url' => $request->input('bride.instagramUrl', ''),
+                'bride_child_order' => $request->input('bride.childOrder', ''),
+                'music_url' => $request->input('musicUrl', ''),
+            ]
+        );
 
         return response()->json($this->formatCouple($couple, $wedding->slug));
     }
