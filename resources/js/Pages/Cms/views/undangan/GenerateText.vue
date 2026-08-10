@@ -6,30 +6,25 @@
                 <div>
                     <h2 class="section-title">Generate Text</h2>
                     <p class="section-desc">
-                        Buat teks undangan untuk dibagikan ke berbagai platform
+                        Paste template teks undangan lalu bagikan
                     </p>
                 </div>
             </div>
 
-            <!-- Generated Text -->
+            <!-- Text Area -->
             <div class="field-group">
-                <label class="field-label">Teks Undangan</label>
                 <textarea
                     v-model="generatedText"
                     rows="14"
                     class="field-input field-textarea"
-                    placeholder="Ketik atau paste teks undangan Anda di sini..."
+                    placeholder="Paste teks undangan Anda di sini..."
                 ></textarea>
-                <span class="field-hint"
-                    >Tulis atau paste teks undangan, lalu bagikan ke platform
-                    pilihan Anda</span
-                >
             </div>
 
             <!-- Action Buttons -->
             <div class="action-bar">
                 <button type="button" class="btn-save" @click="copyText">
-                    📋 Salin Teks
+                    📋 Salin Template Text
                 </button>
                 <button
                     type="button"
@@ -103,7 +98,20 @@ const invitationLink = computed(
 const generatedText = ref("");
 
 function copyText() {
-    navigator.clipboard.writeText(generatedText.value);
+    if (!generatedText.value) return;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(generatedText.value);
+    } else {
+        // Fallback for HTTP
+        const textarea = document.createElement("textarea");
+        textarea.value = generatedText.value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+    }
     copied.value = true;
     setTimeout(() => {
         copied.value = false;
@@ -111,6 +119,10 @@ function copyText() {
 }
 
 function share(platform) {
+    if (!generatedText.value) {
+        alert("Paste teks undangan terlebih dahulu");
+        return;
+    }
     const text = encodeURIComponent(generatedText.value);
     const url = encodeURIComponent(invitationLink.value);
     const title = encodeURIComponent("Undangan Pernikahan");
@@ -118,7 +130,7 @@ function share(platform) {
 
     switch (platform) {
         case "whatsapp":
-            shareUrl = `https://wa.me/?text=${text}`;
+            shareUrl = `https://api.whatsapp.com/send?text=${text}`;
             break;
         case "telegram":
             shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
@@ -130,7 +142,7 @@ function share(platform) {
             shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
             break;
         case "facebook":
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
             break;
         case "line":
             shareUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`;
