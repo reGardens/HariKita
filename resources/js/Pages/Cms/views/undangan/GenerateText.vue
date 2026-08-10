@@ -98,20 +98,20 @@ const invitationLink = computed(
 const generatedText = ref("");
 
 function copyText() {
-    if (!generatedText.value) return;
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(generatedText.value);
-    } else {
-        // Fallback for HTTP
-        const textarea = document.createElement("textarea");
-        textarea.value = generatedText.value;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
+    if (!generatedText.value) {
+        alert("Paste teks undangan terlebih dahulu");
+        return;
     }
+    const el = document.createElement("textarea");
+    el.value = generatedText.value;
+    el.setAttribute("readonly", "");
+    el.style.position = "absolute";
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+    el.select();
+    el.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(el);
     copied.value = true;
     setTimeout(() => {
         copied.value = false;
