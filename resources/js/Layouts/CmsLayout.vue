@@ -18,6 +18,7 @@ const userRole = computed(() => user.value?.roles?.[0] || "user");
 // Show live preview only on undangan editor pages
 const showLivePreview = computed(() => {
     const url = page.url || "";
+    if (url.includes("/undangan/pesan-wa")) return false;
     return url.includes("/undangan/");
 });
 

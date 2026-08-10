@@ -43,13 +43,32 @@
                     type="button"
                     class="btn-save"
                     @click="parseAndFill"
-                    :disabled="!clientResponse.trim()"
+                    :disabled="!clientResponse.trim() || filling"
                 >
-                    ⚡ Fill Semua Form
+                    <span v-if="filling">⏳ Memproses...</span>
+                    <span v-else>⚡ Fill Semua Form</span>
                 </button>
                 <span v-if="filled" class="save-ok"
                     >✅ Data berhasil di-fill ke form terkait!</span
                 >
+            </div>
+
+            <!-- Loading Bar -->
+            <div v-if="filling" class="loading-bar">
+                <div class="loading-bar-inner"></div>
+            </div>
+
+            <!-- Filled menus info -->
+            <div v-if="filledMenus.length > 0" class="field-group">
+                <label class="field-label">Menu yang ter-update</label>
+                <div class="badge-list">
+                    <span
+                        v-for="menu in filledMenus"
+                        :key="menu"
+                        class="menu-badge"
+                        >✅ {{ menu }}</span
+                    >
+                </div>
             </div>
 
             <!-- Parsed Preview -->
@@ -83,8 +102,10 @@ import "./section.css";
 const store = useStore();
 const copiedTemplate = ref(false);
 const filled = ref(false);
+const filling = ref(false);
 const clientResponse = ref("");
 const parsedData = ref(null);
+const filledMenus = ref([]);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 
@@ -189,11 +210,17 @@ function extractValue(line) {
     return "";
 }
 
-function parseAndFill() {
+async function parseAndFill() {
     if (!clientResponse.value.trim()) return;
+
+    filling.value = true;
+    filledMenus.value = [];
 
     const data = parseClientResponse(clientResponse.value);
     parsedData.value = data;
+
+    // Simulate processing delay for UX
+    await new Promise((r) => setTimeout(r, 800));
 
     // Fill couple data via API
     if (data.groomFullName || data.brideFullName) {
@@ -207,7 +234,8 @@ function parseAndFill() {
                 nickname: data.brideNickname || "",
             },
         };
-        store.dispatch("couple/saveCouple", couplePayload);
+        await store.dispatch("couple/saveCouple", couplePayload);
+        filledMenus.value.push("Informasi Pasangan");
     }
 
     // Fill event data via API
@@ -220,9 +248,11 @@ function parseAndFill() {
             address: data.venueAddress || "",
             maps_url: data.mapsLink || "",
         };
-        store.dispatch("events/saveEvent", eventPayload);
+        await store.dispatch("events/saveEvent", eventPayload);
+        filledMenus.value.push("Informasi Acara");
     }
 
+    filling.value = false;
     filled.value = true;
     setTimeout(() => {
         filled.value = false;
@@ -308,5 +338,52 @@ onMounted(() => {
 
 .dark .parsed-value {
     color: #f9fafb;
+}
+
+.loading-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border, #e5e7eb);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-bar-inner {
+    height: 100%;
+    width: 40%;
+    background: #10b981;
+    border-radius: 2px;
+    animation: loading-slide 1s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(350%);
+    }
+}
+
+.badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.menu-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.dark .menu-badge {
+    background: hsl(160 40% 15%);
+    color: #6ee7b7;
+    border-color: hsl(160 40% 25%);
 }
 </style>
