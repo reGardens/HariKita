@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { computed, watch, shallowRef, ref, nextTick } from "vue";
+import { computed, watch, shallowRef, ref, nextTick, onMounted } from "vue";
 import { useStore } from "vuex";
 import { getTemplate } from "@/Pages/Landing/invitation/templates/index.js";
 
@@ -119,25 +119,38 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     position: relative;
     width: 100%;
     max-width: 260px;
+    /* Force aspect ratio 2:3 matching the image */
+    aspect-ratio: 2 / 3;
 }
 
 .mockup-image {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
+    object-fit: contain;
     pointer-events: none;
     user-select: none;
-    position: relative;
     z-index: 2;
 }
 
+/*
+ * Screen area calculation based on 1024x1536 image:
+ * Estimated screen inset from image edges:
+ *   top: ~115px / 1536 = 7.5%
+ *   bottom: ~100px / 1536 = 6.5%
+ *   left: ~115px / 1024 = 11.2%
+ *   right: ~115px / 1024 = 11.2%
+ * Screen width: 1024 - 230 = 794px → 794/1024 = 77.5%
+ * Screen height: 1536 - 215 = 1321px → 1321/1536 = 86%
+ */
 .mockup-screen {
     position: absolute;
-    top: 2.2%;
-    left: 4.5%;
-    right: 4.5%;
-    bottom: 2.2%;
-    border-radius: 2rem;
+    top: 7.5%;
+    bottom: 6.5%;
+    left: 11.2%;
+    right: 11.2%;
+    border-radius: 1.2rem;
     overflow: hidden;
     z-index: 1;
 }
@@ -149,9 +162,8 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
     width: 375px;
     height: 812px;
     transform-origin: top left;
-    /* Scale = mockup-screen-width / 375. For ~237px screen width: 237/375 = 0.632 */
-    /* But we need to calculate based on container. Use a safe small scale */
-    transform: scale(0.632);
+    /* Container screen width ≈ 260 * 0.775 = 201px → scale = 201/375 = 0.536 */
+    transform: scale(0.536);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -178,27 +190,21 @@ watch(templateId, (id) => loadTemplate(id), { immediate: true });
 
 @media (max-width: 1279px) {
     .mockup-container {
-        max-width: 230px;
+        max-width: 220px;
     }
+    /* 220 * 0.775 = 170px → 170/375 = 0.453 */
     .screen-viewport {
-        transform: scale(0.56);
-    }
-    .mockup-placeholder {
-        transform: scale(0.56);
-        transform-origin: top left;
+        transform: scale(0.453);
     }
 }
 
 @media (max-width: 768px) {
     .mockup-container {
-        max-width: 200px;
+        max-width: 190px;
     }
+    /* 190 * 0.775 = 147px → 147/375 = 0.392 */
     .screen-viewport {
-        transform: scale(0.49);
-    }
-    .mockup-placeholder {
-        transform: scale(0.49);
-        transform-origin: top left;
+        transform: scale(0.392);
     }
 }
 </style>
