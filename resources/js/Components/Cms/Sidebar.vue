@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import IconComponent from "@/Components/IconComponent/IconComponent.vue";
 import { useI18n } from "@/Composables/useI18n";
@@ -15,7 +15,6 @@ function hasRole(role) {
 }
 
 function isActive(path) {
-    // Exact match for template list page, startsWith for others
     if (path === "/cms/templates") {
         return (
             page.url === "/cms/templates" ||
@@ -23,6 +22,35 @@ function isActive(path) {
         );
     }
     return page.url === path || page.url.startsWith(path + "/");
+}
+
+// Track which menus the user has already visited (persisted in localStorage)
+const SEEN_KEY = "cms-sidebar-seen";
+function loadSeen() {
+    try {
+        return JSON.parse(localStorage.getItem(SEEN_KEY) || "{}");
+    } catch {
+        return {};
+    }
+}
+const seenMenus = ref(loadSeen());
+
+function markSeen(path) {
+    seenMenus.value[path] = true;
+    localStorage.setItem(SEEN_KEY, JSON.stringify(seenMenus.value));
+}
+
+// Mark current page as seen whenever URL changes
+watch(
+    () => page.url,
+    (url) => {
+        if (url) markSeen(url);
+    },
+    { immediate: true },
+);
+
+function shouldShowDot(item) {
+    return item.filled && !seenMenus.value[item.href];
 }
 
 // Expandable menu state
@@ -43,13 +71,18 @@ const menuGroups = computed(() => {
     const wedding = page.props.wedding;
     const slug = wedding?.slug || "";
 
-    // Detect which menus have data filled (from Inertia shared props)
+    // Detect which menus have meaningful data filled (from Inertia shared props).
+    // Backend returns booleans; blank auto-created records return false.
     const weddingData = page.props.weddingData || {};
-    const hasCouple = !!weddingData.couple;
-    const hasEvents = !!(weddingData.events && weddingData.events.length > 0);
-    const hasGuests = !!(weddingData.guests && weddingData.guests.length > 0);
-    const hasMedia = !!(weddingData.media && weddingData.media.length > 0);
-    const hasSettings = !!weddingData.settings;
+    const hasEvents = !!weddingData.events;
+    const hasGuests = !!weddingData.guests;
+    const hasMedia = !!weddingData.media;
+    const hasCountdown = !!weddingData.countdown;
+    const hasAmplop = !!weddingData.amplop;
+    const hasStreaming = !!weddingData.streaming;
+    const hasLoveStory = !!weddingData.loveStory;
+    const hasWishlist = !!weddingData.wishlist;
+    const hasTheme = !!weddingData.settings;
 
     return [
         {
@@ -126,7 +159,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/tema`,
                     icon: "Palette",
                     visible: !!slug,
-                    filled: hasSettings,
+                    filled: hasTheme,
                 },
                 {
                     label: "RSVP Online",
@@ -149,6 +182,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/love-story`,
                     icon: "Book",
                     visible: !!slug,
+                    filled: hasLoveStory,
                 },
                 {
                     label:
@@ -158,6 +192,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/tamu`,
                     icon: "UsersGroup",
                     visible: !!slug,
+                    filled: hasGuests,
                 },
                 {
                     label:
@@ -167,6 +202,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/amplop`,
                     icon: "CreditCard",
                     visible: !!slug,
+                    filled: hasAmplop,
                 },
                 {
                     label:
@@ -174,11 +210,30 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/galeri`,
                     icon: "Photo",
                     visible: !!slug,
+                    filled: hasMedia,
                 },
                 {
                     label: "Countdown",
                     href: `/cms/${slug}/undangan/countdown`,
                     icon: "Clock",
+                    visible: !!slug,
+                    filled: hasCountdown,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Live Streaming"
+                            : "Live Streaming",
+                    href: `/cms/${slug}/undangan/streaming`,
+                    icon: "Video",
+                    visible: !!slug,
+                    filled: hasStreaming,
+                },
+                {
+                    label:
+                        locale.value === "id" ? "QR Check-in" : "QR Check-in",
+                    href: `/cms/${slug}/undangan/qr-checkin`,
+                    icon: "Qrcode",
                     visible: !!slug,
                 },
                 {
@@ -198,6 +253,7 @@ const menuGroups = computed(() => {
                     href: `/cms/${slug}/undangan/wishlist`,
                     icon: "Gift",
                     visible: !!slug,
+                    filled: hasWishlist,
                 },
             ],
         },
@@ -320,12 +376,14 @@ const visibleGroups = computed(() =>
                         :name="item.icon"
                         class="h-4 w-4 flex-shrink-0"
                     />
-                    <span class="truncate">{{ item.label }}</span>
-                    <span
-                        v-if="item.filled"
-                        class="ml-auto w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"
-                        title="Data terisi"
-                    ></span>
+                    <span class="truncate flex items-center gap-1.5">
+                        {{ item.label }}
+                        <span
+                            v-if="shouldShowDot(item)"
+                            class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"
+                            title="Data terisi"
+                        ></span>
+                    </span>
                 </Link>
             </template>
         </template>

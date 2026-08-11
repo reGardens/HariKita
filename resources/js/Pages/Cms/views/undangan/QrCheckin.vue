@@ -14,10 +14,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label"
-                            >Aktifkan QR Code per Tamu</span
-                        >
-                        <p class="field-hint">
+                        <Label>Aktifkan QR Code per Tamu</Label>
+                        <p class="text-xs text-muted-foreground">
                             Setiap tamu mendapatkan QR Code unik untuk check-in
                         </p>
                     </div>
@@ -36,16 +34,26 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="qrStyle">Gaya QR Code</label>
-                <select id="qrStyle" v-model="form.style" class="field-input">
-                    <option value="square">◼ Kotak Klasik</option>
-                    <option value="rounded">⬛ Sudut Membulat</option>
-                    <option value="dots">⚫ Titik-Titik</option>
-                </select>
+                <Label for="qrStyle">Gaya QR Code</Label>
+                <Select
+                    :model-value="form.style"
+                    @update:model-value="(v) => (form.style = v)"
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Pilih gaya" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="square">◼ Kotak Klasik</SelectItem>
+                        <SelectItem value="rounded"
+                            >⬛ Sudut Membulat</SelectItem
+                        >
+                        <SelectItem value="dots">⚫ Titik-Titik</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
             <div class="field-group">
-                <label class="field-label">Warna QR</label>
+                <Label>Warna QR</Label>
                 <div class="color-row">
                     <div class="color-item">
                         <label class="color-label">Foreground</label>
@@ -67,14 +75,11 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="checkinMsg"
-                    >Pesan Setelah Check-in</label
-                >
-                <textarea
+                <Label for="checkinMsg">Pesan Setelah Check-in</Label>
+                <Textarea
                     id="checkinMsg"
                     v-model="form.message"
                     rows="2"
-                    class="field-input field-textarea"
                     placeholder="Selamat datang! Silakan menuju tempat duduk Anda."
                 />
             </div>
@@ -82,10 +87,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label"
-                            >Notifikasi Real-time ke Admin</span
-                        >
-                        <p class="field-hint">
+                        <Label>Notifikasi Real-time ke Admin</Label>
+                        <p class="text-xs text-muted-foreground">
                             Terima notifikasi setiap kali tamu check-in
                         </p>
                     </div>
@@ -104,15 +107,10 @@
             </div>
 
             <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
+                <Button :disabled="saving" @click="handleSave">
                     <span v-if="saving">Menyimpan…</span>
                     <span v-else>💾 Simpan QR Setting</span>
-                </button>
+                </Button>
                 <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
             </div>
         </div>
@@ -184,7 +182,19 @@
 
 <script setup>
 import { ref } from "vue";
+import { useStore } from "vuex";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui";
+import { Button, Label } from "@/Components/ui";
+import { Textarea } from "@/Components/ui";
 import "./section.css";
+
+const store = useStore();
 
 const saving = ref(false);
 const saved = ref(false);
@@ -203,6 +213,7 @@ async function handleSave() {
     await new Promise((r) => setTimeout(r, 800));
     saving.value = false;
     saved.value = true;
+    store.commit("wedding/BUMP_PREVIEW");
     setTimeout(() => {
         saved.value = false;
     }, 2500);

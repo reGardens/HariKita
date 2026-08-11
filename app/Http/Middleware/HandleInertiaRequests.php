@@ -35,12 +35,31 @@ class HandleInertiaRequests extends Middleware
         if ($user && !$user->hasRole('super-admin')) {
             $wedding = \App\Models\Wedding::where('user_id', $user->id)->first(['id', 'slug', 'label']);
             if ($wedding) {
+                $couple = $wedding->couple;
+                $setting = \App\Models\Setting::where('wedding_id', $wedding->id)->first();
+
                 $weddingData = [
-                    'couple' => $wedding->couple()->exists(),
+                    // Couple has meaningful data if any name set
+                    'couple' => (bool) ($couple && (
+                        !empty($couple->groom_full_name) || !empty($couple->bride_full_name)
+                    )),
                     'events' => $wedding->events()->count() > 0,
                     'guests' => $wedding->guests()->count() > 0,
                     'media' => $wedding->media()->count() > 0,
-                    'settings' => \App\Models\Setting::where('wedding_id', $wedding->id)->exists(),
+                    // Countdown-specific badge
+                    'countdown' => (bool) ($setting && !empty($setting->countdown_datetime)),
+                    // Amplop-specific badge
+                    'amplop' => (bool) ($setting && (
+                        !empty($setting->amplop_accounts) || !empty($setting->amplop_addresses)
+                    )),
+                    // Streaming-specific badge
+                    'streaming' => (bool) ($setting && !empty($setting->live_stream_url)),
+                    // Love Story badge
+                    'loveStory' => (bool) ($setting && !empty($setting->love_story)),
+                    // Wishlist badge
+                    'wishlist' => (bool) ($setting && !empty($setting->wishlist_items)),
+                    // Only true when a non-default template was chosen
+                    'settings' => (bool) ($setting && $setting->template_id && $setting->template_id !== 'batik-elegance'),
                 ];
             }
         }

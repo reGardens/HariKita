@@ -1,8 +1,11 @@
 <template>
-    <div class="invitation-view w-full" :class="{ 'pt-[52px]': isDemo }">
+    <div
+        class="invitation-view w-full"
+        :class="{ 'pt-[52px]': showDemoHeader }"
+    >
         <!-- Sticky Demo Header -->
         <div
-            v-if="isDemo"
+            v-if="showDemoHeader"
             class="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-between border-b border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur-md text-white shadow-lg md:px-8"
         >
             <div class="flex items-center gap-2">
@@ -119,6 +122,14 @@ const loading = ref(true);
 const error = ref(null);
 
 const isDemo = computed(() => slug.value.startsWith("demo-"));
+const isInIframe = computed(() => {
+    try {
+        return window.self !== window.top;
+    } catch {
+        return true;
+    }
+});
+const showDemoHeader = computed(() => isDemo.value && !isInIframe.value);
 
 const couple = ref(null);
 const events = ref([]);

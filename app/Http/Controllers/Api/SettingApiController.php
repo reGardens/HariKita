@@ -108,6 +108,14 @@ class SettingApiController extends Controller
             'shipping_address' => $request->input('shippingAddress', $setting->shipping_address ?? ''),
             'seo_meta' => $request->input('seoMeta', $setting->seo_meta ?? []),
             'qris_image_url' => $request->input('qrisImageUrl', $setting->qris_image_url ?? ''),
+            'amplop_accounts' => $request->input('amplopAccounts', $setting->amplop_accounts ?? []),
+            'amplop_addresses' => $request->input('amplopAddresses', $setting->amplop_addresses ?? []),
+            'amplop_thank_you_msg' => $request->input('amplopThankYouMsg', $setting->amplop_thank_you_msg ?? ''),
+            'countdown_datetime' => $request->input('countdownDatetime', $setting->countdown_datetime ?? ''),
+            'custom_message' => $request->input('customMessage', $setting->custom_message ?? ''),
+            'love_story' => $request->input('loveStory', $setting->love_story ?? []),
+            'wishlist_items' => $request->input('wishlistItems', $setting->wishlist_items ?? []),
+            'wishlist_enabled' => filter_var($request->input('wishlistEnabled', $setting->wishlist_enabled ?? true), FILTER_VALIDATE_BOOLEAN),
         ]);
 
         return response()->json($this->formatSetting($setting));
@@ -130,6 +138,14 @@ class SettingApiController extends Controller
             'shippingAddress' => $setting->shipping_address,
             'seoMeta' => $setting->seo_meta ?? [],
             'qrisImageUrl' => $setting->qris_image_url,
+            'amplopAccounts' => $setting->amplop_accounts ?? [],
+            'amplopAddresses' => $setting->amplop_addresses ?? [],
+            'amplopThankYouMsg' => $setting->amplop_thank_you_msg,
+            'countdownDatetime' => $setting->countdown_datetime,
+            'customMessage' => $setting->custom_message,
+            'loveStory' => $setting->love_story ?? [],
+            'wishlistItems' => $setting->wishlist_items ?? [],
+            'wishlistEnabled' => (bool)$setting->wishlist_enabled,
             'createdAt' => $setting->created_at ? $setting->created_at->toIso8601String() : null,
             'updatedAt' => $setting->updated_at ? $setting->updated_at->toIso8601String() : null,
         ];

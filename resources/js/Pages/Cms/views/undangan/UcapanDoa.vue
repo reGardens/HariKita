@@ -14,8 +14,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label">Aktifkan Kolom Ucapan</span>
-                        <p class="field-hint">
+                        <Label>Aktifkan Kolom Ucapan</Label>
+                        <p class="text-xs text-muted-foreground">
                             Tampilkan form ucapan di halaman undangan
                         </p>
                     </div>
@@ -36,8 +36,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label">Moderasi Ucapan</span>
-                        <p class="field-hint">
+                        <Label>Moderasi Ucapan</Label>
+                        <p class="text-xs text-muted-foreground">
                             Ucapan harus disetujui admin sebelum tampil
                         </p>
                     </div>
@@ -56,37 +56,30 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="wishPlaceholder"
-                    >Placeholder Pesan</label
-                >
-                <input
+                <Label for="wishPlaceholder">Placeholder Pesan</Label>
+                <Input
                     id="wishPlaceholder"
                     v-model="form.placeholder"
-                    type="text"
-                    class="field-input"
                     placeholder="Tuliskan ucapan dan doa terbaik Anda untuk kami..."
                 />
             </div>
 
             <div class="field-group">
-                <label class="field-label" for="maxWish"
-                    >Batas Karakter Ucapan</label
-                >
-                <input
+                <Label for="maxWish">Batas Karakter Ucapan</Label>
+                <Input
                     id="maxWish"
                     v-model="form.maxChars"
                     type="number"
                     min="50"
                     max="1000"
-                    class="field-input"
                 />
-                <span class="field-hint"
-                    >Maksimum {{ form.maxChars }} karakter per ucapan</span
-                >
+                <p class="text-xs text-muted-foreground">
+                    Maksimum {{ form.maxChars }} karakter per ucapan
+                </p>
             </div>
 
             <div class="field-group">
-                <label class="field-label">Warna Kartu Ucapan</label>
+                <Label>Warna Kartu Ucapan</Label>
                 <div class="color-row">
                     <div class="color-item">
                         <label class="color-label">Latar Kartu</label>
@@ -108,15 +101,10 @@
             </div>
 
             <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
+                <Button :disabled="saving" @click="handleSave">
                     <span v-if="saving">Menyimpan…</span>
                     <span v-else>💾 Simpan Ucapan</span>
-                </button>
+                </Button>
                 <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
             </div>
         </div>
@@ -191,7 +179,11 @@
 
 <script setup>
 import { ref } from "vue";
+import { useStore } from "vuex";
+import { Button, Input, Label } from "@/Components/ui";
 import "./section.css";
+
+const store = useStore();
 
 const saving = ref(false);
 const saved = ref(false);
@@ -221,6 +213,7 @@ async function handleSave() {
     await new Promise((r) => setTimeout(r, 800));
     saving.value = false;
     saved.value = true;
+    store.commit("wedding/BUMP_PREVIEW");
     setTimeout(() => {
         saved.value = false;
     }, 2500);

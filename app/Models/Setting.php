@@ -22,14 +22,27 @@ class Setting extends Model
         'shipping_address',
         'seo_meta',
         'qris_image_url',
+        'amplop_accounts',
+        'amplop_addresses',
+        'amplop_thank_you_msg',
+        'countdown_datetime',
+        'custom_message',
+        'love_story',
+        'wishlist_items',
+        'wishlist_enabled',
     ];
 
     protected $casts = [
         'theme_colors' => 'array',
         'seo_meta' => 'array',
+        'amplop_accounts' => 'array',
+        'amplop_addresses' => 'array',
+        'love_story' => 'array',
+        'wishlist_items' => 'array',
         'moderation_enabled' => 'boolean',
         'password_protected' => 'boolean',
         'show_watermark' => 'boolean',
+        'wishlist_enabled' => 'boolean',
     ];
 
     public function wedding(): BelongsTo

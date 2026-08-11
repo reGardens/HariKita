@@ -1,159 +1,135 @@
 <template>
-    <div class="section-layout">
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">⏰</span>
-                <div>
-                    <h2 class="section-title">Countdown Wedding</h2>
-                    <p class="section-desc">
-                        Hitung mundur menuju hari bahagia
-                    </p>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="weddingDate"
-                    >Tanggal & Waktu Akad</label
-                >
-                <input
-                    id="weddingDate"
-                    v-model="form.weddingDatetime"
-                    type="datetime-local"
-                    class="field-input"
-                />
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="countdownTitle"
-                    >Judul Countdown</label
-                >
-                <input
-                    id="countdownTitle"
-                    v-model="form.title"
-                    type="text"
-                    class="field-input"
-                    placeholder="Contoh: Menuju Hari Bahagia Kami"
-                />
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Tampilkan Unit Waktu</label>
-                <div class="checkbox-group">
-                    <label
-                        v-for="unit in units"
-                        :key="unit.key"
-                        class="checkbox-item"
-                    >
-                        <input
-                            type="checkbox"
-                            v-model="form.showUnits"
-                            :value="unit.key"
-                        />
-                        <span>{{ unit.label }}</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Warna Angka Countdown</label>
-                <div class="color-row">
-                    <div class="color-item">
-                        <label class="color-label">Angka</label>
-                        <input
-                            type="color"
-                            v-model="form.numColor"
-                            class="color-input"
-                        />
-                    </div>
-                    <div class="color-item">
-                        <label class="color-label">Latar</label>
-                        <input
-                            type="color"
-                            v-model="form.bgColor"
-                            class="color-input"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Countdown</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">⏰</span>
+            <div>
+                <h2 class="section-title">Countdown Wedding</h2>
+                <p class="section-desc">Hitung mundur menuju hari bahagia</p>
             </div>
         </div>
 
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Countdown</span>
-            </div>
-            <div
-                class="preview-body"
-                :style="{
-                    background: `linear-gradient(135deg, ${form.bgColor}22, ${form.bgColor}44)`,
-                }"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
+        <div class="field-group">
+            <Label for="weddingDate">Tanggal & Waktu Akad</Label>
+            <Input
+                id="weddingDate"
+                v-model="form.weddingDatetime"
+                type="datetime-local"
+            />
+        </div>
+
+        <div class="field-group">
+            <Label for="countdownTitle">Judul Countdown</Label>
+            <Input
+                id="countdownTitle"
+                v-model="form.title"
+                placeholder="Contoh: Menuju Hari Bahagia Kami"
+            />
+        </div>
+
+        <div class="field-group">
+            <Label>Tampilkan Unit Waktu</Label>
+            <div class="flex flex-wrap gap-3">
+                <label
+                    v-for="unit in units"
+                    :key="unit.key"
+                    class="flex items-center gap-1.5 text-sm text-foreground cursor-pointer"
                 >
-                    <div
-                        class="preview-couple"
-                        :style="{ color: form.numColor }"
-                    >
-                        ⏳ {{ form.title || "Menuju Hari Bahagia" }}
-                    </div>
-                    <div
-                        class="preview-divider"
-                        :style="{ background: form.numColor }"
-                    ></div>
-                    <div class="preview-countdown">
-                        <div
-                            v-for="u in activeUnits"
-                            :key="u.key"
-                            class="preview-countdown-unit"
-                            :style="{
-                                background: form.bgColor + '22',
-                                border: `1px solid ${form.numColor}30`,
-                            }"
-                        >
-                            <div
-                                class="preview-countdown-num"
-                                :style="{ color: form.numColor }"
-                            >
-                                {{ countdown[u.key] }}
-                            </div>
-                            <div class="preview-countdown-lbl">
-                                {{ u.label }}
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        v-if="form.weddingDatetime"
-                        style="font-size: 0.75rem; margin-top: 0.5rem"
-                        :style="{ color: form.numColor + 'aa' }"
-                    >
-                        📅 {{ formatDt(form.weddingDatetime) }}
-                    </div>
+                    <input
+                        type="checkbox"
+                        v-model="form.showUnits"
+                        :value="unit.key"
+                        class="accent-emerald-500 cursor-pointer"
+                    />
+                    <span>{{ unit.label }}</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <Label>Warna Countdown</Label>
+            <div class="flex gap-4 flex-wrap">
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs text-muted-foreground">Angka</span>
+                    <input
+                        type="color"
+                        v-model="form.numColor"
+                        class="w-12 h-10 border-2 border-border rounded-lg cursor-pointer p-0.5"
+                    />
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs text-muted-foreground">Latar</span>
+                    <input
+                        type="color"
+                        v-model="form.bgColor"
+                        class="w-12 h-10 border-2 border-border rounded-lg cursor-pointer p-0.5"
+                    />
                 </div>
             </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div
+            class="rounded-xl border border-border p-4 bg-card"
+            :style="{
+                background: `linear-gradient(135deg, ${form.bgColor}22, ${form.bgColor}44)`,
+            }"
+        >
+            <p
+                class="text-center text-sm font-semibold mb-3"
+                :style="{ color: form.numColor }"
+            >
+                ⏳ {{ form.title || "Menuju Hari Bahagia" }}
+            </p>
+            <div class="flex gap-2 justify-center">
+                <div
+                    v-for="u in activeUnits"
+                    :key="u.key"
+                    class="flex flex-col items-center rounded-lg px-3 py-2 min-w-[52px]"
+                    :style="{
+                        background: form.bgColor + '22',
+                        border: `1px solid ${form.numColor}30`,
+                    }"
+                >
+                    <span
+                        class="text-2xl font-bold leading-none"
+                        :style="{ color: form.numColor }"
+                    >
+                        {{ countdown[u.key] }}
+                    </span>
+                    <span class="text-[10px] text-muted-foreground mt-0.5">
+                        {{ u.label }}
+                    </span>
+                </div>
+            </div>
+            <p
+                v-if="form.weddingDatetime"
+                class="text-center text-xs mt-2"
+                :style="{ color: form.numColor + 'aa' }"
+            >
+                📅 {{ formatDt(form.weddingDatetime) }}
+            </p>
+        </div>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Countdown</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
+import { Input } from "@/Components/ui";
+import { Label } from "@/Components/ui";
+import { Button } from "@/Components/ui";
 import "./section.css";
 
+const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
 let timer = null;
@@ -173,15 +149,17 @@ const form = ref({
     bgColor: "#ffffff",
 });
 
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+const activeUnits = computed(() =>
+    units.filter((u) => form.value.showUnits.includes(u.key)),
+);
+
 const countdown = ref({
     days: "00",
     hours: "00",
     minutes: "00",
     seconds: "00",
 });
-const activeUnits = computed(() =>
-    units.filter((u) => form.value.showUnits.includes(u.key)),
-);
 
 function tick() {
     if (!form.value.weddingDatetime) {
@@ -225,42 +203,51 @@ function formatDt(dt) {
     });
 }
 
-onMounted(() => {
+async function loadCountdown() {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/settings`);
+        if (data.countdownDatetime) {
+            const val = String(data.countdownDatetime);
+            if (val.length === 10) {
+                form.value.weddingDatetime = `${val}T08:00`;
+            } else if (val.includes("T")) {
+                form.value.weddingDatetime = val.slice(0, 16);
+            } else {
+                form.value.weddingDatetime = val;
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load countdown", err);
+    }
+}
+
+onMounted(async () => {
+    await loadCountdown();
     tick();
     timer = setInterval(tick, 1000);
 });
 onUnmounted(() => clearInterval(timer));
 
 async function handleSave() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     saving.value = true;
-    await new Promise((r) => setTimeout(r, 800));
-    saving.value = false;
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2500);
+    try {
+        await axios.post(`/api/wedding/${slug}/settings`, {
+            countdownDatetime: form.value.weddingDatetime,
+        });
+        saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
+        setTimeout(() => {
+            saved.value = false;
+        }, 2500);
+    } catch (err) {
+        console.error("Failed to save countdown", err);
+        alert("Gagal menyimpan countdown. Silakan coba lagi.");
+    } finally {
+        saving.value = false;
+    }
 }
 </script>
-
-<style scoped>
-.checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.875rem;
-    color: var(--foreground, #374151);
-    cursor: pointer;
-}
-.dark .checkbox-item {
-    color: #e5e7eb;
-}
-.checkbox-item input {
-    accent-color: #10b981;
-    cursor: pointer;
-}
-</style>

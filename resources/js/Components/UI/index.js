@@ -29,3 +29,4 @@ export { default as SelectValue } from './SelectValue.vue';
 export { default as Badge } from './Badge.vue';
 export { default as Label } from './Label.vue';
 export { default as RichTextEditor } from './RichTextEditor.vue';
+export { default as Textarea } from './Textarea.vue';

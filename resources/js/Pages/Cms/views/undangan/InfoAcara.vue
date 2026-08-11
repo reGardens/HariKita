@@ -1,316 +1,246 @@
 <template>
-    <div class="section-layout">
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">📅</span>
-                <div>
-                    <h2 class="section-title">Informasi Acara</h2>
-                    <p class="section-desc">
-                        Tambahkan detail rangkaian acara pernikahan
-                    </p>
-                </div>
-            </div>
-
-            <div
-                v-for="(event, idx) in form.events"
-                :key="idx"
-                class="event-block"
-            >
-                <div class="event-block-header">
-                    <span class="field-label">Acara {{ idx + 1 }}</span>
-                    <button
-                        v-if="form.events.length > 1"
-                        type="button"
-                        class="btn-remove"
-                        @click="removeEvent(idx)"
-                    >
-                        ✕ Hapus
-                    </button>
-                </div>
-                <div class="field-group">
-                    <input
-                        v-model="event.name"
-                        type="text"
-                        class="field-input"
-                        placeholder="Nama acara, misal: Akad Nikah"
-                    />
-                </div>
-                <div
-                    style="
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 0.75rem;
-                    "
-                >
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Tanggal</label
-                        >
-                        <input
-                            v-model="event.date"
-                            type="date"
-                            class="field-input"
-                        />
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Dress Code</label
-                        >
-                        <input
-                            v-model="event.dressCode"
-                            type="text"
-                            class="field-input"
-                            placeholder="Contoh: Soft Pink"
-                        />
-                    </div>
-                </div>
-                <div
-                    style="
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 0.75rem;
-                    "
-                >
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Mulai</label
-                        >
-                        <input
-                            v-model="event.startTime"
-                            type="time"
-                            class="field-input"
-                        />
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Selesai</label
-                        >
-                        <input
-                            v-model="event.endTime"
-                            type="time"
-                            class="field-input"
-                        />
-                    </div>
-                </div>
-                <div class="field-group">
-                    <input
-                        v-model="event.venue"
-                        type="text"
-                        class="field-input"
-                        placeholder="Nama tempat, misal: Gedung Serbaguna Mawar"
-                    />
-                </div>
-                <div class="field-group">
-                    <textarea
-                        v-model="event.address"
-                        rows="2"
-                        class="field-input field-textarea"
-                        placeholder="Alamat lengkap..."
-                    />
-                </div>
-                <div class="field-group">
-                    <input
-                        v-model="event.mapsUrl"
-                        type="text"
-                        class="field-input"
-                        placeholder="Link Google Maps (opsional)"
-                    />
-                </div>
-            </div>
-
-            <button type="button" class="btn-add" @click="addEvent">
-                + Tambah Acara
-            </button>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Acara</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">📅</span>
+            <div>
+                <h2 class="section-title">Informasi Acara</h2>
+                <p class="section-desc">
+                    Tambahkan detail rangkaian acara pernikahan
+                </p>
             </div>
         </div>
 
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Informasi Acara</span>
-            </div>
-            <div
-                class="preview-body"
-                style="background: linear-gradient(135deg, #fffbeb, #fef3c7)"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
+        <div v-for="(event, idx) in form.events" :key="idx" class="event-block">
+            <div class="event-block-header">
+                <Label class="text-foreground font-semibold"
+                    >Acara {{ idx + 1 }}</Label
                 >
-                    <div class="preview-couple" style="color: #92400e">
-                        Rangkaian Acara
-                    </div>
-                    <div
-                        class="preview-divider"
-                        style="background: #d97706"
-                    ></div>
-                    <div
-                        v-for="(ev, i) in form.events"
-                        :key="i"
-                        class="preview-event-card"
-                        style="
-                            border-color: #d9770640;
-                            background: rgba(255, 255, 255, 0.7);
-                        "
-                    >
-                        <div class="preview-event-name" style="color: #92400e">
-                            {{ ev.name || "Nama Acara" }}
-                        </div>
-                        <div class="preview-event-time">
-                            <span v-if="ev.date"
-                                >📅 {{ formatDate(ev.date) }}</span
-                            >
-                        </div>
-                        <div class="preview-event-time" v-if="ev.startTime">
-                            ⏰ {{ ev.startTime }}
-                            <span v-if="ev.endTime"> – {{ ev.endTime }}</span>
-                        </div>
-                        <div class="preview-event-time" v-if="ev.venue">
-                            📍 {{ ev.venue }}
-                        </div>
-                        <div class="preview-event-time" v-if="ev.dressCode">
-                            👗 Dress Code: {{ ev.dressCode }}
-                        </div>
-                        <a v-if="ev.mapsUrl" href="#" class="preview-maps-link"
-                            >🗺️ Lihat di Maps</a
-                        >
-                    </div>
+                <Button
+                    v-if="form.events.length > 1"
+                    variant="ghost"
+                    size="sm"
+                    class="text-destructive hover:text-destructive/80 h-7 px-2"
+                    @click="removeEvent(idx)"
+                >
+                    ✕ Hapus
+                </Button>
+            </div>
+
+            <div class="field-group">
+                <Label>Nama Acara</Label>
+                <Input
+                    v-model="event.name"
+                    placeholder="Nama acara, misal: Akad Nikah"
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="field-group">
+                    <Label>Tanggal</Label>
+                    <Input v-model="event.date" type="date" />
+                </div>
+                <div class="field-group">
+                    <Label>Dress Code</Label>
+                    <Input
+                        v-model="event.dressCode"
+                        placeholder="Contoh: Soft Pink"
+                    />
                 </div>
             </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="field-group">
+                    <Label>Mulai</Label>
+                    <Input v-model="event.startTime" type="time" />
+                </div>
+                <div class="field-group">
+                    <Label>Selesai</Label>
+                    <Input v-model="event.endTime" type="time" />
+                </div>
+            </div>
+
+            <div class="field-group">
+                <Label>Nama Tempat</Label>
+                <Input
+                    v-model="event.venue"
+                    placeholder="Nama tempat, misal: Gedung Serbaguna Mawar"
+                />
+            </div>
+
+            <div class="field-group">
+                <Label>Alamat Lengkap</Label>
+                <Textarea
+                    v-model="event.address"
+                    rows="2"
+                    placeholder="Alamat lengkap..."
+                />
+            </div>
+
+            <div class="field-group">
+                <Label>Link Google Maps</Label>
+                <Input
+                    v-model="event.mapsUrl"
+                    placeholder="Link Google Maps (opsional)"
+                />
+            </div>
+        </div>
+
+        <Button
+            variant="outline"
+            class="w-full border-dashed border-2 hover:border-emerald-500 hover:text-emerald-600"
+            @click="addEvent"
+        >
+            + Tambah Acara
+        </Button>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Acara</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
+import { Input } from "@/Components/ui";
+import { Label } from "@/Components/ui";
+import { Button } from "@/Components/ui";
+import { Textarea } from "@/Components/ui";
 import "./section.css";
 
+const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
 
-const form = ref({
-    events: [
-        {
-            name: "",
-            date: "",
-            startTime: "",
-            endTime: "",
-            venue: "",
-            address: "",
-            mapsUrl: "",
-            dressCode: "",
-        },
-    ],
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+
+const emptyEvent = () => ({
+    id: null,
+    name: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    venue: "",
+    address: "",
+    mapsUrl: "",
+    dressCode: "",
 });
 
+const form = ref({
+    events: [emptyEvent()],
+});
+
+function mapApiToForm(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return [emptyEvent()];
+    }
+    return items.map((e) => ({
+        id: e.id || null,
+        name: e.name || "",
+        date: e.date || "",
+        startTime: e.timeStart || "",
+        endTime: e.timeEnd || "",
+        venue: e.locationName || "",
+        address: e.locationAddress || "",
+        mapsUrl: e.locationMapUrl || "",
+        dressCode: e.dressCode || "",
+    }));
+}
+
+async function loadEvents() {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/events`);
+        form.value.events = mapApiToForm(data);
+    } catch (err) {
+        console.error("Failed to load events", err);
+    }
+}
+
+onMounted(loadEvents);
+
 function addEvent() {
-    form.value.events.push({
-        name: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        venue: "",
-        address: "",
-        mapsUrl: "",
-        dressCode: "",
-    });
+    form.value.events.push(emptyEvent());
 }
 
 function removeEvent(idx) {
     form.value.events.splice(idx, 1);
 }
 
-function formatDate(d) {
-    if (!d) return "";
-    return new Date(d + "T00:00:00").toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-}
-
 async function handleSave() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     saving.value = true;
-    await new Promise((r) => setTimeout(r, 800));
-    saving.value = false;
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2500);
+    try {
+        const { data: current } = await axios.get(
+            `/api/wedding/${slug}/events`,
+        );
+        const currentIds = new Set(
+            (Array.isArray(current) ? current : []).map((e) => e.id),
+        );
+        const formIds = new Set(
+            form.value.events.filter((e) => e.id).map((e) => e.id),
+        );
+
+        for (const id of currentIds) {
+            if (!formIds.has(id)) {
+                await axios
+                    .delete(`/api/wedding/${slug}/events/${id}`)
+                    .catch(() => {});
+            }
+        }
+
+        for (const ev of form.value.events) {
+            const payload = {
+                name: ev.name,
+                date: ev.date,
+                timeStart: ev.startTime,
+                timeEnd: ev.endTime,
+                timezone: "WIB",
+                locationName: ev.venue,
+                locationAddress: ev.address,
+                locationMapUrl: ev.mapsUrl,
+                dressCode: ev.dressCode,
+            };
+            if (ev.id) {
+                await axios.put(
+                    `/api/wedding/${slug}/events/${ev.id}`,
+                    payload,
+                );
+            } else {
+                const { data } = await axios.post(
+                    `/api/wedding/${slug}/events`,
+                    payload,
+                );
+                ev.id = data.id;
+            }
+        }
+
+        saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
+        setTimeout(() => {
+            saved.value = false;
+        }, 2500);
+    } catch (err) {
+        console.error("Failed to save events", err);
+        alert("Gagal menyimpan acara. Silakan coba lagi.");
+    } finally {
+        saving.value = false;
+    }
 }
 </script>
 
 <style scoped>
 .event-block {
-    border: 1px solid var(--border, #e5e7eb);
-    border-radius: 0.75rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    background: var(--card, #f9fafb);
-}
-.dark .event-block {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 20%);
+    @apply border border-border rounded-xl p-4 flex flex-col gap-3 bg-card;
 }
 .event-block-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.btn-remove {
-    font-size: 0.75rem;
-    color: #ef4444;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-}
-.btn-remove:hover {
-    text-decoration: underline;
-}
-.btn-add {
-    border: 2px dashed var(--border, #d1d5db);
-    border-radius: 0.75rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-    color: var(--muted-foreground, #6b7280);
-    background: var(--card, white);
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-    transition:
-        border-color 0.15s,
-        color 0.15s;
-}
-.dark .btn-add {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 25%);
-    color: #9ca3af;
-}
-.btn-add:hover {
-    border-color: #10b981;
-    color: #10b981;
-}
-.preview-maps-link {
-    font-size: 0.75rem;
-    color: #10b981;
-    text-decoration: none;
-    font-weight: 500;
+    @apply flex items-center justify-between;
 }
 </style>

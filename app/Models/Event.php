@@ -22,6 +22,7 @@ class Event extends Model
         'location_name',
         'location_address',
         'location_map_url',
+        'dress_code',
     ];
 
     protected static function boot()

@@ -1,192 +1,114 @@
 <template>
-    <div class="section-layout">
-        <!-- Left: Form -->
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">🎨</span>
-                <div>
-                    <h2 class="section-title">Tema Undangan</h2>
-                    <p class="section-desc">
-                        Pilih tema yang sesuai dengan nuansa pernikahanmu
-                    </p>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Pilih Tema</label>
-                <div class="template-grid">
-                    <button
-                        v-for="tmpl in templates"
-                        :key="tmpl.id"
-                        type="button"
-                        class="template-card"
-                        :class="{
-                            'template-card--active':
-                                form.templateId === tmpl.id,
-                        }"
-                        @click="selectTemplate(tmpl.id)"
-                    >
-                        <div
-                            class="template-swatch"
-                            :style="{ background: tmplGradient(tmpl.id) }"
-                        >
-                            <img
-                                :src="`/images/templates/${tmpl.id}-thumb.png`"
-                                :alt="tmpl.name"
-                                class="template-thumb-img"
-                                loading="lazy"
-                                @error="$event.target.style.display = 'none'"
-                            />
-                            <span class="template-icon">{{
-                                tmplIcon(tmpl.id)
-                            }}</span>
-                        </div>
-                        <span class="template-name">{{ tmpl.name }}</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Warna Utama</label>
-                <div class="color-row">
-                    <div class="color-item">
-                        <label class="color-label">Primer</label>
-                        <input
-                            type="color"
-                            v-model="form.primaryColor"
-                            class="color-input"
-                        />
-                        <span class="color-hex">{{ form.primaryColor }}</span>
-                    </div>
-                    <div class="color-item">
-                        <label class="color-label">Sekunder</label>
-                        <input
-                            type="color"
-                            v-model="form.secondaryColor"
-                            class="color-input"
-                        />
-                        <span class="color-hex">{{ form.secondaryColor }}</span>
-                    </div>
-                    <div class="color-item">
-                        <label class="color-label">Aksen</label>
-                        <input
-                            type="color"
-                            v-model="form.accentColor"
-                            class="color-input"
-                        />
-                        <span class="color-hex">{{ form.accentColor }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="fontFamily">Font Huruf</label>
-                <select
-                    id="fontFamily"
-                    v-model="form.fontFamily"
-                    class="field-input"
-                >
-                    <option v-for="f in fonts" :key="f" :value="f">
-                        {{ f }}
-                    </option>
-                </select>
-            </div>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Tema</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">🎨</span>
+            <div>
+                <h2 class="section-title">Tema Undangan</h2>
+                <p class="section-desc">
+                    Pilih tema dan preview akan berubah secara realtime
+                </p>
             </div>
         </div>
 
-        <!-- Right: Live Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">{{
-                    selectedTemplateName
-                }}</span>
-            </div>
-            <div class="preview-body" :style="previewBg">
-                <div
-                    class="preview-accent-bar"
-                    :style="{ background: form.accentColor }"
-                ></div>
-                <div
-                    class="preview-content"
-                    :style="{ fontFamily: form.fontFamily }"
+        <div class="field-group">
+            <Label>Pilih Tema</Label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                <button
+                    v-for="tmpl in templates"
+                    :key="tmpl.id"
+                    type="button"
+                    class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
+                    :class="
+                        form.templateId === tmpl.id
+                            ? 'border-emerald-500 ring-2 ring-emerald-500/25'
+                            : 'border-border'
+                    "
+                    @click="selectTemplate(tmpl.id)"
                 >
                     <div
-                        class="preview-badge-pill"
-                        :style="{ background: form.primaryColor }"
+                        class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center"
+                        :style="{ background: getGradient(tmpl.id) }"
                     >
-                        {{ selectedTemplateName }}
-                    </div>
-                    <div
-                        class="preview-couple"
-                        :style="{ color: form.primaryColor }"
-                    >
-                        Budi &amp; Ani
-                    </div>
-                    <div
-                        class="preview-divider"
-                        :style="{ background: form.accentColor }"
-                    ></div>
-                    <div
-                        class="preview-date"
-                        :style="{ color: form.secondaryColor }"
-                    >
-                        25 Desember 2024
-                    </div>
-                    <div class="preview-icon-row">
-                        <div
-                            class="preview-line"
-                            :style="{ background: form.accentColor }"
-                        ></div>
-                        <span>{{ tmplIcon(form.templateId) }}</span>
-                        <div
-                            class="preview-line"
-                            :style="{ background: form.accentColor }"
-                        ></div>
-                    </div>
-                    <div
-                        class="preview-event-card"
-                        :style="{ borderColor: form.secondaryColor + '60' }"
-                    >
-                        <div
-                            class="preview-event-name"
-                            :style="{ color: form.primaryColor }"
+                        <!-- Thumbnail image (from DB) -->
+                        <img
+                            v-if="tmpl.thumbnail_url"
+                            :src="tmpl.thumbnail_url"
+                            :alt="tmpl.name"
+                            class="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            loading="lazy"
+                            @error="$event.target.style.display = 'none'"
+                        />
+                        <!-- Fallback icon -->
+                        <span class="text-2xl select-none relative">{{
+                            getIcon(tmpl.id)
+                        }}</span>
+                        <!-- Status badge -->
+                        <span
+                            v-if="!tmpl.is_custom"
+                            class="absolute top-1 right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-emerald-500 text-white"
+                            >✓</span
                         >
-                            Akad Nikah
-                        </div>
-                        <div class="preview-event-time">08:00 - 10:00 WIB</div>
+                        <span
+                            v-else
+                            class="absolute top-1 right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-amber-500 text-white"
+                            >Dev</span
+                        >
+                        <!-- Hover: Lihat Demo button (small, bottom) -->
+                        <a
+                            :href="`/wedding/demo-${tmpl.id}`"
+                            target="_blank"
+                            class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap"
+                            @click.stop
+                        >
+                            👁 Lihat Demo
+                        </a>
                     </div>
-                    <button
-                        class="preview-rsvp-btn"
-                        :style="{ background: form.primaryColor }"
+                    <span
+                        class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full"
+                        >{{ tmpl.name }}</span
                     >
-                        Konfirmasi Kehadiran
-                    </button>
-                </div>
-                <div
-                    class="preview-accent-bar preview-accent-bar--bottom"
-                    :style="{ background: form.accentColor }"
-                ></div>
+                </button>
             </div>
+        </div>
+
+        <div class="field-group">
+            <Label for="fontFamily">Font Huruf</Label>
+            <Select
+                :model-value="form.fontFamily"
+                @update:model-value="(v) => (form.fontFamily = v)"
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder="Pilih font" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem v-for="f in fonts" :key="f" :value="f">
+                        {{ f }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Tema</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui";
+import { Button, Label } from "@/Components/ui";
 import "./section.css";
 
 const store = useStore();
@@ -208,9 +130,6 @@ const fonts = [
 
 const form = ref({
     templateId: "batik-elegance",
-    primaryColor: "#8B4513",
-    secondaryColor: "#D2691E",
-    accentColor: "#FFD700",
     fontFamily: "Playfair Display",
 });
 
@@ -227,6 +146,7 @@ const gradients = {
     "papua-cendrawasih": "linear-gradient(135deg,#F8F0E8,#F0D8C8)",
     "batik-elegance": "linear-gradient(135deg,#FFF0E0,#FFD0A0)",
 };
+
 const icons = {
     "jawa-klasik": "🪷",
     "sunda-pasundan": "🌿",
@@ -241,37 +161,18 @@ const icons = {
     "batik-elegance": "🌺",
 };
 
-function tmplGradient(id) {
+function getGradient(id) {
     return gradients[id] || "linear-gradient(135deg,#f3f4f6,#e5e7eb)";
 }
-function tmplIcon(id) {
+
+function getIcon(id) {
     return icons[id] || "💒";
 }
-
-const selectedTemplateName = computed(() => {
-    const t = templates.value.find((t) => t.id === form.value.templateId);
-    return t ? t.name : form.value.templateId;
-});
-
-const previewBg = computed(() => ({
-    background:
-        gradients[form.value.templateId] ||
-        "linear-gradient(135deg,#f9fafb,#f3f4f6)",
-    fontFamily: form.value.fontFamily,
-}));
 
 function populateFromStore() {
     const s = store.getters["settings/settings"];
     if (s) {
         if (s.templateId) form.value.templateId = s.templateId;
-        if (s.themeColors) {
-            form.value.primaryColor =
-                s.themeColors.primary || form.value.primaryColor;
-            form.value.secondaryColor =
-                s.themeColors.secondary || form.value.secondaryColor;
-            form.value.accentColor =
-                s.themeColors.accent || form.value.accentColor;
-        }
         if (s.fontFamily) form.value.fontFamily = s.fontFamily;
     }
 }
@@ -286,14 +187,10 @@ async function handleSave() {
     try {
         await store.dispatch("settings/saveSettings", {
             templateId: form.value.templateId,
-            themeColors: {
-                primary: form.value.primaryColor,
-                secondary: form.value.secondaryColor,
-                accent: form.value.accentColor,
-            },
             fontFamily: form.value.fontFamily,
         });
         saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
         setTimeout(() => {
             saved.value = false;
         }, 2500);
@@ -312,18 +209,3 @@ onMounted(async () => {
     populateFromStore();
 });
 </script>
-
-<style scoped>
-.template-thumb-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
-}
-.template-swatch {
-    position: relative;
-    overflow: hidden;
-}
-</style>

@@ -1,415 +1,294 @@
 <template>
-    <div class="section-layout">
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">💰</span>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">💰</span>
+            <div>
+                <h2 class="section-title">Amplop Digital</h2>
+                <p class="section-desc">
+                    Terima hadiah digital via transfer bank & e-wallet
+                </p>
+            </div>
+        </div>
+
+        <div v-for="(acc, i) in form.accounts" :key="i" class="account-block">
+            <div class="account-block-header">
+                <Label class="text-foreground font-semibold"
+                    >Rekening / Dompet {{ i + 1 }}</Label
+                >
+                <Button
+                    v-if="form.accounts.length > 1"
+                    variant="ghost"
+                    size="sm"
+                    class="text-destructive hover:text-destructive/80 h-7 px-2"
+                    @click="removeAcc(i)"
+                >
+                    ✕ Hapus
+                </Button>
+            </div>
+
+            <div class="field-group">
+                <Label>Jenis</Label>
+                <Select
+                    v-model="acc.type"
+                    @update:model-value="(v) => (acc.type = v)"
+                >
+                    <SelectTrigger>
+                        <SelectValue
+                            :placeholder="
+                                acc.type === 'bank' ? '🏦 Bank' : acc.type
+                            "
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="bank">🏦 Bank</SelectItem>
+                        <SelectItem value="dana">💙 DANA</SelectItem>
+                        <SelectItem value="ovo">💜 OVO</SelectItem>
+                        <SelectItem value="gopay">🟢 GoPay</SelectItem>
+                        <SelectItem value="shopeepay">🟠 ShopeePay</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div class="field-group">
+                <Label>{{
+                    acc.type === "bank" ? "Nama Bank" : "Platform"
+                }}</Label>
+                <Input
+                    v-model="acc.bankName"
+                    :placeholder="
+                        acc.type === 'bank'
+                            ? 'Contoh: BCA, BNI, Mandiri...'
+                            : 'Diisi otomatis'
+                    "
+                />
+            </div>
+
+            <div class="field-group">
+                <Label>{{
+                    acc.type === "bank" ? "Nomor Rekening" : "Nomor HP"
+                }}</Label>
+                <Input v-model="acc.number" placeholder="Masukkan nomor..." />
+            </div>
+
+            <div class="field-group">
+                <Label>Atas Nama</Label>
+                <Input v-model="acc.name" placeholder="Nama pemilik rekening" />
+            </div>
+        </div>
+
+        <Button
+            variant="outline"
+            class="w-full border-dashed border-2 hover:border-amber-500 hover:text-amber-600"
+            @click="addAcc"
+        >
+            + Tambah Rekening / E-Wallet
+        </Button>
+
+        <!-- Alamat Pengiriman Hadiah -->
+        <div class="pt-4 border-t border-border">
+            <div class="section-header mb-4">
+                <span class="section-icon text-xl">🏠</span>
                 <div>
-                    <h2 class="section-title">Amplop Digital</h2>
+                    <Label class="text-base text-foreground font-semibold"
+                        >Alamat Pengiriman Hadiah</Label
+                    >
                     <p class="section-desc">
-                        Terima hadiah digital via transfer bank & e-wallet
+                        Alamat untuk tamu yang ingin mengirim hadiah fisik
                     </p>
                 </div>
             </div>
 
-            <div
-                v-for="(acc, i) in form.accounts"
-                :key="i"
-                class="account-block"
-            >
-                <div class="account-block-header">
-                    <span class="field-label"
-                        >Rekening / Dompet {{ i + 1 }}</span
-                    >
-                    <button
-                        v-if="form.accounts.length > 1"
-                        type="button"
-                        class="btn-remove"
-                        @click="removeAcc(i)"
-                    >
-                        ✕ Hapus
-                    </button>
-                </div>
-                <div class="field-group">
-                    <label class="field-label" style="font-size: 0.75rem"
-                        >Jenis</label
-                    >
-                    <select v-model="acc.type" class="field-input">
-                        <option value="bank">🏦 Bank</option>
-                        <option value="dana">💙 DANA</option>
-                        <option value="ovo">💜 OVO</option>
-                        <option value="gopay">🟢 GoPay</option>
-                        <option value="shopeepay">🟠 ShopeePay</option>
-                    </select>
-                </div>
-                <div class="field-group">
-                    <label class="field-label" style="font-size: 0.75rem">
-                        {{ acc.type === "bank" ? "Nama Bank" : "Platform" }}
-                    </label>
-                    <input
-                        v-model="acc.bankName"
-                        type="text"
-                        class="field-input"
-                        :placeholder="
-                            acc.type === 'bank'
-                                ? 'Contoh: BCA, BNI, Mandiri...'
-                                : 'Diisi otomatis'
-                        "
-                    />
-                </div>
-                <div class="field-group">
-                    <label class="field-label" style="font-size: 0.75rem">
-                        {{
-                            acc.type === "bank" ? "Nomor Rekening" : "Nomor HP"
-                        }}
-                    </label>
-                    <input
-                        v-model="acc.number"
-                        type="text"
-                        class="field-input"
-                        placeholder="Masukkan nomor..."
-                    />
-                </div>
-                <div class="field-group">
-                    <label class="field-label" style="font-size: 0.75rem"
-                        >Atas Nama</label
-                    >
-                    <input
-                        v-model="acc.name"
-                        type="text"
-                        class="field-input"
-                        placeholder="Nama pemilik rekening"
-                    />
-                </div>
-            </div>
-
-            <button type="button" class="btn-add" @click="addAcc">
-                + Tambah Rekening / E-Wallet
-            </button>
-
-            <!-- Alamat Pengiriman Hadiah -->
-            <div class="mt-6 pt-6 border-t border-border">
-                <div class="section-header mb-4">
-                    <span class="section-icon">🏠</span>
-                    <div>
-                        <h3 class="field-label text-base">
-                            Alamat Pengiriman Hadiah
-                        </h3>
-                        <p class="section-desc">
-                            Alamat untuk tamu yang ingin mengirim hadiah fisik
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Groom Address -->
-                <details class="account-block mb-4">
-                    <summary
-                        class="cursor-pointer font-semibold text-sm text-foreground"
-                    >
-                        📍 Alamat Mempelai Pria
-                    </summary>
-                    <div class="mt-3 flex flex-col gap-3">
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Nama Penerima</label
-                            >
-                            <input
-                                v-model="form.addresses.groom.recipientName"
-                                type="text"
-                                class="field-input"
-                                placeholder="Nama lengkap penerima"
-                            />
-                        </div>
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Alamat Lengkap</label
-                            >
-                            <textarea
-                                v-model="form.addresses.groom.fullAddress"
-                                rows="2"
-                                class="field-input field-textarea"
-                                placeholder="Jl. Contoh No. 1, RT/RW, Kelurahan, Kecamatan"
-                            />
-                        </div>
-                        <div
-                            class="grid grid-cols-2 gap-3"
-                        >
-                            <div class="field-group">
-                                <label
-                                    class="field-label"
-                                    style="font-size: 0.75rem"
-                                    >Kota</label
-                                >
-                                <input
-                                    v-model="form.addresses.groom.city"
-                                    type="text"
-                                    class="field-input"
-                                    placeholder="Kota"
-                                />
-                            </div>
-                            <div class="field-group">
-                                <label
-                                    class="field-label"
-                                    style="font-size: 0.75rem"
-                                    >Kode Pos</label
-                                >
-                                <input
-                                    v-model="form.addresses.groom.postalCode"
-                                    type="text"
-                                    class="field-input"
-                                    placeholder="12345"
-                                />
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Nomor HP</label
-                            >
-                            <input
-                                v-model="form.addresses.groom.phone"
-                                type="text"
-                                class="field-input"
-                                placeholder="08xxxxxxxxxx"
-                            />
-                        </div>
-                    </div>
-                </details>
-
-                <!-- Bride Address -->
-                <details class="account-block">
-                    <summary
-                        class="cursor-pointer font-semibold text-sm text-foreground"
-                    >
-                        📍 Alamat Mempelai Wanita
-                    </summary>
-                    <div class="mt-3 flex flex-col gap-3">
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Nama Penerima</label
-                            >
-                            <input
-                                v-model="form.addresses.bride.recipientName"
-                                type="text"
-                                class="field-input"
-                                placeholder="Nama lengkap penerima"
-                            />
-                        </div>
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Alamat Lengkap</label
-                            >
-                            <textarea
-                                v-model="form.addresses.bride.fullAddress"
-                                rows="2"
-                                class="field-input field-textarea"
-                                placeholder="Jl. Contoh No. 1, RT/RW, Kelurahan, Kecamatan"
-                            />
-                        </div>
-                        <div
-                            class="grid grid-cols-2 gap-3"
-                        >
-                            <div class="field-group">
-                                <label
-                                    class="field-label"
-                                    style="font-size: 0.75rem"
-                                    >Kota</label
-                                >
-                                <input
-                                    v-model="form.addresses.bride.city"
-                                    type="text"
-                                    class="field-input"
-                                    placeholder="Kota"
-                                />
-                            </div>
-                            <div class="field-group">
-                                <label
-                                    class="field-label"
-                                    style="font-size: 0.75rem"
-                                    >Kode Pos</label
-                                >
-                                <input
-                                    v-model="form.addresses.bride.postalCode"
-                                    type="text"
-                                    class="field-input"
-                                    placeholder="12345"
-                                />
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label
-                                class="field-label"
-                                style="font-size: 0.75rem"
-                                >Nomor HP</label
-                            >
-                            <input
-                                v-model="form.addresses.bride.phone"
-                                type="text"
-                                class="field-input"
-                                placeholder="08xxxxxxxxxx"
-                            />
-                        </div>
-                    </div>
-                </details>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Pesan Ucapan Terima Kasih</label>
-                <textarea
-                    v-model="form.thankYouMsg"
-                    rows="2"
-                    class="field-input field-textarea"
-                    placeholder="Terima kasih atas doa dan hadiah yang telah diberikan..."
-                />
-            </div>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
+            <!-- Groom Address -->
+            <details class="account-block mb-4">
+                <summary
+                    class="cursor-pointer font-semibold text-sm text-foreground"
                 >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Amplop Digital</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
-            </div>
+                    📍 Alamat Mempelai Pria
+                </summary>
+                <div class="mt-3 flex flex-col gap-3">
+                    <div class="field-group">
+                        <Label>Nama Penerima</Label>
+                        <Input
+                            v-model="form.addresses.groom.recipientName"
+                            placeholder="Nama lengkap penerima"
+                        />
+                    </div>
+                    <div class="field-group">
+                        <Label>Alamat Lengkap</Label>
+                        <Textarea
+                            v-model="form.addresses.groom.fullAddress"
+                            rows="2"
+                            placeholder="Jl. Contoh No. 1, RT/RW, Kelurahan, Kecamatan"
+                        />
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="field-group">
+                            <Label>Kota</Label>
+                            <Input
+                                v-model="form.addresses.groom.city"
+                                placeholder="Kota"
+                            />
+                        </div>
+                        <div class="field-group">
+                            <Label>Kode Pos</Label>
+                            <Input
+                                v-model="form.addresses.groom.postalCode"
+                                placeholder="12345"
+                            />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <Label>Nomor HP</Label>
+                        <Input
+                            v-model="form.addresses.groom.phone"
+                            placeholder="08xxxxxxxxxx"
+                        />
+                    </div>
+                </div>
+            </details>
+
+            <!-- Bride Address -->
+            <details class="account-block">
+                <summary
+                    class="cursor-pointer font-semibold text-sm text-foreground"
+                >
+                    📍 Alamat Mempelai Wanita
+                </summary>
+                <div class="mt-3 flex flex-col gap-3">
+                    <div class="field-group">
+                        <Label>Nama Penerima</Label>
+                        <Input
+                            v-model="form.addresses.bride.recipientName"
+                            placeholder="Nama lengkap penerima"
+                        />
+                    </div>
+                    <div class="field-group">
+                        <Label>Alamat Lengkap</Label>
+                        <Textarea
+                            v-model="form.addresses.bride.fullAddress"
+                            rows="2"
+                            placeholder="Jl. Contoh No. 1, RT/RW, Kelurahan, Kecamatan"
+                        />
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="field-group">
+                            <Label>Kota</Label>
+                            <Input
+                                v-model="form.addresses.bride.city"
+                                placeholder="Kota"
+                            />
+                        </div>
+                        <div class="field-group">
+                            <Label>Kode Pos</Label>
+                            <Input
+                                v-model="form.addresses.bride.postalCode"
+                                placeholder="12345"
+                            />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <Label>Nomor HP</Label>
+                        <Input
+                            v-model="form.addresses.bride.phone"
+                            placeholder="08xxxxxxxxxx"
+                        />
+                    </div>
+                </div>
+            </details>
         </div>
 
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Amplop Digital</span>
-            </div>
-            <div
-                class="preview-body"
-                style="background: linear-gradient(135deg, #fefce8, #fef9c3)"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
-                >
-                    <div class="preview-couple" style="color: #713f12">
-                        💝 Amplop Digital
-                    </div>
-                    <div
-                        class="preview-divider"
-                        style="background: #ca8a04"
-                    ></div>
-                    <div
-                        v-for="(acc, i) in form.accounts"
-                        :key="i"
-                        class="preview-bank-card"
-                    >
-                        <div class="preview-bank-logo">
-                            {{ typeIcon(acc.type) }}
-                        </div>
-                        <div class="preview-bank-info">
-                            <div
-                                class="preview-bank-name"
-                                style="color: #713f12"
-                            >
-                                {{ acc.bankName || typeName(acc.type) }}
-                            </div>
-                            <div class="preview-bank-number">
-                                {{ acc.number || "0000 0000 0000" }}
-                            </div>
-                            <div style="font-size: 0.7rem; color: #9ca3af">
-                                {{ acc.name || "Nama Pemilik" }}
-                            </div>
-                        </div>
-                        <button
-                            style="
-                                font-size: 0.7rem;
-                                background: #ca8a04;
-                                color: white;
-                                border: none;
-                                border-radius: 0.375rem;
-                                padding: 0.25rem 0.5rem;
-                                cursor: default;
-                            "
-                        >
-                            Salin
-                        </button>
-                    </div>
-                    <div
-                        v-if="form.thankYouMsg"
-                        style="
-                            font-size: 0.75rem;
-                            color: #713f12;
-                            font-style: italic;
-                            text-align: center;
-                        "
-                    >
-                        "{{ form.thankYouMsg }}"
-                    </div>
-                </div>
-            </div>
+        <div class="field-group">
+            <Label>Pesan Ucapan Terima Kasih</Label>
+            <Textarea
+                v-model="form.thankYouMsg"
+                rows="2"
+                placeholder="Terima kasih atas doa dan hadiah yang telah diberikan..."
+            />
+        </div>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Amplop Digital</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
+import axios from "axios";
+import { Input } from "@/Components/ui";
+import { Label } from "@/Components/ui";
+import { Button } from "@/Components/ui";
+import { Textarea } from "@/Components/ui";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui";
 import "./section.css";
 
 const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
 
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+
+const emptyAddress = () => ({
+    recipientName: "",
+    fullAddress: "",
+    city: "",
+    postalCode: "",
+    phone: "",
+});
+
 const form = ref({
     accounts: [{ type: "bank", bankName: "", number: "", name: "" }],
     thankYouMsg: "",
     addresses: {
-        groom: {
-            recipientName: "",
-            fullAddress: "",
-            city: "",
-            postalCode: "",
-            phone: "",
-        },
-        bride: {
-            recipientName: "",
-            fullAddress: "",
-            city: "",
-            postalCode: "",
-            phone: "",
-        },
+        groom: emptyAddress(),
+        bride: emptyAddress(),
     },
 });
 
-const typeIconMap = {
-    bank: "🏦",
-    dana: "💙",
-    ovo: "💜",
-    gopay: "🟢",
-    shopeepay: "🟠",
-};
-const typeNameMap = {
-    bank: "Bank",
-    dana: "DANA",
-    ovo: "OVO",
-    gopay: "GoPay",
-    shopeepay: "ShopeePay",
-};
+function hydrateForm(s) {
+    if (!s) return;
+    if (Array.isArray(s.amplopAccounts) && s.amplopAccounts.length > 0) {
+        form.value.accounts = s.amplopAccounts.map((a) => ({
+            type: a.type || "bank",
+            bankName: a.bankName || "",
+            number: a.number || "",
+            name: a.name || "",
+        }));
+    }
+    if (s.amplopThankYouMsg) {
+        form.value.thankYouMsg = s.amplopThankYouMsg;
+    }
+    if (s.amplopAddresses && typeof s.amplopAddresses === "object") {
+        const g = s.amplopAddresses.groom || {};
+        const b = s.amplopAddresses.bride || {};
+        form.value.addresses.groom = { ...emptyAddress(), ...g };
+        form.value.addresses.bride = { ...emptyAddress(), ...b };
+    }
+}
 
-function typeIcon(t) {
-    return typeIconMap[t] || "💳";
+async function loadData() {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/settings`);
+        hydrateForm(data);
+    } catch (err) {
+        console.error("Failed to load amplop settings", err);
+    }
 }
-function typeName(t) {
-    return typeNameMap[t] || t;
-}
+
+onMounted(loadData);
 
 function addAcc() {
     form.value.accounts.push({
@@ -425,18 +304,22 @@ function removeAcc(i) {
 }
 
 async function handleSave() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     saving.value = true;
     try {
-        await store.dispatch("settings/saveSettings", {
+        await axios.post(`/api/wedding/${slug}/settings`, {
             amplopAccounts: form.value.accounts,
             amplopThankYouMsg: form.value.thankYouMsg,
             amplopAddresses: form.value.addresses,
         });
         saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
         setTimeout(() => {
             saved.value = false;
         }, 2500);
-    } catch {
+    } catch (err) {
+        console.error("Failed to save amplop", err);
         alert("Gagal menyimpan. Silakan coba lagi.");
     } finally {
         saving.value = false;
@@ -446,49 +329,9 @@ async function handleSave() {
 
 <style scoped>
 .account-block {
-    border: 1px solid var(--border, #e5e7eb);
-    border-radius: 0.75rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    background: var(--card, #f9fafb);
-}
-.dark .account-block {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 20%);
+    @apply border border-border rounded-xl p-4 flex flex-col gap-3 bg-card;
 }
 .account-block-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.btn-remove {
-    font-size: 0.75rem;
-    color: #ef4444;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-}
-.btn-add {
-    border: 2px dashed var(--border, #d1d5db);
-    border-radius: 0.75rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-    color: var(--muted-foreground, #6b7280);
-    background: var(--card, white);
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-}
-.dark .btn-add {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 25%);
-    color: #9ca3af;
-}
-.btn-add:hover {
-    border-color: #ca8a04;
-    color: #ca8a04;
+    @apply flex items-center justify-between;
 }
 </style>

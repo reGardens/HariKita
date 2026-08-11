@@ -1,207 +1,164 @@
 <template>
-    <div class="section-layout">
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">🎁</span>
-                <div>
-                    <h2 class="section-title">Wishlist Hadiah</h2>
-                    <p class="section-desc">
-                        Buat daftar hadiah yang bisa dibeli tamu
-                    </p>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">🎁</span>
+            <div>
+                <h2 class="section-title">Wishlist Hadiah</h2>
+                <p class="section-desc">
+                    Buat daftar hadiah yang bisa dibeli tamu
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <Label class="text-foreground font-semibold"
+                    >Aktifkan Wishlist</Label
+                >
+                <p class="text-xs text-muted-foreground mt-0.5">
+                    Tampilkan halaman wishlist di undangan
+                </p>
+            </div>
+            <button
+                type="button"
+                class="toggle-btn"
+                :class="{ 'toggle-btn--on': form.enabled }"
+                @click="form.enabled = !form.enabled"
+            >
+                <span
+                    class="toggle-thumb"
+                    :class="{ 'toggle-thumb--on': form.enabled }"
+                ></span>
+            </button>
+        </div>
+
+        <div v-for="(item, i) in form.items" :key="i" class="wish-block">
+            <div class="wish-block-header">
+                <Label class="text-foreground font-semibold"
+                    >Item {{ i + 1 }}</Label
+                >
+                <Button
+                    v-if="form.items.length > 1"
+                    variant="ghost"
+                    size="sm"
+                    class="text-destructive hover:text-destructive/80 h-7 px-2"
+                    @click="removeItem(i)"
+                >
+                    ✕
+                </Button>
+            </div>
+
+            <div class="flex gap-3 items-center">
+                <Input
+                    v-model="item.emoji"
+                    maxlength="4"
+                    placeholder="🎁"
+                    class="w-14 text-center text-2xl"
+                />
+                <Input
+                    v-model="item.name"
+                    placeholder="Nama hadiah"
+                    class="flex-1"
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="field-group">
+                    <Label>Harga (opsional)</Label>
+                    <Input v-model="item.price" placeholder="Rp 500.000" />
+                </div>
+                <div class="field-group">
+                    <Label>Link Toko</Label>
+                    <Input v-model="item.url" placeholder="https://..." />
                 </div>
             </div>
 
             <div class="field-group">
-                <div class="toggle-row">
-                    <div>
-                        <span class="field-label">Aktifkan Wishlist</span>
-                        <p class="field-hint">
-                            Tampilkan halaman wishlist di undangan
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        class="toggle-btn"
-                        :class="{ 'toggle-btn--on': form.enabled }"
-                        @click="form.enabled = !form.enabled"
-                    >
-                        <span
-                            class="toggle-thumb"
-                            :class="{ 'toggle-thumb--on': form.enabled }"
-                        ></span>
-                    </button>
-                </div>
-            </div>
-
-            <div v-for="(item, i) in form.items" :key="i" class="wish-block">
-                <div class="wish-block-header">
-                    <span class="field-label">Item {{ i + 1 }}</span>
-                    <button
-                        v-if="form.items.length > 1"
-                        type="button"
-                        class="btn-remove"
-                        @click="removeItem(i)"
-                    >
-                        ✕
-                    </button>
-                </div>
-                <div
-                    style="
-                        display: grid;
-                        grid-template-columns: auto 1fr;
-                        gap: 0.75rem;
-                        align-items: center;
-                    "
-                >
-                    <input
-                        v-model="item.emoji"
-                        type="text"
-                        class="field-input"
-                        maxlength="4"
-                        placeholder="🎁"
-                        style="
-                            width: 56px;
-                            font-size: 1.5rem;
-                            text-align: center;
-                        "
-                    />
-                    <input
-                        v-model="item.name"
-                        type="text"
-                        class="field-input"
-                        placeholder="Nama hadiah"
-                    />
-                </div>
-                <div
-                    style="
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 0.75rem;
-                    "
-                >
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Harga (opsional)</label
-                        >
-                        <input
-                            v-model="item.price"
-                            type="text"
-                            class="field-input"
-                            placeholder="Rp 500.000"
-                        />
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label" style="font-size: 0.75rem"
-                            >Link Toko</label
-                        >
-                        <input
-                            v-model="item.url"
-                            type="text"
-                            class="field-input"
-                            placeholder="https://..."
-                        />
-                    </div>
-                </div>
-                <input
+                <Input
                     v-model="item.note"
-                    type="text"
-                    class="field-input"
                     placeholder="Catatan tambahan (opsional)"
                 />
             </div>
-
-            <button type="button" class="btn-add" @click="addItem">
-                + Tambah Item Wishlist
-            </button>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Wishlist</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
-            </div>
         </div>
 
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Wishlist</span>
-            </div>
-            <div
-                class="preview-body"
-                style="background: linear-gradient(135deg, #fff7ed, #ffedd5)"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
-                >
-                    <div class="preview-couple" style="color: #9a3412">
-                        🎁 Wishlist Kami
-                    </div>
-                    <div
-                        class="preview-divider"
-                        style="background: #ea580c"
-                    ></div>
-                    <div v-if="form.enabled">
-                        <div
-                            v-for="(item, i) in form.items"
-                            :key="i"
-                            class="preview-wishlist-item"
-                        >
-                            <span class="preview-wishlist-emoji">{{
-                                item.emoji || "🎁"
-                            }}</span>
-                            <span
-                                class="preview-wishlist-text"
-                                style="color: #9a3412"
-                                >{{ item.name || "Nama Hadiah" }}</span
-                            >
-                            <span
-                                v-if="item.price"
-                                class="preview-wishlist-price"
-                                >{{ item.price }}</span
-                            >
-                        </div>
-                    </div>
-                    <div v-else style="font-size: 0.875rem; color: #9ca3af">
-                        Wishlist tidak aktif
-                    </div>
-                </div>
-            </div>
+        <Button
+            variant="outline"
+            class="w-full border-dashed border-2 hover:border-orange-500 hover:text-orange-600"
+            @click="addItem"
+        >
+            + Tambah Item Wishlist
+        </Button>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Wishlist</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
+import { Input } from "@/Components/ui";
+import { Label } from "@/Components/ui";
+import { Button } from "@/Components/ui";
 import "./section.css";
 
+const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
+
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+
+const emptyItem = () => ({
+    emoji: "🎁",
+    name: "",
+    price: "",
+    url: "",
+    note: "",
+});
 
 const form = ref({
     enabled: true,
     items: [
-        { emoji: "🍳", name: "", price: "", url: "", note: "" },
-        { emoji: "🛁", name: "", price: "", url: "", note: "" },
+        { ...emptyItem(), emoji: "🍳" },
+        { ...emptyItem(), emoji: "🛁" },
     ],
 });
 
+async function loadWishlist() {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/settings`);
+        if (typeof data.wishlistEnabled === "boolean") {
+            form.value.enabled = data.wishlistEnabled;
+        }
+        if (
+            Array.isArray(data.wishlistItems) &&
+            data.wishlistItems.length > 0
+        ) {
+            form.value.items = data.wishlistItems.map((w) => ({
+                emoji: w.emoji || "🎁",
+                name: w.name || "",
+                price: w.price || "",
+                url: w.url || "",
+                note: w.note || "",
+            }));
+        }
+    } catch (err) {
+        console.error("Failed to load wishlist", err);
+    }
+}
+
+onMounted(loadWishlist);
+
 function addItem() {
-    form.value.items.push({
-        emoji: "🎁",
-        name: "",
-        price: "",
-        url: "",
-        note: "",
-    });
+    form.value.items.push(emptyItem());
 }
 
 function removeItem(i) {
@@ -209,113 +166,45 @@ function removeItem(i) {
 }
 
 async function handleSave() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     saving.value = true;
-    await new Promise((r) => setTimeout(r, 800));
-    saving.value = false;
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2500);
+    try {
+        await axios.post(`/api/wedding/${slug}/settings`, {
+            wishlistEnabled: form.value.enabled,
+            wishlistItems: form.value.items,
+        });
+        saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
+        setTimeout(() => {
+            saved.value = false;
+        }, 2500);
+    } catch (err) {
+        console.error("Failed to save wishlist", err);
+        alert("Gagal menyimpan wishlist. Silakan coba lagi.");
+    } finally {
+        saving.value = false;
+    }
 }
 </script>
 
 <style scoped>
 .wish-block {
-    border: 1px solid var(--border, #fed7aa);
-    border-radius: 0.75rem;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    background: #fff7ed;
-}
-.dark .wish-block {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 20%);
+    @apply border border-border rounded-xl p-4 flex flex-col gap-3 bg-card;
 }
 .wish-block-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.btn-remove {
-    font-size: 0.875rem;
-    color: #ef4444;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.btn-remove:hover {
-    background: #fee2e2;
-}
-.dark .btn-remove:hover {
-    background: hsl(0 40% 15%);
-}
-.btn-add {
-    border: 2px dashed var(--border, #d1d5db);
-    border-radius: 0.75rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-    color: var(--muted-foreground, #6b7280);
-    background: var(--card, white);
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-}
-.dark .btn-add {
-    background: hsl(240 10% 12%);
-    border-color: hsl(240 5% 25%);
-    color: #9ca3af;
-}
-.btn-add:hover {
-    border-color: #ea580c;
-    color: #ea580c;
-}
-.toggle-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
+    @apply flex items-center justify-between;
 }
 .toggle-btn {
-    width: 44px;
-    height: 24px;
-    border-radius: 12px;
-    background: #d1d5db;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    flex-shrink: 0;
-    transition: background 0.2s;
-}
-.dark .toggle-btn {
-    background: hsl(240 5% 30%);
+    @apply w-11 h-6 rounded-full bg-muted border-none cursor-pointer relative flex-shrink-0 transition-colors;
 }
 .toggle-btn--on {
-    background: #10b981;
-}
-.dark .toggle-btn--on {
-    background: #10b981;
+    @apply bg-emerald-500;
 }
 .toggle-thumb {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
+    @apply absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform;
 }
 .toggle-thumb--on {
-    transform: translateX(20px);
+    @apply translate-x-5;
 }
 </style>

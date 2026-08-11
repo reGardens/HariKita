@@ -13,7 +13,7 @@
 
             <!-- Quick add guest -->
             <div class="field-group">
-                <label class="field-label">Tambah Tamu Cepat</label>
+                <Label>Tambah Tamu Cepat</Label>
                 <div
                     style="
                         display: grid;
@@ -21,21 +21,17 @@
                         gap: 0.5rem;
                     "
                 >
-                    <input
+                    <Input
                         v-model="newGuest.name"
-                        type="text"
-                        class="field-input"
                         placeholder="Nama tamu"
                         @keydown.enter="addGuest"
                     />
-                    <button
-                        type="button"
-                        class="btn-save"
-                        style="padding: 0.5rem 1rem; white-space: nowrap"
+                    <Button
                         @click="addGuest"
+                        style="padding: 0.5rem 1rem; white-space: nowrap"
                     >
                         + Tambah
-                    </button>
+                    </Button>
                 </div>
                 <div
                     style="
@@ -45,24 +41,38 @@
                         margin-top: 0.5rem;
                     "
                 >
-                    <input
+                    <Input
                         v-model="newGuest.phone"
-                        type="text"
-                        class="field-input"
                         placeholder="No HP (opsional)"
                     />
-                    <select v-model="newGuest.category" class="field-input">
-                        <option value="keluarga">👨‍👩‍👧 Keluarga</option>
-                        <option value="teman">👫 Teman</option>
-                        <option value="kantor">💼 Rekan Kerja</option>
-                        <option value="lainnya">👤 Lainnya</option>
-                    </select>
+                    <div>
+                        <Select
+                            :model-value="newGuest.category"
+                            @update:model-value="(v) => (newGuest.category = v)"
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Kategori" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="keluarga"
+                                    >👨‍👩‍👧 Keluarga</SelectItem
+                                >
+                                <SelectItem value="teman">👫 Teman</SelectItem>
+                                <SelectItem value="kantor"
+                                    >💼 Rekan Kerja</SelectItem
+                                >
+                                <SelectItem value="lainnya"
+                                    >👤 Lainnya</SelectItem
+                                >
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
 
             <!-- Import Excel -->
             <div class="field-group">
-                <label class="field-label">Import dari Excel</label>
+                <Label>Import dari Excel</Label>
                 <div class="upload-area">
                     <input
                         ref="xlsInput"
@@ -70,14 +80,13 @@
                         accept=".xlsx,.csv"
                         class="hidden-input"
                     />
-                    <button
-                        type="button"
-                        class="upload-btn"
-                        @click="$refs.xlsInput.click()"
-                    >
+                    <Button variant="outline" @click="$refs.xlsInput.click()">
                         📊 Upload Excel / CSV
-                    </button>
-                    <p class="field-hint" style="margin-top: 0.5rem">
+                    </Button>
+                    <p
+                        class="text-xs text-muted-foreground"
+                        style="margin-top: 0.5rem"
+                    >
                         Format: Kolom Nama, No HP, Kategori.
                         <a href="#" style="color: #10b981">Download template</a>
                     </p>
@@ -86,9 +95,7 @@
 
             <!-- Guest list -->
             <div v-if="form.guests.length" class="field-group">
-                <label class="field-label"
-                    >Daftar Tamu ({{ form.guests.length }})</label
-                >
+                <Label>Daftar Tamu ({{ form.guests.length }})</Label>
                 <div class="guest-list">
                     <div
                         v-for="(g, i) in form.guests"
@@ -113,27 +120,23 @@
                             >
                             <span v-else class="status-badge">Belum</span>
                         </div>
-                        <button
-                            type="button"
-                            class="btn-remove"
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="text-destructive hover:text-destructive/80"
                             @click="removeGuest(i)"
                         >
                             ✕
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
 
             <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
+                <Button :disabled="saving" @click="handleSave">
                     <span v-if="saving">Menyimpan…</span>
                     <span v-else>💾 Simpan Daftar Tamu</span>
-                </button>
+                </Button>
                 <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
             </div>
         </div>
@@ -264,7 +267,18 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useStore } from "vuex";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui";
+import { Button, Input, Label } from "@/Components/ui";
 import "./section.css";
+
+const store = useStore();
 
 const saving = ref(false);
 const saved = ref(false);
@@ -328,6 +342,7 @@ async function handleSave() {
     await new Promise((r) => setTimeout(r, 800));
     saving.value = false;
     saved.value = true;
+    store.commit("wedding/BUMP_PREVIEW");
     setTimeout(() => {
         saved.value = false;
     }, 2500);

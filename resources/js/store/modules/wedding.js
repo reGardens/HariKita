@@ -9,7 +9,8 @@ export default {
     registry: [],
     loading: false,
     error: null,
-    userProfile: null
+    userProfile: null,
+    previewVersion: 0
   }),
 
   mutations: {
@@ -27,6 +28,9 @@ export default {
     },
     SET_USER_PROFILE(state, profile) {
       state.userProfile = profile
+    },
+    BUMP_PREVIEW(state) {
+      state.previewVersion++
     }
   },
 
@@ -111,6 +115,7 @@ export default {
     registry: (state) => state.registry,
     activeWedding: (state) => state.registry.find(w => w.slug === state.activeSlug) || null,
     userProfile: (state) => state.userProfile,
-    allowedFeatures: (state) => state.userProfile?.allowed_features || []
+    allowedFeatures: (state) => state.userProfile?.allowed_features || [],
+    previewVersion: (state) => state.previewVersion
   }
 }

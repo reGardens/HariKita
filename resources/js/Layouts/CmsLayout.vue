@@ -282,7 +282,7 @@ function logout() {
                     <!-- Live Preview iPhone Mockup — sticky on desktop, below form on mobile -->
                     <div
                         v-if="showLivePreview"
-                        class="xl:w-[320px] xl:border-l border-t xl:border-t-0 border-border bg-muted/30 xl:sticky xl:top-0 xl:h-screen xl:overflow-y-auto flex items-start justify-center p-4"
+                        class="xl:w-[380px] xl:border-l border-t xl:border-t-0 border-border bg-muted/30 xl:sticky xl:top-0 xl:h-screen xl:overflow-hidden flex items-start justify-center p-4"
                     >
                         <LivePreview :section="currentSection" />
                     </div>

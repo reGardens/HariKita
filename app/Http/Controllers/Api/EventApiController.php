@@ -71,6 +71,7 @@ class EventApiController extends Controller
             'location_name' => $request->locationName,
             'location_address' => $request->locationAddress,
             'location_map_url' => $request->locationMapUrl,
+            'dress_code' => $request->dressCode,
         ]);
 
         return response()->json($this->formatEvent($event), 201);
@@ -90,6 +91,7 @@ class EventApiController extends Controller
             'location_name' => $request->locationName ?? $event->location_name,
             'location_address' => $request->locationAddress ?? $event->location_address,
             'location_map_url' => $request->locationMapUrl ?? $event->location_map_url,
+            'dress_code' => $request->dressCode ?? $event->dress_code,
         ]);
 
         return response()->json($this->formatEvent($event));
@@ -116,6 +118,7 @@ class EventApiController extends Controller
             'locationName' => $event->location_name,
             'locationAddress' => $event->location_address,
             'locationMapUrl' => $event->location_map_url,
+            'dressCode' => $event->dress_code,
             'createdAt' => $event->created_at ? $event->created_at->toIso8601String() : null,
             'updatedAt' => $event->updated_at ? $event->updated_at->toIso8601String() : null,
         ];

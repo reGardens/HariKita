@@ -12,7 +12,7 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label">Upload Foto</label>
+                <Label>Upload Foto</Label>
                 <div
                     class="upload-area"
                     @dragover.prevent
@@ -26,14 +26,13 @@
                         class="hidden-input"
                         @change="handleFileChange"
                     />
-                    <button
-                        type="button"
-                        class="upload-btn"
-                        @click="$refs.fileInput.click()"
-                    >
+                    <Button variant="outline" @click="$refs.fileInput.click()">
                         📸 Pilih Foto
-                    </button>
-                    <p class="field-hint" style="margin-top: 0.5rem">
+                    </Button>
+                    <p
+                        class="text-xs text-muted-foreground"
+                        style="margin-top: 0.5rem"
+                    >
                         Atau seret dan lepas file di sini · JPG, PNG, WEBP ·
                         Maks 5MB
                     </p>
@@ -47,38 +46,33 @@
                     class="photo-thumb"
                 >
                     <img :src="photo.url" :alt="photo.name" class="photo-img" />
-                    <button
-                        type="button"
-                        class="photo-remove"
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        class="photo-remove text-white"
                         @click="removePhoto(i)"
                     >
                         ✕
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label"
-                    >Link Video (YouTube / Google Drive)</label
-                >
-                <input
+                <Label>Link Video (YouTube / Google Drive)</Label>
+                <Input
                     v-model="form.videoUrl"
-                    type="text"
-                    class="field-input"
                     placeholder="https://youtube.com/embed/..."
                 />
-                <span class="field-hint"
-                    >Gunakan link embed YouTube untuk video prewedding</span
-                >
+                <p class="text-xs text-muted-foreground">
+                    Gunakan link embed YouTube untuk video prewedding
+                </p>
             </div>
 
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label"
-                            >Izinkan Tamu Upload Foto</span
-                        >
-                        <p class="field-hint">
+                        <Label>Izinkan Tamu Upload Foto</Label>
+                        <p class="text-xs text-muted-foreground">
                             Tamu bisa mengirimkan foto saat acara
                         </p>
                     </div>
@@ -99,15 +93,10 @@
             </div>
 
             <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
+                <Button :disabled="saving" @click="handleSave">
                     <span v-if="saving">Menyimpan…</span>
                     <span v-else>💾 Simpan Galeri</span>
-                </button>
+                </Button>
                 <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
             </div>
         </div>
@@ -188,7 +177,11 @@
 
 <script setup>
 import { ref } from "vue";
+import { useStore } from "vuex";
+import { Button, Input, Label } from "@/Components/ui";
 import "./section.css";
+
+const store = useStore();
 
 const saving = ref(false);
 const saved = ref(false);
@@ -235,6 +228,7 @@ async function handleSave() {
     await new Promise((r) => setTimeout(r, 800));
     saving.value = false;
     saved.value = true;
+    store.commit("wedding/BUMP_PREVIEW");
     setTimeout(() => {
         saved.value = false;
     }, 2500);

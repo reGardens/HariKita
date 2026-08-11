@@ -12,44 +12,37 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label">Batas RSVP</label>
-                <input
-                    type="date"
-                    v-model="form.deadline"
-                    class="field-input"
-                />
-                <span class="field-hint"
-                    >Tamu tidak bisa konfirmasi setelah tanggal ini</span
-                >
+                <Label>Batas RSVP</Label>
+                <Input type="date" v-model="form.deadline" />
+                <p class="text-xs text-muted-foreground">
+                    Tamu tidak bisa konfirmasi setelah tanggal ini
+                </p>
             </div>
 
             <div class="field-group">
-                <label class="field-label">Jumlah Maksimal Tamu</label>
-                <input
+                <Label>Jumlah Maksimal Tamu</Label>
+                <Input
                     type="number"
                     v-model="form.maxGuests"
                     min="0"
-                    class="field-input"
                     placeholder="0 = tidak terbatas"
                 />
             </div>
 
             <div class="field-group">
-                <label class="field-label">Pesan Konfirmasi Hadir</label>
-                <textarea
+                <Label>Pesan Konfirmasi Hadir</Label>
+                <Textarea
                     v-model="form.confirmMsg"
                     rows="2"
-                    class="field-input field-textarea"
                     placeholder="Terima kasih atas konfirmasinya! Kami menantikan kehadiran Anda."
                 />
             </div>
 
             <div class="field-group">
-                <label class="field-label">Pesan Konfirmasi Tidak Hadir</label>
-                <textarea
+                <Label>Pesan Konfirmasi Tidak Hadir</Label>
+                <Textarea
                     v-model="form.declineMsg"
                     rows="2"
-                    class="field-input field-textarea"
                     placeholder="Kami memahami. Terima kasih sudah meluangkan waktu untuk mengonfirmasi."
                 />
             </div>
@@ -57,10 +50,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label"
-                            >Tanya Jumlah Tamu Pendamping</span
-                        >
-                        <p class="field-hint">
+                        <Label>Tanya Jumlah Tamu Pendamping</Label>
+                        <p class="text-xs text-muted-foreground">
                             Tampilkan kolom jumlah tamu yang dibawa
                         </p>
                     </div>
@@ -81,10 +72,8 @@
             <div class="field-group">
                 <div class="toggle-row">
                     <div>
-                        <span class="field-label"
-                            >Reminder Otomatis via WhatsApp</span
-                        >
-                        <p class="field-hint">
+                        <Label>Reminder Otomatis via WhatsApp</Label>
+                        <p class="text-xs text-muted-foreground">
                             Kirim pengingat H-3 dan H-1 ke nomor tamu
                         </p>
                     </div>
@@ -103,15 +92,10 @@
             </div>
 
             <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
+                <Button :disabled="saving" @click="handleSave">
                     <span v-if="saving">Menyimpan…</span>
                     <span v-else>💾 Simpan RSVP</span>
-                </button>
+                </Button>
                 <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
             </div>
 
@@ -121,9 +105,7 @@
                 class="field-group"
                 style="margin-top: 1.5rem"
             >
-                <label class="field-label"
-                    >Daftar Konfirmasi ({{ rsvpItems.length }})</label
-                >
+                <Label>Daftar Konfirmasi ({{ rsvpItems.length }})</Label>
                 <div
                     style="
                         overflow-x: auto;
@@ -297,6 +279,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
+import { Button, Input, Label } from "@/Components/ui";
+import { Textarea } from "@/Components/ui";
 import "./section.css";
 
 const store = useStore();
@@ -336,6 +320,7 @@ async function handleSave() {
             rsvpAutoReminder: form.value.autoReminder,
         });
         saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
         setTimeout(() => {
             saved.value = false;
         }, 2500);

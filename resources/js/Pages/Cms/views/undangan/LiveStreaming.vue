@@ -1,183 +1,115 @@
 <template>
-    <div class="section-layout">
-        <div class="section-form">
-            <div class="section-header">
-                <span class="section-icon">🎥</span>
-                <div>
-                    <h2 class="section-title">Live Streaming</h2>
-                    <p class="section-desc">
-                        Siarkan acara pernikahanmu secara langsung
-                    </p>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <div class="toggle-row">
-                    <div>
-                        <span class="field-label">Aktifkan Live Streaming</span>
-                        <p class="field-hint">
-                            Tampilkan tombol tonton live di undangan
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        class="toggle-btn"
-                        :class="{ 'toggle-btn--on': form.enabled }"
-                        @click="form.enabled = !form.enabled"
-                    >
-                        <span
-                            class="toggle-thumb"
-                            :class="{ 'toggle-thumb--on': form.enabled }"
-                        ></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="streamUrl"
-                    >URL Live Streaming</label
-                >
-                <input
-                    id="streamUrl"
-                    v-model="form.url"
-                    type="text"
-                    class="field-input"
-                    placeholder="Contoh: https://youtube.com/live/..."
-                />
-                <span class="field-hint"
-                    >YouTube Live, Zoom, atau platform streaming lainnya</span
-                >
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="streamPlatform">Platform</label>
-                <select
-                    id="streamPlatform"
-                    v-model="form.platform"
-                    class="field-input"
-                >
-                    <option value="youtube">▶️ YouTube Live</option>
-                    <option value="zoom">🔵 Zoom Webinar</option>
-                    <option value="instagram">📸 Instagram Live</option>
-                    <option value="tiktok">🎵 TikTok Live</option>
-                    <option value="other">🌐 Lainnya</option>
-                </select>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="streamStart"
-                    >Mulai Siaran</label
-                >
-                <input
-                    id="streamStart"
-                    v-model="form.startAt"
-                    type="datetime-local"
-                    class="field-input"
-                />
-            </div>
-
-            <div class="field-group">
-                <label class="field-label" for="streamMsg">Pesan Siaran</label>
-                <textarea
-                    id="streamMsg"
-                    v-model="form.message"
-                    rows="2"
-                    class="field-input field-textarea"
-                    placeholder="Bergabunglah dengan kami secara virtual dan saksikan momen bahagia kami!"
-                />
-            </div>
-
-            <div class="save-bar">
-                <button
-                    type="button"
-                    class="btn-save"
-                    :disabled="saving"
-                    @click="handleSave"
-                >
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Streaming</span>
-                </button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
+    <div class="section-form">
+        <div class="section-header">
+            <span class="section-icon">🎥</span>
+            <div>
+                <h2 class="section-title">Live Streaming</h2>
+                <p class="section-desc">
+                    Siarkan acara pernikahanmu secara langsung
+                </p>
             </div>
         </div>
 
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Live Streaming</span>
-            </div>
-            <div
-                class="preview-body"
-                style="background: linear-gradient(135deg, #0f172a, #1e293b)"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <Label class="text-foreground font-semibold"
+                    >Aktifkan Live Streaming</Label
                 >
-                    <div class="preview-couple" style="color: white">
-                        🎥 Live Streaming
-                    </div>
-                    <div
-                        class="preview-divider"
-                        style="background: #ef4444"
-                    ></div>
-                    <div v-if="form.enabled">
-                        <div class="preview-stream-box">
-                            <span>{{ platformIcon }}</span>
-                        </div>
-                        <p
-                            v-if="form.message"
-                            style="
-                                font-size: 0.75rem;
-                                color: #94a3b8;
-                                font-style: italic;
-                                margin-top: 0.5rem;
-                                text-align: center;
-                            "
-                        >
-                            "{{ form.message }}"
-                        </p>
-                        <div
-                            v-if="form.startAt"
-                            style="
-                                font-size: 0.7rem;
-                                color: #64748b;
-                                margin-top: 0.25rem;
-                            "
-                        >
-                            📅 {{ formatDt(form.startAt) }}
-                        </div>
-                        <button
-                            style="
-                                background: #ef4444;
-                                color: white;
-                                border: none;
-                                border-radius: 0.5rem;
-                                padding: 0.5rem 1.25rem;
-                                font-size: 0.8125rem;
-                                font-weight: 600;
-                                cursor: default;
-                                margin-top: 0.5rem;
-                                width: 100%;
-                            "
-                        >
-                            🔴 Tonton Live
-                        </button>
-                    </div>
-                    <div v-else style="font-size: 0.875rem; color: #64748b">
-                        Streaming tidak aktif
-                    </div>
-                </div>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                    Tampilkan tombol tonton live di undangan
+                </p>
             </div>
+            <button
+                type="button"
+                class="toggle-btn"
+                :class="{ 'toggle-btn--on': form.enabled }"
+                @click="form.enabled = !form.enabled"
+            >
+                <span
+                    class="toggle-thumb"
+                    :class="{ 'toggle-thumb--on': form.enabled }"
+                ></span>
+            </button>
+        </div>
+
+        <div class="field-group">
+            <Label for="streamUrl">URL Live Streaming</Label>
+            <Input
+                id="streamUrl"
+                v-model="form.url"
+                placeholder="Contoh: https://youtube.com/live/..."
+            />
+            <span class="text-xs text-muted-foreground"
+                >YouTube Live, Zoom, atau platform streaming lainnya</span
+            >
+        </div>
+
+        <div class="field-group">
+            <Label for="streamPlatform">Platform</Label>
+            <Select
+                v-model="form.platform"
+                @update:model-value="(v) => (form.platform = v)"
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder="Pilih platform" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="youtube">▶️ YouTube Live</SelectItem>
+                    <SelectItem value="zoom">🔵 Zoom Webinar</SelectItem>
+                    <SelectItem value="instagram">📸 Instagram Live</SelectItem>
+                    <SelectItem value="tiktok">🎵 TikTok Live</SelectItem>
+                    <SelectItem value="other">🌐 Lainnya</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+
+        <div class="field-group">
+            <Label for="streamStart">Mulai Siaran</Label>
+            <Input
+                id="streamStart"
+                v-model="form.startAt"
+                type="datetime-local"
+            />
+        </div>
+
+        <div class="field-group">
+            <Label for="streamMsg">Pesan Siaran</Label>
+            <Textarea
+                id="streamMsg"
+                v-model="form.message"
+                rows="2"
+                placeholder="Bergabunglah dengan kami secara virtual dan saksikan momen bahagia kami!"
+            />
+        </div>
+
+        <div class="save-bar">
+            <Button :disabled="saving" @click="handleSave">
+                <span v-if="saving">Menyimpan…</span>
+                <span v-else>💾 Simpan Streaming</span>
+            </Button>
+            <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
+import { Input } from "@/Components/ui";
+import { Label } from "@/Components/ui";
+import { Button } from "@/Components/ui";
+import { Textarea } from "@/Components/ui";
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from "@/Components/ui";
 import "./section.css";
 
+const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
 
@@ -189,76 +121,57 @@ const form = ref({
     message: "Bergabunglah dengan kami secara virtual!",
 });
 
-const platformIcons = {
-    youtube: "▶️",
-    zoom: "🔵",
-    instagram: "📸",
-    tiktok: "🎵",
-    other: "🌐",
-};
-const platformIcon = computed(() => platformIcons[form.value.platform] || "🌐");
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 
-function formatDt(dt) {
-    if (!dt) return "";
-    return new Date(dt).toLocaleString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+async function loadStreaming() {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/settings`);
+        if (data.liveStreamUrl) {
+            form.value.url = data.liveStreamUrl;
+            form.value.enabled = true;
+        }
+    } catch (err) {
+        console.error("Failed to load streaming", err);
+    }
 }
 
+onMounted(loadStreaming);
+
 async function handleSave() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     saving.value = true;
-    await new Promise((r) => setTimeout(r, 800));
-    saving.value = false;
-    saved.value = true;
-    setTimeout(() => {
-        saved.value = false;
-    }, 2500);
+    try {
+        await axios.post(`/api/wedding/${slug}/settings`, {
+            liveStreamUrl: form.value.enabled ? form.value.url : "",
+        });
+        saved.value = true;
+        store.commit("wedding/BUMP_PREVIEW");
+        setTimeout(() => {
+            saved.value = false;
+        }, 2500);
+    } catch (err) {
+        console.error("Failed to save streaming", err);
+        alert("Gagal menyimpan streaming. Silakan coba lagi.");
+    } finally {
+        saving.value = false;
+    }
 }
 </script>
 
 <style scoped>
-.toggle-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-}
 .toggle-btn {
-    width: 44px;
-    height: 24px;
-    border-radius: 12px;
-    background: #d1d5db;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    flex-shrink: 0;
-    transition: background 0.2s;
-}
-.dark .toggle-btn {
-    background: hsl(240 5% 30%);
+    @apply w-11 h-6 rounded-full bg-muted border-none cursor-pointer relative flex-shrink-0 transition-colors;
 }
 .toggle-btn--on {
-    background: #10b981;
-}
-.dark .toggle-btn--on {
-    background: #10b981;
+    @apply bg-emerald-500;
 }
 .toggle-thumb {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
+    @apply absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform;
 }
 .toggle-thumb--on {
-    transform: translateX(20px);
+    @apply translate-x-5;
 }
 </style>
