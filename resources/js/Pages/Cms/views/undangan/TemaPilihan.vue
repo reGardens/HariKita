@@ -13,16 +13,16 @@
         <div class="field-group">
             <Label>Pilih Tema</Label>
             <div class="space-y-3">
-                <section class="border border-emerald-200 rounded-xl overflow-hidden">
+                <section class="border border-emerald-200 dark:border-emerald-800 rounded-xl overflow-hidden">
                     <button
                         type="button"
-                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-800 font-semibold text-sm hover:bg-emerald-100 transition-colors"
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 font-semibold text-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                         :aria-expanded="showReadyTemplates"
                         @click="showReadyTemplates = !showReadyTemplates"
                     >
                         <span class="flex items-center gap-2">
                             <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs">Tema Siap Pakai</span>
-                            <span class="text-xs font-normal text-emerald-700">{{ readyTemplates.length }} tema</span>
+                            <span class="text-xs font-normal text-emerald-700 dark:text-emerald-400">{{ readyTemplates.length }} tema</span>
                         </span>
                         <span>{{ showReadyTemplates ? '⌃' : '⌄' }}</span>
                     </button>
@@ -47,16 +47,16 @@
                     </div>
                 </section>
 
-                <section class="border border-amber-200 rounded-xl overflow-hidden">
+                <section class="border border-amber-200 dark:border-amber-800 rounded-xl overflow-hidden">
                     <button
                         type="button"
-                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-amber-50 text-amber-800 font-semibold text-sm hover:bg-amber-100 transition-colors"
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 font-semibold text-sm hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
                         :aria-expanded="showOngoingTemplates"
                         @click="showOngoingTemplates = !showOngoingTemplates"
                     >
                         <span class="flex items-center gap-2">
                             <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs">Tema Dalam Pengembangan</span>
-                            <span class="text-xs font-normal text-amber-700">{{ ongoingTemplates.length }} tema</span>
+                            <span class="text-xs font-normal text-amber-700 dark:text-amber-400">{{ ongoingTemplates.length }} tema</span>
                         </span>
                         <span>{{ showOngoingTemplates ? '⌃' : '⌄' }}</span>
                     </button>
