@@ -8,7 +8,7 @@
                     :src="previewUrl"
                     class="phone-iframe"
                     frameborder="0"
-                    scrolling="yes"
+                    scrolling="no"
                 ></iframe>
                 <div v-else class="phone-placeholder">
                     <span class="text-3xl">💒</span>

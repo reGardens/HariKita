@@ -12,64 +12,6 @@
             </div>
 
             <div class="field-group">
-                <Label>Batas RSVP</Label>
-                <Input type="date" v-model="form.deadline" />
-                <p class="text-xs text-muted-foreground">
-                    Tamu tidak bisa konfirmasi setelah tanggal ini
-                </p>
-            </div>
-
-            <div class="field-group">
-                <Label>Jumlah Maksimal Tamu</Label>
-                <Input
-                    type="number"
-                    v-model="form.maxGuests"
-                    min="0"
-                    placeholder="0 = tidak terbatas"
-                />
-            </div>
-
-            <div class="field-group">
-                <Label>Pesan Konfirmasi Hadir</Label>
-                <Textarea
-                    v-model="form.confirmMsg"
-                    rows="2"
-                    placeholder="Terima kasih atas konfirmasinya! Kami menantikan kehadiran Anda."
-                />
-            </div>
-
-            <div class="field-group">
-                <Label>Pesan Konfirmasi Tidak Hadir</Label>
-                <Textarea
-                    v-model="form.declineMsg"
-                    rows="2"
-                    placeholder="Kami memahami. Terima kasih sudah meluangkan waktu untuk mengonfirmasi."
-                />
-            </div>
-
-            <div class="field-group">
-                <div class="toggle-row">
-                    <div>
-                        <Label>Tanya Jumlah Tamu Pendamping</Label>
-                        <p class="text-xs text-muted-foreground">
-                            Tampilkan kolom jumlah tamu yang dibawa
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        class="toggle-btn"
-                        :class="{ 'toggle-btn--on': form.askCompanion }"
-                        @click="form.askCompanion = !form.askCompanion"
-                    >
-                        <span
-                            class="toggle-thumb"
-                            :class="{ 'toggle-thumb--on': form.askCompanion }"
-                        ></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="field-group">
                 <div class="toggle-row">
                     <div>
                         <Label>Reminder Otomatis via WhatsApp</Label>
@@ -205,82 +147,13 @@
                 </div>
             </div>
         </div>
-
-        <!-- Preview -->
-        <div class="section-preview">
-            <div class="preview-header">
-                <span class="preview-badge">Live Preview</span>
-                <span class="preview-tmpl-name">Form RSVP</span>
-            </div>
-            <div
-                class="preview-body"
-                style="background: linear-gradient(135deg, #f0fdf4, #dcfce7)"
-            >
-                <div
-                    class="preview-content"
-                    style="font-family: &quot;Playfair Display&quot;, serif"
-                >
-                    <div class="preview-couple" style="color: #166534">
-                        Konfirmasi Kehadiran
-                    </div>
-                    <div
-                        class="preview-divider"
-                        style="background: #16a34a"
-                    ></div>
-                    <div class="preview-rsvp-section">
-                        <div class="preview-field-mock">👤 Nama Lengkap</div>
-                        <div class="preview-field-mock">📱 Nomor WhatsApp</div>
-                        <div style="display: flex; gap: 0.5rem">
-                            <div
-                                class="preview-field-mock"
-                                style="
-                                    flex: 1;
-                                    background: #dcfce7;
-                                    color: #166534;
-                                    font-weight: 600;
-                                    text-align: center;
-                                "
-                            >
-                                ✅ Hadir
-                            </div>
-                            <div
-                                class="preview-field-mock"
-                                style="flex: 1; text-align: center"
-                            >
-                                ❌ Tidak Hadir
-                            </div>
-                        </div>
-                        <div
-                            v-if="form.askCompanion"
-                            class="preview-field-mock"
-                        >
-                            👥 Jumlah tamu pendamping
-                        </div>
-                        <div
-                            v-if="form.deadline"
-                            class="preview-field-mock"
-                            style="font-size: 0.7rem; color: #9ca3af"
-                        >
-                            ⏰ Batas: {{ formatDate(form.deadline) }}
-                        </div>
-                        <button
-                            class="preview-rsvp-btn"
-                            style="background: #16a34a"
-                        >
-                            Kirim Konfirmasi
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
-import { Button, Input, Label } from "@/Components/ui";
-import { Textarea } from "@/Components/ui";
+import { Button, Label } from "@/Components/ui";
 import "./section.css";
 
 const store = useStore();
@@ -291,32 +164,13 @@ let pollInterval = null;
 const rsvpItems = computed(() => store.getters["rsvp/rsvps"]);
 
 const form = ref({
-    deadline: "",
-    maxGuests: "",
-    confirmMsg: "",
-    declineMsg: "",
-    askCompanion: true,
     autoReminder: false,
 });
-
-function formatDate(d) {
-    if (!d) return "";
-    return new Date(d + "T00:00:00").toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-}
 
 async function handleSave() {
     saving.value = true;
     try {
         await store.dispatch("settings/saveSettings", {
-            rsvpDeadline: form.value.deadline,
-            rsvpMaxGuests: form.value.maxGuests,
-            rsvpConfirmMsg: form.value.confirmMsg,
-            rsvpDeclineMsg: form.value.declineMsg,
-            rsvpAskCompanion: form.value.askCompanion,
             rsvpAutoReminder: form.value.autoReminder,
         });
         saved.value = true;
@@ -331,12 +185,10 @@ async function handleSave() {
 
 onMounted(() => {
     store.dispatch("rsvp/fetchRsvps");
-    // Poll every 60 seconds
     pollInterval = setInterval(() => {
         store.dispatch("rsvp/silentFetchRsvps");
     }, 60000);
 
-    // Pause polling when tab is hidden
     document.addEventListener("visibilitychange", handleVisibility);
 });
 

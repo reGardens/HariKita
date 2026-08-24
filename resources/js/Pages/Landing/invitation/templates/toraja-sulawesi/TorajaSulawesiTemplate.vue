@@ -111,6 +111,7 @@
       <CoupleSection :couple="couple" :theme-colors="settings?.themeColors" />
       <EventSection :events="events" :theme-colors="settings?.themeColors" />
       <CountdownSection :target-date="firstEventDate" :theme-colors="settings?.themeColors" />
+      <LoveStorySection v-if="settings?.loveStory?.length" :love-story="settings.loveStory" :theme-colors="settings?.themeColors" />
       <GallerySection :media="media" :gallery-layout="settings?.galleryLayout" :theme-colors="settings?.themeColors" />
       <RsvpSection :theme-colors="settings?.themeColors" />
       <WishesSection :wishes="wishes" :theme-colors="settings?.themeColors" />
@@ -138,6 +139,7 @@ import MusicPlayer from "@/Pages/Landing/invitation/sections/MusicPlayer.vue";
 import CoupleSection from "@/Pages/Landing/invitation/sections/CoupleSection.vue";
 import EventSection from "@/Pages/Landing/invitation/sections/EventSection.vue";
 import CountdownSection from "@/Pages/Landing/invitation/sections/CountdownSection.vue";
+import LoveStorySection from "@/Pages/Landing/invitation/sections/LoveStorySection.vue";
 import GallerySection from "@/Pages/Landing/invitation/sections/GallerySection.vue";
 import RsvpSection from "@/Pages/Landing/invitation/sections/RsvpSection.vue";
 import WishesSection from "@/Pages/Landing/invitation/sections/WishesSection.vue";

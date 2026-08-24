@@ -115,23 +115,19 @@ Waktu Acara:
 Nama Tempat:
 Alamat Lengkap:
 Link Google Maps:
-Dress Code:
-
-═══ COUNTDOWN ═══
-Tanggal Pernikahan (YYYY-MM-DD):
 
 ═══ AMPLOP DIGITAL ═══
-Nama Bank:
-Nomor Rekening:
-Atas Nama Rekening:
+Nama Bank Mempelai Pria:
+Nomor Rekening Mempelai Pria:
+Atas Nama Rekening Mempelai Pria:
+Nama Bank Mempelai Wanita:
+Nomor Rekening Mempelai Wanita:
+Atas Nama Rekening Mempelai Wanita:
 Alamat Rumah Pengantin Pria:
 Alamat Rumah Pengantin Wanita:
 
 ═══ LIVE STREAMING ═══
 Link Live Streaming:
-
-═══ PESAN TAMBAHAN ═══
-Pesan untuk tamu:
 
 Silakan isi dan kirim kembali. Terima kasih! 🙏`;
 
@@ -146,15 +142,15 @@ const labelMap = {
     venueName: "Nama Tempat",
     venueAddress: "Alamat Lengkap",
     mapsLink: "Google Maps",
-    dressCode: "Dress Code",
-    countdownDate: "Tanggal Pernikahan",
-    bankName: "Nama Bank",
-    bankNumber: "Nomor Rekening",
-    bankHolder: "Atas Nama",
+    groomBankName: "Nama Bank Mempelai Pria",
+    groomBankNumber: "Nomor Rekening Mempelai Pria",
+    groomBankHolder: "Atas Nama Rekening Mempelai Pria",
+    brideBankName: "Nama Bank Mempelai Wanita",
+    brideBankNumber: "Nomor Rekening Mempelai Wanita",
+    brideBankHolder: "Atas Nama Rekening Mempelai Wanita",
     groomAddress: "Alamat Pengantin Pria",
     brideAddress: "Alamat Pengantin Wanita",
     streamingLink: "Link Streaming",
-    message: "Pesan Tambahan",
 };
 
 function copyTemplate() {
@@ -213,15 +209,18 @@ function parseClientResponse(text) {
         else if (label.includes("alamat lengkap")) data.venueAddress = value;
         else if (label.includes("google maps") || label.includes("link google"))
             data.mapsLink = value;
-        else if (label.includes("dress code")) data.dressCode = value;
-        else if (
-            label.includes("tanggal pernikahan") ||
-            label.includes("countdown")
-        )
-            data.countdownDate = value;
-        else if (label.includes("nama bank")) data.bankName = value;
-        else if (label.includes("nomor rekening")) data.bankNumber = value;
-        else if (label.includes("atas nama")) data.bankHolder = value;
+        else if (label.includes("nama bank") && label.includes("pria"))
+            data.groomBankName = value;
+        else if (label.includes("nomor rekening") && label.includes("pria"))
+            data.groomBankNumber = value;
+        else if (label.includes("atas nama") && label.includes("pria"))
+            data.groomBankHolder = value;
+        else if (label.includes("nama bank") && label.includes("wanita"))
+            data.brideBankName = value;
+        else if (label.includes("nomor rekening") && label.includes("wanita"))
+            data.brideBankNumber = value;
+        else if (label.includes("atas nama") && label.includes("wanita"))
+            data.brideBankHolder = value;
         else if (label.includes("alamat") && label.includes("pria"))
             data.groomAddress = value;
         else if (label.includes("alamat") && label.includes("wanita"))
@@ -231,7 +230,6 @@ function parseClientResponse(text) {
             label.includes("link live")
         )
             data.streamingLink = value;
-        else if (label.includes("pesan")) data.message = value;
     }
     return data;
 }
@@ -260,7 +258,6 @@ async function parseAndFill() {
         return;
     }
 
-    // Show loading
     Swal.fire({
         title: "Menyimpan data...",
         text: "Mengisi semua form secara otomatis",
@@ -272,6 +269,7 @@ async function parseAndFill() {
 
     filling.value = true;
     const errors = [];
+    let eventSaved = false;
 
     try {
         // 1. Save Couple
@@ -297,7 +295,6 @@ async function parseAndFill() {
         // 2. Save Event — replace existing events with the parsed one
         if (data.eventName || data.eventDate || data.venueName) {
             try {
-                // Fetch existing events and delete them to avoid duplicates
                 const existing = await axios.get(`/api/wedding/${slug}/events`);
                 if (Array.isArray(existing.data)) {
                     for (const ev of existing.data) {
@@ -319,8 +316,8 @@ async function parseAndFill() {
                     locationName: data.venueName || "",
                     locationAddress: data.venueAddress || "",
                     locationMapUrl: data.mapsLink || "",
-                    dressCode: data.dressCode || "",
                 });
+                eventSaved = true;
             } catch (e) {
                 errors.push(
                     "Acara: " + (e.response?.data?.message || e.message),
@@ -328,21 +325,33 @@ async function parseAndFill() {
             }
         }
 
-        // 3. Save Settings (countdown, streaming, amplop)
+        // 3. Save Settings (event-derived countdown, streaming, amplop)
         try {
             const settingsPayload = {};
-            if (data.countdownDate)
-                settingsPayload.countdownDatetime = data.countdownDate;
+            if (eventSaved)
+                settingsPayload.countdownDatetime = data.eventDate || "";
             if (data.streamingLink)
                 settingsPayload.liveStreamUrl = data.streamingLink;
-            if (data.message) settingsPayload.customMessage = data.message;
-            if (data.bankName || data.bankNumber) {
+            if (
+                data.groomBankName ||
+                data.groomBankNumber ||
+                data.groomBankHolder ||
+                data.brideBankName ||
+                data.brideBankNumber ||
+                data.brideBankHolder
+            ) {
                 settingsPayload.amplopAccounts = [
                     {
                         type: "bank",
-                        bankName: data.bankName || "",
-                        number: data.bankNumber || "",
-                        name: data.bankHolder || "",
+                        bankName: data.groomBankName || "",
+                        number: data.groomBankNumber || "",
+                        name: data.groomBankHolder || "",
+                    },
+                    {
+                        type: "bank",
+                        bankName: data.brideBankName || "",
+                        number: data.brideBankNumber || "",
+                        name: data.brideBankHolder || "",
                     },
                 ];
             }
@@ -364,7 +373,6 @@ async function parseAndFill() {
             );
         }
 
-        // Show result
         if (errors.length === 0) {
             Swal.fire({
                 icon: "success",
@@ -381,8 +389,6 @@ async function parseAndFill() {
             });
         }
 
-        // Refresh Inertia shared props (weddingData) so sidebar badges update.
-        // We do a silent partial reload of the current page.
         try {
             const { router } = await import("@inertiajs/vue3");
             router.reload({ only: ["weddingData"] });

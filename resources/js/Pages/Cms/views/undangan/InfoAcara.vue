@@ -34,18 +34,9 @@
                 />
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="field-group">
-                    <Label>Tanggal</Label>
-                    <Input v-model="event.date" type="date" />
-                </div>
-                <div class="field-group">
-                    <Label>Dress Code</Label>
-                    <Input
-                        v-model="event.dressCode"
-                        placeholder="Contoh: Soft Pink"
-                    />
-                </div>
+            <div class="field-group">
+                <Label>Tanggal</Label>
+                <Input v-model="event.date" type="date" />
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -135,7 +126,6 @@ const emptyEvent = () => ({
     venue: "",
     address: "",
     mapsUrl: "",
-    dressCode: "",
 });
 
 const form = ref({
@@ -150,12 +140,11 @@ function mapApiToForm(items) {
         id: e.id || null,
         name: e.name || "",
         date: e.date || "",
-        startTime: e.timeStart || "",
-        endTime: e.timeEnd || "",
-        venue: e.locationName || "",
-        address: e.locationAddress || "",
-        mapsUrl: e.locationMapUrl || "",
-        dressCode: e.dressCode || "",
+        startTime: e.timeStart || e.time_start || "",
+        endTime: e.timeEnd || e.time_end || "",
+        venue: e.locationName || e.location_name || "",
+        address: e.locationAddress || e.location_address || "",
+        mapsUrl: e.locationMapUrl || e.location_map_url || "",
     }));
 }
 
@@ -217,7 +206,6 @@ async function handleSave() {
                 locationName: ev.venue,
                 locationAddress: ev.address,
                 locationMapUrl: ev.mapsUrl,
-                dressCode: ev.dressCode,
             };
             if (ev.id) {
                 await axios.put(

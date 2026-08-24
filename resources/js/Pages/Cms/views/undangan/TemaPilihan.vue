@@ -12,62 +12,74 @@
 
         <div class="field-group">
             <Label>Pilih Tema</Label>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                <button
-                    v-for="tmpl in templates"
-                    :key="tmpl.id"
-                    type="button"
-                    class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
-                    :class="
-                        form.templateId === tmpl.id
-                            ? 'border-emerald-500 ring-2 ring-emerald-500/25'
-                            : 'border-border'
-                    "
-                    @click="selectTemplate(tmpl.id)"
-                >
-                    <div
-                        class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center"
-                        :style="{ background: getGradient(tmpl.id) }"
+            <div class="space-y-3">
+                <section class="border border-emerald-200 rounded-xl overflow-hidden">
+                    <button
+                        type="button"
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-emerald-50 text-emerald-800 font-semibold text-sm hover:bg-emerald-100 transition-colors"
+                        :aria-expanded="showReadyTemplates"
+                        @click="showReadyTemplates = !showReadyTemplates"
                     >
-                        <!-- Thumbnail image (from DB) -->
-                        <img
-                            v-if="tmpl.thumbnail_url"
-                            :src="tmpl.thumbnail_url"
-                            :alt="tmpl.name"
-                            class="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            loading="lazy"
-                            @error="$event.target.style.display = 'none'"
-                        />
-                        <!-- Fallback icon -->
-                        <span class="text-2xl select-none relative">{{
-                            getIcon(tmpl.id)
-                        }}</span>
-                        <!-- Status badge -->
-                        <span
-                            v-if="!tmpl.is_custom"
-                            class="absolute top-1 right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-emerald-500 text-white"
-                            >✓</span
-                        >
-                        <span
-                            v-else
-                            class="absolute top-1 right-1 text-[8px] font-bold px-1 py-0.5 rounded-full bg-amber-500 text-white"
-                            >Dev</span
-                        >
-                        <!-- Hover: Lihat Demo button (small, bottom) -->
-                        <a
-                            :href="`/wedding/demo-${tmpl.id}`"
-                            target="_blank"
-                            class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap"
-                            @click.stop
-                        >
-                            👁 Lihat Demo
-                        </a>
+                        <span class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs">Tema Siap Pakai</span>
+                            <span class="text-xs font-normal text-emerald-700">{{ readyTemplates.length }} tema</span>
+                        </span>
+                        <span>{{ showReadyTemplates ? '⌃' : '⌄' }}</span>
+                    </button>
+                    <div v-show="showReadyTemplates" class="p-3">
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                            <button
+                                v-for="tmpl in readyTemplates"
+                                :key="tmpl.id"
+                                type="button"
+                                class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
+                                :class="form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border'"
+                                @click="selectTemplate(tmpl.id)"
+                            >
+                                <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
+                                    <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
+                                    <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
+                                </div>
+                                <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
+                            </button>
+                        </div>
                     </div>
-                    <span
-                        class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full"
-                        >{{ tmpl.name }}</span
+                </section>
+
+                <section class="border border-amber-200 rounded-xl overflow-hidden">
+                    <button
+                        type="button"
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-amber-50 text-amber-800 font-semibold text-sm hover:bg-amber-100 transition-colors"
+                        :aria-expanded="showOngoingTemplates"
+                        @click="showOngoingTemplates = !showOngoingTemplates"
                     >
-                </button>
+                        <span class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs">Tema Dalam Pengembangan</span>
+                            <span class="text-xs font-normal text-amber-700">{{ ongoingTemplates.length }} tema</span>
+                        </span>
+                        <span>{{ showOngoingTemplates ? '⌃' : '⌄' }}</span>
+                    </button>
+                    <div v-show="showOngoingTemplates" class="p-3">
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                            <button
+                                v-for="tmpl in ongoingTemplates"
+                                :key="tmpl.id"
+                                type="button"
+                                class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
+                                :class="form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border'"
+                                @click="selectTemplate(tmpl.id)"
+                            >
+                                <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
+                                    <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
+                                    <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
+                                </div>
+                                <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
 
@@ -117,6 +129,10 @@ const saving = ref(false);
 const saved = ref(false);
 
 const templates = computed(() => store.getters["template/templates"]);
+const readyTemplates = computed(() => templates.value.filter((t) => !t.is_custom));
+const ongoingTemplates = computed(() => templates.value.filter((t) => t.is_custom));
+const showReadyTemplates = ref(true);
+const showOngoingTemplates = ref(true);
 
 const fonts = [
     "Playfair Display",
@@ -127,6 +143,23 @@ const fonts = [
     "Dancing Script",
     "Lora",
     "Merriweather",
+    "Poppins",
+    "Montserrat",
+    "Raleway",
+    "Open Sans",
+    "Roboto Slab",
+    "Josefin Sans",
+    "Libre Baskerville",
+    "Cormorant SC",
+    "Alex Brush",
+    "Satisfy",
+    "Parisienne",
+    "Sacramento",
+    "Tangerine",
+    "Allura",
+    "DM Serif Display",
+    "Italiana",
+    "Bodoni Moda",
 ];
 
 const form = ref({
