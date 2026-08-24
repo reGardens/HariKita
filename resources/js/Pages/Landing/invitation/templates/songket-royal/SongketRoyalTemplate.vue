@@ -123,7 +123,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from "vue";
-import "./styles.css";
+import "./style.scss";
 import PasswordGate from "@/Pages/Landing/invitation/sections/PasswordGate.vue";
 import MusicPlayer from "@/Pages/Landing/invitation/sections/MusicPlayer.vue";
 import CoupleSection from "@/Pages/Landing/invitation/sections/CoupleSection.vue";

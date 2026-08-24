@@ -159,21 +159,7 @@ const templates = [
       animationStyle: 'zoom-in',
     },
   },
-  {
-    id: 'misal',
-    name: 'misal',
-    description: 'misal',
-    thumbnail: '/templates/misal/thumbnail.webp',
-    component: () => import('./misal/MisalTemplate.vue'),
-    defaultConfig: {
-      primaryColor: '#1B3A5C',
-      secondaryColor: '#2E6B9E',
-      accentColor: '#C9A84C',
-      fontFamily: 'Playfair Display',
-      galleryLayout: 'grid',
-      animationStyle: 'fade-up',
-    },
-  }
+
   // [REGISTER_TEMPLATES]
 ]
 

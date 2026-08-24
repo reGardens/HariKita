@@ -1,0 +1,132 @@
+@use '../scss/foundation' as *;
+
+@import url("https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap");
+
+$papua-primary: #1A0A2E;
+$papua-secondary: #4A1580;
+$papua-accent: #FF6B35;
+$papua-teal: #00C9A7;
+$papua-yellow: #FFD60A;
+
+.papua-cendrawasih-template {
+  --papua-primary: #{$papua-primary};
+  --papua-secondary: #{$papua-secondary};
+  --papua-accent: #{$papua-accent};
+  --papua-teal: #{$papua-teal};
+  --papua-yellow: #{$papua-yellow};
+
+  font-family: "Spectral", "Georgia", serif;
+  color: #fff0e0;
+  background: linear-gradient(160deg, #0a0515 0%, #1a0a2e 40%, #0f1a35 80%, #0a0515 100%);
+  position: relative;
+  overflow-x: hidden;
+
+  section { color: #fff0e0; }
+  h2 {
+    color: var(--papua-teal);
+    font-style: italic;
+  }
+
+  .buka-undangan-btn {
+    @include btn-primary;
+
+    background: linear-gradient(135deg, var(--papua-accent) 0%, var(--papua-secondary) 100%);
+    color: #fff;
+    border: 2px solid var(--papua-teal);
+    border-radius: 50px;
+    letter-spacing: 0.15em;
+    box-shadow:
+      0 0 20px rgba(255, 107, 53, 0.4),
+      0 0 40px rgba(0, 201, 167, 0.2),
+      0 4px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.35s ease;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow:
+        0 0 40px rgba(255, 107, 53, 0.6),
+        0 0 60px rgba(0, 201, 167, 0.3),
+        0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    &:active { transform: scale(0.97); }
+  }
+}
+
+.papua-cover {
+  @include cover-fullscreen;
+
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(74, 21, 128, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(0, 201, 167, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, #050210 0%, #1a0a2e 100%);
+}
+
+.papua-title {
+  @include heading(inherit);
+
+  color: #fff8f0;
+  font-family: inherit;
+  font-weight: 600;
+  font-style: italic;
+  line-height: inherit;
+  text-shadow:
+    0 0 40px rgba(255, 107, 53, 0.4),
+    0 2px 20px rgba(0, 0, 0, 0.8);
+}
+
+.papua-ampersand {
+  color: var(--papua-teal);
+  text-shadow: 0 0 30px rgba(0, 201, 167, 0.6);
+  font-style: normal;
+}
+
+.bird-soar { animation: birdSoar 6s ease-in-out infinite alternate; }
+.tropical-glow { animation: tropicalGlow 3s ease-in-out infinite; }
+.neon-pulse { animation: neonPulse 2.5s ease-in-out infinite; }
+
+.papua-cendrawasih-bird {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: birdSoar 7s ease-in-out infinite alternate;
+}
+
+.papua-tropical-left,
+.papua-tropical-right {
+  position: absolute;
+  bottom: 15%;
+  pointer-events: none;
+  animation: tropicalGlow 4s ease-in-out infinite;
+}
+
+.papua-tropical-left { left: 0; }
+.papua-tropical-right {
+  right: 0;
+  animation-delay: -2s;
+}
+
+.papua-stars-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@keyframes birdSoar {
+  0% { transform: translateX(-30px) translateY(0) rotate(-10deg); }
+  50% { transform: translateX(0) translateY(-20px) rotate(5deg); }
+  100% { transform: translateX(30px) translateY(0) rotate(-5deg); }
+}
+
+@keyframes tropicalGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes neonPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
