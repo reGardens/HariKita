@@ -1,0 +1,39 @@
+{
+  "id": "batik-elegance",
+  "name": "Batik Elegance",
+  "description": "Motif batik kontemporer dengan estetika premium ungu-emas",
+  "category": "nusantara",
+  "thumbnail": "/images/templates/batik-elegance.webp",
+  "fonts": [
+    "Cormorant SC:300,400,500,600,700"
+  ],
+  "defaultTheme": {
+    "primaryColor": "#1A0A2E",
+    "secondaryColor": "#3D1A78",
+    "accentColor": "#C9A64A",
+    "fontFamily": "Cormorant SC"
+  },
+  "sections": [
+    "cover",
+    "couple",
+    "events",
+    "countdown",
+    "love-story",
+    "gallery",
+    "rsvp",
+    "wishes",
+    "gift",
+    "footer"
+  ],
+  "features": {
+    "musicPlayer": true,
+    "passwordGate": true,
+    "guestName": true,
+    "liveStreaming": true,
+    "healthProtocol": true,
+    "qrCheckin": true
+  },
+  "coverLayout": "fullscreen-mandala",
+  "galleryLayout": "masonry",
+  "animationStyle": "fade-up"
+}

@@ -127,6 +127,7 @@ import axios from "axios";
 import { Input } from "@/Components/ui";
 import { Label } from "@/Components/ui";
 import { Button } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
@@ -218,6 +219,7 @@ async function loadCountdown() {
                 form.value.weddingDatetime = val;
             }
         }
+        skipNextWatch();
     } catch (err) {
         console.error("Failed to load countdown", err);
     }
@@ -250,4 +252,6 @@ async function handleSave() {
         saving.value = false;
     }
 }
+
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
 </script>

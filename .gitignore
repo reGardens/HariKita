@@ -20,3 +20,9 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/e2e/.auth/*.json

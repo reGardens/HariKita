@@ -231,6 +231,7 @@ import {
     SelectItem,
     SelectValue,
 } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
@@ -283,6 +284,7 @@ async function loadData() {
     try {
         const { data } = await axios.get(`/api/wedding/${slug}/settings`);
         hydrateForm(data);
+        skipNextWatch();
     } catch (err) {
         console.error("Failed to load amplop settings", err);
     }
@@ -325,6 +327,8 @@ async function handleSave() {
         saving.value = false;
     }
 }
+
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
 </script>
 
 <style scoped>

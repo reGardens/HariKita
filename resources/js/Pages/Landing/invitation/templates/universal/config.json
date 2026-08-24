@@ -1,0 +1,39 @@
+{
+  "id": "universal",
+  "name": "Universal Modern",
+  "description": "Template modern minimalis yang adaptif ke semua tema",
+  "category": "modern",
+  "thumbnail": "/images/templates/universal.webp",
+  "fonts": [
+    "DM Serif Display:ital@0;1",
+    "DM Sans:300,400,500,600"
+  ],
+  "defaultTheme": {
+    "primaryColor": "#1A1A2E",
+    "secondaryColor": "#16213E",
+    "accentColor": "#E94560",
+    "fontFamily": "DM Serif Display"
+  },
+  "sections": [
+    "cover",
+    "couple",
+    "events",
+    "countdown",
+    "gallery",
+    "rsvp",
+    "wishes",
+    "gift",
+    "footer"
+  ],
+  "features": {
+    "musicPlayer": true,
+    "passwordGate": true,
+    "guestName": true,
+    "liveStreaming": true,
+    "healthProtocol": true,
+    "qrCheckin": true
+  },
+  "coverLayout": "fullscreen-blob",
+  "galleryLayout": "masonry",
+  "animationStyle": "fade-up"
+}

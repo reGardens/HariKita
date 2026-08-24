@@ -106,6 +106,7 @@ import axios from "axios";
 import { Input } from "@/Components/ui";
 import { Label } from "@/Components/ui";
 import { Button } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
@@ -150,6 +151,7 @@ async function loadWishlist() {
                 note: w.note || "",
             }));
         }
+        skipNextWatch();
     } catch (err) {
         console.error("Failed to load wishlist", err);
     }
@@ -186,6 +188,8 @@ async function handleSave() {
         saving.value = false;
     }
 }
+
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
 </script>
 
 <style scoped>

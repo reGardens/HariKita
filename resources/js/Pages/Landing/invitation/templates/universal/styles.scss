@@ -1,0 +1,117 @@
+// ============================================================
+// Universal Template — SCSS
+// Modern minimalist yang adaptif ke semua tema via CSS variables.
+// ============================================================
+
+@use '../scss/foundation' as *;
+
+// ─── Font import ───
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap");
+
+// ─── Template-specific variables ───
+$uni-primary: var(--uni-primary, #1A1A2E);
+$uni-secondary: var(--uni-secondary, #16213E);
+$uni-accent: var(--uni-accent, #E94560);
+
+// ─── Template-specific keyframes ───
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+// ─── Base ───
+.universal-template {
+  font-family: "DM Sans", "Arial", sans-serif;
+  color: #1a1a2e;
+  background: linear-gradient(160deg, #fafafa 0%, #f5f5ff 40%, #eeefff 80%, #f0f0ff 100%);
+  position: relative;
+  overflow-x: hidden;
+
+  h2 {
+    font-family: "DM Serif Display", serif;
+  }
+}
+
+// ─── Cover ───
+.universal-cover {
+  @include cover-fullscreen;
+  background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+}
+
+// ─── Typography ───
+.universal-title {
+  @include heading(3rem);
+  font-family: "DM Serif Display", serif;
+  color: $white;
+  font-weight: normal;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 30px rgba(233, 69, 96, 0.3);
+
+  @include desktop {
+    font-size: 4.5rem;
+  }
+}
+
+.universal-ampersand {
+  color: var(--uni-accent, #E94560);
+  font-style: italic;
+  text-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+}
+
+// ─── Decorative blobs ───
+.universal-blob-1 {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
+  top: -50px;
+  right: -50px;
+  pointer-events: none;
+  animation: morphBlob 8s ease-in-out infinite, float 6s ease-in-out infinite;
+}
+
+.universal-blob-2 {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(80, 80, 255, 0.12) 0%, transparent 70%);
+  bottom: 50px;
+  left: -30px;
+  pointer-events: none;
+  animation: morphBlob 10s ease-in-out infinite reverse, float 8s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+.universal-line-ornament {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.06;
+}
+
+// ─── Float circles ───
+.float-circle {
+  @include float(6s);
+}
+
+// ─── CTA Button ───
+.universal-template .buka-undangan-btn {
+  @include btn-primary;
+  background: linear-gradient(135deg, var(--uni-accent, #E94560) 0%, #C23152 100%);
+  color: $white;
+  border: none;
+  border-radius: $radius-full;
+  box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4), 0 8px 40px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 40px rgba(233, 69, 96, 0.6), 0 16px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}

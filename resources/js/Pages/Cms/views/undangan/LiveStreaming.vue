@@ -107,6 +107,7 @@ import {
     SelectItem,
     SelectValue,
 } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
@@ -132,6 +133,7 @@ async function loadStreaming() {
             form.value.url = data.liveStreamUrl;
             form.value.enabled = true;
         }
+        skipNextWatch();
     } catch (err) {
         console.error("Failed to load streaming", err);
     }
@@ -159,6 +161,8 @@ async function handleSave() {
         saving.value = false;
     }
 }
+
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
 </script>
 
 <style scoped>

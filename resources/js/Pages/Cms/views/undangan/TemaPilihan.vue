@@ -109,6 +109,7 @@ import {
     SelectValue,
 } from "@/Components/ui";
 import { Button, Label } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
@@ -201,11 +202,14 @@ async function handleSave() {
     }
 }
 
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
+
 onMounted(async () => {
     await Promise.all([
         store.dispatch("settings/fetchSettings"),
         store.dispatch("template/fetchTemplates"),
     ]);
     populateFromStore();
+    skipNextWatch();
 });
 </script>

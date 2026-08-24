@@ -1,0 +1,13 @@
+// ============================================================
+// Template Invitation — SCSS Foundation
+// 
+// Import ini di setiap template SCSS:
+//   @use '../scss/foundation' as *;
+//
+// Menyediakan: variables, mixins, animations
+// TIDAK meng-output CSS apapun sendiri (hanya tools).
+// ============================================================
+
+@forward 'variables';
+@forward 'mixins';
+@forward 'animations';

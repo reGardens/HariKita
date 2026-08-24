@@ -1,0 +1,210 @@
+// ============================================================
+// Batik Elegance — Template SCSS
+// Motif batik kontemporer dengan estetika premium ungu-emas.
+//
+// Usage: import di Vue component via `import './style.scss'`
+// ============================================================
+
+@use '../scss/foundation' as *;
+
+// ─── Template-specific variables ───
+$batik-primary: #1A0A2E;
+$batik-secondary: #3D1A78;
+$batik-accent: #C9A64A;
+$batik-rose: #E0A0A0;
+$batik-text: #f5f0ff;
+$batik-text-muted: #f0ecff;
+
+// ─── Font import ───
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&display=swap");
+
+// ─── Template-specific keyframes ───
+@keyframes batikRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes goldPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes batikFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(10deg); }
+}
+
+// ─── Root ───
+.batik-elegance-template {
+  font-family: "Cormorant SC", "Georgia", serif;
+  color: $batik-text;
+  background: linear-gradient(160deg, #0d0520 0%, $batik-primary 40%, #2d1560 80%, $batik-primary 100%);
+  position: relative;
+  overflow-x: hidden;
+
+  // CSS custom properties (overridable dari Vue inline style)
+  --t-primary: #{$batik-primary};
+  --t-secondary: #{$batik-secondary};
+  --t-accent: #{$batik-accent};
+  --t-font-heading: "Cormorant SC", "Georgia", serif;
+
+  // Batik pattern overlay
+  &::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba($batik-accent, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba($batik-accent, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // ─── Section defaults ───
+  section {
+    position: relative;
+    color: $batik-text-muted;
+  }
+
+  h2 {
+    color: $batik-accent;
+    letter-spacing: 0.1em;
+    @include heading(2rem);
+    font-family: "Cormorant SC", "Georgia", serif;
+  }
+}
+
+// ─── Cover ───
+.batik-cover {
+  @include cover-fullscreen;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba($batik-secondary, 0.6) 0%, rgba(#0d0520, 0.95) 70%),
+    linear-gradient(160deg, #0d0520 0%, $batik-primary 100%);
+}
+
+.batik-title {
+  @include heading(3.5rem);
+  font-family: "Cormorant SC", "Georgia", serif;
+  color: $batik-text;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 40px rgba($batik-accent, 0.3);
+
+  @include desktop {
+    font-size: 5rem;
+  }
+}
+
+.batik-ampersand {
+  color: $batik-accent;
+  text-shadow: 0 0 30px rgba($batik-accent, 0.5);
+  font-style: italic;
+}
+
+// ─── Animations ───
+.batik-spin { animation: batikRotate 20s linear infinite; }
+.batik-pulse { animation: goldPulse 3s ease-in-out infinite; }
+.batik-float { animation: batikFloat 6s ease-in-out infinite; }
+
+// ─── Decorative elements ───
+.batik-mandala-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.08;
+
+  svg {
+    width: 500px;
+    height: 500px;
+  }
+}
+
+.batik-diamond {
+  position: absolute;
+  pointer-events: none;
+
+  &-tl { top: 20px; left: 20px; }
+  &-tr { top: 20px; right: 20px; }
+  &-bl { bottom: 20px; left: 20px; }
+  &-br { bottom: 20px; right: 20px; }
+}
+
+// ─── CTA Button ───
+.batik-elegance-template .buka-undangan-btn {
+  @include btn-primary;
+  background: transparent;
+  color: $batik-accent;
+  border: 1px solid $batik-accent;
+  border-radius: 0;
+  letter-spacing: 0.25em;
+  font-size: 0.7rem;
+  box-shadow: 0 0 15px rgba($batik-accent, 0.2), inset 0 0 15px rgba($batik-accent, 0.05);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: $batik-accent;
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+
+  &:hover {
+    color: $batik-primary;
+    box-shadow: 0 0 30px rgba($batik-accent, 0.5);
+    transform: none;
+
+    &::before {
+      transform: translateX(0);
+    }
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+// ─── Section Cards (RSVP, Wishes, etc.) ───
+.batik-elegance-template {
+  .card,
+  .form-card {
+    @include glass-card(12px, 0.08);
+    border-color: rgba($batik-accent, 0.15);
+  }
+
+  input,
+  textarea,
+  select {
+    background: rgba($batik-secondary, 0.3);
+    border: 1px solid rgba($batik-accent, 0.2);
+    color: $batik-text;
+    border-radius: $radius-sm;
+    padding: $gap-sm $gap-md;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $batik-accent;
+      box-shadow: 0 0 0 2px rgba($batik-accent, 0.15);
+    }
+
+    &::placeholder {
+      color: rgba($batik-text, 0.4);
+    }
+  }
+
+  // Gallery
+  .gallery-masonry {
+    @include gallery-masonry(3);
+  }
+
+  .gallery-grid {
+    @include gallery-grid(3);
+  }
+}

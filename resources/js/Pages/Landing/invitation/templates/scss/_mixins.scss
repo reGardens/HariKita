@@ -1,0 +1,197 @@
+// ============================================================
+// Template Invitation — SCSS Mixins
+// Reusable patterns untuk semua template undangan.
+// ============================================================
+
+@use 'variables' as *;
+
+// ─── Responsive Breakpoints ───
+@mixin mobile {
+  @media (max-width: #{$bp-sm - 1px}) { @content; }
+}
+@mixin tablet {
+  @media (min-width: $bp-sm) and (max-width: #{$bp-lg - 1px}) { @content; }
+}
+@mixin desktop {
+  @media (min-width: $bp-lg) { @content; }
+}
+@mixin min-width($bp) {
+  @media (min-width: $bp) { @content; }
+}
+
+// ─── Section Layout ───
+@mixin section-base {
+  padding: $section-padding;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+@mixin section-centered {
+  @include section-base;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+// ─── Cover (full-height opening) ───
+@mixin cover-fullscreen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+// ─── Typography ───
+@mixin heading($size: 2.5rem) {
+  font-family: $font-heading;
+  font-size: $size;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@mixin subheading($size: 1.25rem) {
+  font-family: $font-body;
+  font-size: $size;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@mixin body-text($size: 1rem) {
+  font-family: $font-body;
+  font-size: $size;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+@mixin accent-text {
+  font-family: $font-accent;
+  font-style: italic;
+}
+
+// ─── Decorative ───
+@mixin ornament-divider($url, $height: 40px) {
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: $height;
+    margin: $gap-lg auto;
+    background: url($url) no-repeat center/contain;
+    pointer-events: none;
+  }
+}
+
+@mixin ornament-background($url, $opacity: 0.05) {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url($url) repeat center/auto;
+    opacity: $opacity;
+    pointer-events: none;
+    z-index: $z-background;
+  }
+}
+
+@mixin gradient-overlay($direction: 180deg, $from: transparent, $to: rgba(0,0,0,0.5)) {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient($direction, $from, $to);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+// ─── Cards ───
+@mixin card($bg: $white) {
+  background: $bg;
+  border-radius: $radius-lg;
+  padding: $gap-lg;
+  box-shadow: $shadow-md;
+}
+
+@mixin glass-card($blur: 10px, $opacity: 0.1) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+}
+
+// ─── Buttons ───
+@mixin btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $gap-sm;
+  padding: 0.75rem 2rem;
+  font-family: $font-body;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-bounce;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.03);
+  }
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+// ─── Animations ───
+@mixin fade-in($duration: 0.6s, $delay: 0s) {
+  opacity: 0;
+  animation: fadeIn $duration ease $delay forwards;
+}
+
+@mixin float($duration: 6s) {
+  animation: float $duration ease-in-out infinite;
+}
+
+// ─── Grid Layouts ───
+@mixin gallery-masonry($columns: 3, $gap: $gap-md) {
+  columns: $columns;
+  column-gap: $gap;
+
+  > * {
+    break-inside: avoid;
+    margin-bottom: $gap;
+  }
+
+  @include mobile {
+    columns: 1;
+  }
+
+  @include tablet {
+    columns: 2;
+  }
+}
+
+@mixin gallery-grid($columns: 3, $gap: $gap-md) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

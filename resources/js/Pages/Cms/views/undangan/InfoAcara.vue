@@ -86,6 +86,7 @@
         </div>
 
         <Button
+            v-if="isSuperAdmin"
             variant="outline"
             class="w-full border-dashed border-2 hover:border-emerald-500 hover:text-emerald-600"
             @click="addEvent"
@@ -106,18 +107,24 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
+import { usePage } from "@inertiajs/vue3";
 import axios from "axios";
 import { Input } from "@/Components/ui";
 import { Label } from "@/Components/ui";
 import { Button } from "@/Components/ui";
 import { Textarea } from "@/Components/ui";
+import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
+const page = usePage();
 const saving = ref(false);
 const saved = ref(false);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+const isSuperAdmin = computed(
+    () => page.props.auth?.user?.roles?.includes("super-admin") || false,
+);
 
 const emptyEvent = () => ({
     id: null,
@@ -152,18 +159,22 @@ function mapApiToForm(items) {
     }));
 }
 
+onMounted(loadEvents);
+
+// Auto-save & refresh preview on form change (debounced 2s)
+const { skipNextWatch } = useAutoSavePreview(form, handleSave);
+
 async function loadEvents() {
     const slug = activeSlug.value;
     if (!slug) return;
     try {
         const { data } = await axios.get(`/api/wedding/${slug}/events`);
         form.value.events = mapApiToForm(data);
+        skipNextWatch(); // Don't auto-save after initial load
     } catch (err) {
         console.error("Failed to load events", err);
     }
 }
-
-onMounted(loadEvents);
 
 function addEvent() {
     form.value.events.push(emptyEvent());
