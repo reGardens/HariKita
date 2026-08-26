@@ -84,7 +84,7 @@
       <GiftSection
         :bank-accounts="bankAccounts"
         :qris-image-url="settings?.qrisImageUrl"
-        :shipping-address="settings?.shippingAddress"
+        :shipping-address="shippingAddressText"
         :live-stream-url="settings?.liveStreamUrl"
         :health-protocol="settings?.healthProtocol"
         :theme-colors="settings?.themeColors"
@@ -112,7 +112,6 @@ import WishesSection from "@/Pages/Landing/invitation/sections/WishesSection.vue
 import GiftSection from "@/Pages/Landing/invitation/sections/GiftSection.vue";
 import { useGuestName } from "@/Pages/Landing/invitation/composables/useGuestName.js";
 import { wishService } from "@/api/services/wishService.js";
-import { paymentService } from "@/api/services/paymentService.js";
 
 const props = defineProps({
   couple: { type: Object, default: null },
@@ -138,7 +137,15 @@ const brideDisplayName = computed(() => props.couple?.bride?.nickname || props.c
 const { guestName } = useGuestName();
 const firstEventDate = computed(() => props.events?.[0]?.date || "");
 const wishes = ref([]);
-const bankAccounts = ref([]);
+const bankAccounts = computed(() => props.settings?.amplopAccounts || []);
+const shippingAddressText = computed(() => {
+  const addr = props.settings?.amplopAddresses;
+  if (!addr) return "";
+  const parts = [];
+  if (addr.groom?.fullAddress) parts.push("🤵 " + addr.groom.fullAddress);
+  if (addr.bride?.fullAddress) parts.push("👰 " + addr.bride.fullAddress);
+  return parts.join("\n");
+});
 
 function openInvitation() {
   document.documentElement.classList.remove("invitation-locked");
@@ -156,12 +163,8 @@ onMounted(() => {
 
 onMounted(async () => {
   try {
-    const [w, b] = await Promise.all([
-      wishService.getAll(props.slug),
-      paymentService.getBankAccounts(props.slug),
-    ]);
+    const w = await wishService.getAll(props.slug);
     wishes.value = w;
-    bankAccounts.value = b;
   } catch {}
 });
 </script>
