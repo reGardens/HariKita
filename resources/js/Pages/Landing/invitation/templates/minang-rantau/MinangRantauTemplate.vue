@@ -152,7 +152,7 @@ import WishesSection from "@/Pages/Landing/invitation/sections/WishesSection.vue
 import GiftSection from "@/Pages/Landing/invitation/sections/GiftSection.vue";
 import { useGuestName } from "@/Pages/Landing/invitation/composables/useGuestName.js";
 import { wishService } from "@/api/services/wishService.js";
-import { paymentService } from "@/api/services/paymentService.js";
+
 
 const props = defineProps({
   couple: { type: Object, default: null },
@@ -178,7 +178,7 @@ const brideDisplayName = computed(() => props.couple?.bride?.nickname || props.c
 const { guestName } = useGuestName();
 const firstEventDate = computed(() => props.events?.[0]?.date || "");
 const wishes = ref([]);
-const bankAccounts = ref([]);
+const bankAccounts = computed(() => props.settings?.amplopAccounts || []);
 
 function openInvitation() {
   document.documentElement.classList.remove("invitation-locked");
@@ -196,12 +196,7 @@ onMounted(() => {
 
 onMounted(async () => {
   try {
-    const [w, b] = await Promise.all([
-      wishService.getAll(props.slug),
-      paymentService.getBankAccounts(props.slug),
-    ]);
-    wishes.value = w;
-    bankAccounts.value = b;
+    wishes.value = await wishService.getAll(props.slug);
   } catch {}
 });
 </script>
