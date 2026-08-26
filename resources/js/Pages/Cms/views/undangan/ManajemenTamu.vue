@@ -248,6 +248,45 @@
             </div>
         </div>
     </div>
+
+    <!-- Import Preview Modal -->
+    <div v-if="showImportModal" class="import-modal-overlay" @click.self="showImportModal = false">
+        <div class="import-modal">
+            <div class="import-modal-header">
+                <h3>📋 Review Data Import ({{ importPreview.length }} tamu)</h3>
+                <button class="import-modal-close" @click="showImportModal = false">✕</button>
+            </div>
+            <div class="import-modal-body">
+                <table class="import-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Nama</th>
+                            <th style="width: 30%">No HP</th>
+                            <th style="width: 20%">Prioritas</th>
+                            <th style="width: 10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(row, idx) in importPreview" :key="idx">
+                            <td><input v-model="row.name" class="import-input" placeholder="Nama tamu" /></td>
+                            <td><input v-model="row.phone" class="import-input" placeholder="No HP" /></td>
+                            <td>
+                                <select v-model="row.category" class="import-input">
+                                    <option value="umum">Umum</option>
+                                    <option value="vip">VIP</option>
+                                </select>
+                            </td>
+                            <td><button class="btn-remove-row" @click="importPreview.splice(idx, 1)">✕</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="import-modal-footer">
+                <Button variant="outline" @click="showImportModal = false">Batal</Button>
+                <Button @click="confirmImport">✅ Simpan {{ importPreview.length }} Tamu</Button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -338,6 +377,9 @@ async function downloadTemplate() {
     URL.revokeObjectURL(url);
 }
 
+const showImportModal = ref(false);
+const importPreview = ref([]);
+
 async function handleImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -349,8 +391,7 @@ async function handleImport(event) {
         const ws = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        // Skip header row
-        let imported = 0;
+        const preview = [];
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             if (!row || !row[0]) continue;
@@ -358,27 +399,35 @@ async function handleImport(event) {
             const phone = row[1] ? String(row[1]).trim() : "";
             const prioritas = row[2] ? String(row[2]).trim().toLowerCase() : "umum";
             const category = prioritas === "vip" ? "vip" : "umum";
-
-            form.value.guests.push({ name, phone, category, opened: false });
-            imported++;
+            preview.push({ name, phone, category });
         }
 
         // Reset input
         event.target.value = "";
 
-        if (imported > 0) {
+        if (preview.length > 0) {
+            importPreview.value = preview;
+            showImportModal.value = true;
+        } else {
             const Swal = (await import("sweetalert2")).default;
-            Swal.fire({
-                icon: "success",
-                title: `${imported} tamu berhasil diimport!`,
-                timer: 2500,
-                showConfirmButton: false,
-            });
+            Swal.fire({ icon: "warning", title: "File kosong", text: "Tidak ada data tamu ditemukan di file" });
         }
     } catch (err) {
         const Swal = (await import("sweetalert2")).default;
         Swal.fire({ icon: "error", title: "Gagal import", text: err.message });
     }
+}
+
+async function confirmImport() {
+    const valid = importPreview.value.filter(r => r.name.trim());
+    for (const row of valid) {
+        form.value.guests.push({ name: row.name.trim(), phone: row.phone, category: row.category, opened: false });
+    }
+    showImportModal.value = false;
+    importPreview.value = [];
+
+    const Swal = (await import("sweetalert2")).default;
+    Swal.fire({ icon: "success", title: `${valid.length} tamu ditambahkan!`, timer: 2500, showConfirmButton: false });
 }
 
 function addGuest() {
@@ -504,5 +553,106 @@ async function handleSave() {
     border: none;
     cursor: pointer;
     flex-shrink: 0;
+}
+/* ─── Import Modal ─── */
+.import-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.import-modal {
+    background: var(--card, #fff);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.dark .import-modal {
+    background: hsl(240 10% 10%);
+}
+.import-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.import-modal-header h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--foreground, #111);
+}
+.dark .import-modal-header h3 {
+    color: #f9fafb;
+}
+.import-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--muted-foreground, #6b7280);
+}
+.import-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+}
+.import-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+.import-table th {
+    text-align: left;
+    padding: 0.5rem 0.375rem;
+    font-weight: 600;
+    color: var(--muted-foreground, #6b7280);
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.import-table td {
+    padding: 0.375rem;
+}
+.import-input {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border, #d1d5db);
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    background: var(--card, #fff);
+    color: var(--foreground, #111);
+}
+.dark .import-input {
+    background: hsl(240 10% 14%);
+    border-color: hsl(240 5% 25%);
+    color: #f9fafb;
+}
+.import-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+.btn-remove-row {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+}
+.import-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border, #e5e7eb);
 }
 </style>
