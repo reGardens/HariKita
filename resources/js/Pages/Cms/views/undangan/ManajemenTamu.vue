@@ -298,32 +298,43 @@ function catEmoji(c) {
     return catEmojis[c] || "👤";
 }
 
-function downloadTemplate() {
-    import("xlsx").then((XLSX) => {
-        const data = [
-            ["Nama", "No HP", "Prioritas"],
-            ["Budi Santoso", "08123456789", "Umum"],
-            ["Ibu Rahayu", "08198765432", "VIP"],
-        ];
-        const ws = XLSX.utils.aoa_to_sheet(data);
+async function downloadTemplate() {
+    const ExcelJS = await import("exceljs");
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet("Daftar Tamu");
 
-        // Set column widths
-        ws["!cols"] = [{ wch: 25 }, { wch: 15 }, { wch: 12 }];
+    // Header
+    ws.columns = [
+        { header: "Nama", key: "nama", width: 25 },
+        { header: "No HP", key: "hp", width: 18 },
+        { header: "Prioritas", key: "prioritas", width: 12 },
+    ];
 
-        // Add data validation (dropdown) for Prioritas column (C2:C100)
-        ws["!dataValidation"] = [
-            {
-                sqref: "C2:C100",
-                type: "list",
-                formula1: '"Umum,VIP"',
-                showDropDown: true,
-            },
-        ];
+    // Sample rows
+    ws.addRow({ nama: "Budi Santoso", hp: "08123456789", prioritas: "Umum" });
+    ws.addRow({ nama: "Ibu Rahayu", hp: "08198765432", prioritas: "VIP" });
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Daftar Tamu");
-        XLSX.writeFile(wb, "template-daftar-tamu.xlsx");
-    });
+    // Style header
+    ws.getRow(1).font = { bold: true };
+
+    // Add dropdown validation for Prioritas column (C2:C100)
+    for (let i = 2; i <= 100; i++) {
+        ws.getCell(`C${i}`).dataValidation = {
+            type: "list",
+            allowBlank: true,
+            formulae: ['"Umum,VIP"'],
+        };
+    }
+
+    // Generate and download
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "template-daftar-tamu.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function addGuest() {
