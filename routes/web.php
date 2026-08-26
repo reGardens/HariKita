@@ -67,7 +67,9 @@ Route::middleware(['auth', 'role:super-admin'])->group(function () {
 Route::middleware('auth')->group(function () {
     // Dashboard (accessible to all — data is filtered server-side by role)
     Route::get('/cms/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('cms.dashboard');
-    Route::get('/cms/templates', [\App\Http\Controllers\Admin\TemplateController::class, 'index'])->name('cms.templates.index');
+    Route::get('/cms/templates', function () {
+        return redirect('/cms/dashboard');
+    });
 
     // /cms root redirects to dashboard
     Route::get('/cms', function () {
