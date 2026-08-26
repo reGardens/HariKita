@@ -54,14 +54,6 @@
             </div>
         </div>
 
-        <Button
-            variant="outline"
-            class="w-full border-dashed border-2 hover:border-pink-500 hover:text-pink-600"
-            @click="add"
-        >
-            + Tambah Momen
-        </Button>
-
         <div class="save-bar">
             <Button :disabled="saving" @click="handleSave">
                 <span v-if="saving">Menyimpan…</span>
