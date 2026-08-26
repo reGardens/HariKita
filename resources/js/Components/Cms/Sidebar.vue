@@ -147,16 +147,6 @@ const menuGroups = computed(() => {
                 {
                     label:
                         locale.value === "id"
-                            ? "Manajemen Tamu"
-                            : "Guest Management",
-                    href: `/cms/${slug}/undangan/tamu`,
-                    icon: "UsersGroup",
-                    visible: !!slug,
-                    filled: hasGuests,
-                },
-                {
-                    label:
-                        locale.value === "id"
                             ? "Amplop Digital"
                             : "Digital Envelope",
                     href: `/cms/${slug}/undangan/amplop`,
@@ -214,6 +204,16 @@ const menuGroups = computed(() => {
                     icon: "Gift",
                     visible: !!slug,
                     filled: hasWishlist,
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Manajemen Tamu"
+                            : "Guest Management",
+                    href: `/cms/${slug}/undangan/tamu`,
+                    icon: "UsersGroup",
+                    visible: !!slug,
+                    filled: hasGuests,
                 },
             ],
         },

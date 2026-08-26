@@ -51,19 +51,11 @@
                             @update:model-value="(v) => (newGuest.category = v)"
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Kategori" />
+                                <SelectValue placeholder="Prioritas Tamu" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="keluarga"
-                                    >👨‍👩‍👧 Keluarga</SelectItem
-                                >
-                                <SelectItem value="teman">👫 Teman</SelectItem>
-                                <SelectItem value="kantor"
-                                    >💼 Rekan Kerja</SelectItem
-                                >
-                                <SelectItem value="lainnya"
-                                    >👤 Lainnya</SelectItem
-                                >
+                                <SelectItem value="umum">Umum</SelectItem>
+                                <SelectItem value="vip">VIP</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -87,8 +79,8 @@
                         class="text-xs text-muted-foreground"
                         style="margin-top: 0.5rem"
                     >
-                        Format: Kolom Nama, No HP, Kategori.
-                        <a href="#" style="color: #10b981">Download template</a>
+                        Format: Kolom Nama, No HP, Prioritas (Umum/VIP).
+                        <a href="#" style="color: #10b981" @click.prevent="downloadTemplate">Download template</a>
                     </p>
                 </div>
             </div>
@@ -111,14 +103,6 @@
                             <span class="guest-cat">{{
                                 catLabel(g.category)
                             }}</span>
-                        </div>
-                        <div class="guest-status">
-                            <span
-                                v-if="g.opened"
-                                class="status-badge status-badge--open"
-                                >Dibuka ✓</span
-                            >
-                            <span v-else class="status-badge">Belum</span>
                         </div>
                         <Button
                             variant="ghost"
@@ -284,19 +268,10 @@ const saving = ref(false);
 const saved = ref(false);
 const xlsInput = ref(null);
 
-const newGuest = ref({ name: "", phone: "", category: "keluarga" });
+const newGuest = ref({ name: "", phone: "", category: "umum" });
 
 const form = ref({
-    guests: [
-        {
-            name: "Bapak Santoso",
-            phone: "",
-            category: "keluarga",
-            opened: true,
-        },
-        { name: "Ibu Rahayu", phone: "", category: "keluarga", opened: false },
-        { name: "Dian Pratiwi", phone: "", category: "teman", opened: true },
-    ],
+    guests: [],
 });
 
 const openedCount = computed(
@@ -304,18 +279,14 @@ const openedCount = computed(
 );
 
 const catColors = {
-    keluarga: "#10b981",
-    teman: "#3b82f6",
-    kantor: "#f59e0b",
-    lainnya: "#8b5cf6",
+    umum: "#3b82f6",
+    vip: "#f59e0b",
 };
 const catLabels = {
-    keluarga: "Keluarga",
-    teman: "Teman",
-    kantor: "Kantor",
-    lainnya: "Lainnya",
+    umum: "Umum",
+    vip: "VIP",
 };
-const catEmojis = { keluarga: "👨‍👩‍👧", teman: "👫", kantor: "💼", lainnya: "👤" };
+const catEmojis = { umum: "👤", vip: "⭐" };
 
 function catColor(c) {
     return catColors[c] || "#9ca3af";
@@ -327,10 +298,22 @@ function catEmoji(c) {
     return catEmojis[c] || "👤";
 }
 
+function downloadTemplate() {
+    const header = "Nama,No HP,Prioritas\n";
+    const sample = "Budi Santoso,08123456789,Umum\nIbu Rahayu,08198765432,VIP\n";
+    const blob = new Blob([header + sample], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "template-daftar-tamu.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 function addGuest() {
     if (!newGuest.value.name.trim()) return;
     form.value.guests.push({ ...newGuest.value, opened: false });
-    newGuest.value = { name: "", phone: "", category: "keluarga" };
+    newGuest.value = { name: "", phone: "", category: "umum" };
 }
 
 function removeGuest(i) {
