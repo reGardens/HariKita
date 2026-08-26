@@ -26,8 +26,8 @@
           <h3 v-if="milestone.title" class="mt-1 text-xl font-bold text-gray-800">
             {{ milestone.title }}
           </h3>
-          <p v-if="milestone.description" class="mt-2 whitespace-pre-line leading-relaxed text-gray-600">
-            {{ milestone.description }}
+          <p v-if="milestone.story" class="mt-2 whitespace-pre-line leading-relaxed text-gray-600">
+            {{ milestone.story }}
           </p>
         </li>
       </ol>
