@@ -98,46 +98,6 @@ const menuGroups = computed(() => {
         },
         {
             label:
-                locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
-            items: [
-                {
-                    label:
-                        locale.value === "id"
-                            ? "Template Kustom"
-                            : "Custom Templates",
-                    href: "/cms/templates",
-                    icon: "Template",
-                    visible: hasRole("super-admin"),
-                },
-                {
-                    label:
-                        locale.value === "id" ? "Kelola Peran" : "Manage Roles",
-                    href: "/cms/roles",
-                    icon: "Shield",
-                    visible: hasRole("super-admin"),
-                },
-                {
-                    label:
-                        locale.value === "id"
-                            ? "Kelola Pengguna"
-                            : "Manage Users",
-                    href: "/cms/users",
-                    icon: "Users",
-                    visible: hasRole("super-admin"),
-                },
-                {
-                    label:
-                        locale.value === "id"
-                            ? "ACL Fitur User"
-                            : "User Feature ACL",
-                    href: "/cms/acl",
-                    icon: "Lock",
-                    visible: hasRole("super-admin"),
-                },
-            ],
-        },
-        {
-            label:
                 locale.value === "id"
                     ? "Undangan Digital"
                     : "Digital Invitation",
@@ -258,14 +218,42 @@ const menuGroups = computed(() => {
             ],
         },
         {
-            label: locale.value === "id" ? "Preview" : "Preview",
+            label:
+                locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
             items: [
                 {
-                    label: locale.value === "id" ? "Lihat Demo" : "View Demo",
-                    href: `/wedding/${slug}`,
-                    icon: "Eye",
-                    visible: !!slug,
-                    external: true,
+                    label:
+                        locale.value === "id" ? "Kelola Peran" : "Manage Roles",
+                    href: "/cms/roles",
+                    icon: "Shield",
+                    visible: hasRole("super-admin"),
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Kelola Pengguna"
+                            : "Manage Users",
+                    href: "/cms/users",
+                    icon: "Users",
+                    visible: hasRole("super-admin"),
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "ACL Fitur User"
+                            : "User Feature ACL",
+                    href: "/cms/acl",
+                    icon: "Lock",
+                    visible: hasRole("super-admin"),
+                },
+                {
+                    label:
+                        locale.value === "id"
+                            ? "Template Kustom"
+                            : "Custom Templates",
+                    href: "/cms/templates",
+                    icon: "Template",
+                    visible: hasRole("super-admin"),
                 },
             ],
         },
