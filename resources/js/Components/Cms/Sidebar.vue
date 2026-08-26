@@ -246,15 +246,6 @@ const menuGroups = computed(() => {
                     icon: "Lock",
                     visible: hasRole("super-admin"),
                 },
-                {
-                    label:
-                        locale.value === "id"
-                            ? "Template Kustom"
-                            : "Custom Templates",
-                    href: "/cms/templates",
-                    icon: "Template",
-                    visible: hasRole("super-admin"),
-                },
             ],
         },
     ];
