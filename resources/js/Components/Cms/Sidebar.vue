@@ -94,6 +94,12 @@ const menuGroups = computed(() => {
                     icon: "LayoutDashboard",
                     visible: true,
                 },
+            ],
+        },
+        {
+            label:
+                locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
+            items: [
                 {
                     label:
                         locale.value === "id"
@@ -103,12 +109,6 @@ const menuGroups = computed(() => {
                     icon: "Template",
                     visible: hasRole("super-admin"),
                 },
-            ],
-        },
-        {
-            label:
-                locale.value === "id" ? "Akses & Pengguna" : "Access & Users",
-            items: [
                 {
                     label:
                         locale.value === "id" ? "Kelola Peran" : "Manage Roles",

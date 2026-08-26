@@ -34,10 +34,13 @@ class HandleInertiaRequests extends Middleware
 
         if ($user) {
             if ($user->hasRole('super-admin')) {
-                // For super-admin, try to get wedding from URL slug
+                // For super-admin: try URL slug first, then fall back to first wedding in system
                 $slug = $request->route('slug');
                 if ($slug) {
                     $wedding = \App\Models\Wedding::where('slug', $slug)->first(['id', 'slug', 'label']);
+                }
+                if (!$wedding) {
+                    $wedding = \App\Models\Wedding::orderBy('id', 'desc')->first(['id', 'slug', 'label']);
                 }
             } else {
                 $wedding = \App\Models\Wedding::where('user_id', $user->id)->first(['id', 'slug', 'label']);
