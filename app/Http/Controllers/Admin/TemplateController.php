@@ -279,10 +279,14 @@ class TemplateController extends Controller
      */
     public function release(CustomTemplate $template)
     {
-        $template->update(['is_custom' => true]);
+        $template->update(['is_custom' => false]);
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['message' => "Template '{$template->name}' berhasil dirilis ke Siap Pakai!"]);
+        }
 
         return redirect()->route('cms.templates.index')
-            ->with('success', "Template '{$template->name}' berhasil dirilis ke Ready!");
+            ->with('success', "Template '{$template->name}' berhasil dirilis ke Siap Pakai!");
     }
 
     /**

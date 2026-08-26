@@ -110,8 +110,8 @@ Nama Panggilan Wanita:
 
 ═══ INFORMASI ACARA ═══
 Nama Acara:
-Tanggal Acara:
-Waktu Acara:
+Tanggal Acara (YYYY-MM-DD, contoh: 2026-12-25):
+Waktu Acara (HH:mm, contoh: 08:00):
 Nama Tempat:
 Alamat Lengkap:
 Link Google Maps:
@@ -173,6 +173,57 @@ function copyTemplate() {
     });
 }
 
+/**
+ * Normalize tanggal ke format YYYY-MM-DD agar kompatibel dengan input type="date"
+ * Mendukung: "2026-12-25", "25-12-2026", "25/12/2026", "25 Desember 2026", "25 Des 2026"
+ */
+function normalizeDate(value) {
+    if (!value) return "";
+    const v = value.trim();
+
+    // Already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+
+    // DD-MM-YYYY or DD/MM/YYYY
+    const dmy = v.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (dmy) return `${dmy[3]}-${dmy[2].padStart(2, "0")}-${dmy[1].padStart(2, "0")}`;
+
+    // Try Indonesian month names: "25 Desember 2026"
+    const months = { januari: "01", februari: "02", maret: "03", april: "04", mei: "05", juni: "06", juli: "07", agustus: "08", september: "09", oktober: "10", november: "11", desember: "12", jan: "01", feb: "02", mar: "03", apr: "04", jun: "06", jul: "07", agu: "08", ags: "08", sep: "09", okt: "10", nov: "11", des: "12" };
+    const idMatch = v.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/);
+    if (idMatch) {
+        const m = months[idMatch[2].toLowerCase()];
+        if (m) return `${idMatch[3]}-${m}-${idMatch[1].padStart(2, "0")}`;
+    }
+
+    // Fallback: try Date.parse
+    const parsed = Date.parse(v);
+    if (!isNaN(parsed)) {
+        const d = new Date(parsed);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    return v; // Return as-is if nothing matches
+}
+
+/**
+ * Normalize waktu ke format HH:mm agar kompatibel dengan input type="time"
+ * Mendukung: "08:00", "8:00", "08.00", "08:00 WIB", "8 pagi"
+ */
+function normalizeTime(value) {
+    if (!value) return "";
+    const v = value.trim();
+
+    // Already HH:mm or H:mm
+    const hm = v.match(/^(\d{1,2})[:.](\d{2})/);
+    if (hm) return `${hm[1].padStart(2, "0")}:${hm[2]}`;
+
+    // Just hour number: "8" → "08:00"
+    if (/^\d{1,2}$/.test(v)) return `${v.padStart(2, "0")}:00`;
+
+    return v;
+}
+
 function parseClientResponse(text) {
     const data = {};
     const lines = text.split("\n");
@@ -203,8 +254,8 @@ function parseClientResponse(text) {
         else if (label.includes("panggilan") && label.includes("wanita"))
             data.brideNickname = value;
         else if (label.includes("nama acara")) data.eventName = value;
-        else if (label.includes("tanggal acara")) data.eventDate = value;
-        else if (label.includes("waktu acara")) data.eventTime = value;
+        else if (label.includes("tanggal acara")) data.eventDate = normalizeDate(value);
+        else if (label.includes("waktu acara")) data.eventTime = normalizeTime(value);
         else if (label.includes("nama tempat")) data.venueName = value;
         else if (label.includes("alamat lengkap")) data.venueAddress = value;
         else if (label.includes("google maps") || label.includes("link google"))
