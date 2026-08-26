@@ -50,7 +50,7 @@ watch(
 );
 
 function shouldShowDot(item) {
-    return item.filled && !seenMenus.value[item.href];
+    return item.filled;
 }
 
 // Expandable menu state

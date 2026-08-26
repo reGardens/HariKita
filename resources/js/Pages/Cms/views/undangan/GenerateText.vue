@@ -452,7 +452,7 @@ async function parseAndFill() {
 
         try {
             const { router } = await import("@inertiajs/vue3");
-            router.reload({ only: ["weddingData"] });
+            router.reload({ only: ["weddingData", "wedding"] });
         } catch {
             /* ignore if inertia reload fails */
         }
