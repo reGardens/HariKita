@@ -110,8 +110,8 @@ Nama Panggilan Wanita:
 
 ═══ INFORMASI ACARA ═══
 Nama Acara:
-Tanggal Acara (YYYY-MM-DD, contoh: 2026-12-25):
-Waktu Acara (HH:mm, contoh: 08:00):
+Tanggal Acara: 2026-12-25
+Waktu Acara: 08:00
 Nama Tempat:
 Alamat Lengkap:
 Link Google Maps:
