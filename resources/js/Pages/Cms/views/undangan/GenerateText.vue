@@ -136,6 +136,29 @@ Alamat Rumah Pengantin Wanita:
 ═══ LIVE STREAMING ═══
 Link Live Streaming:
 
+═══ LOVE STORY ═══
+(Isi beberapa momen perjalanan cinta, tambahkan momen baru dengan format yang sama)
+
+Momen 1:
+Tanggal/Tahun: 2020
+Judul: Pertama Bertemu
+Cerita: Kami bertemu di acara kampus
+
+Momen 2:
+Tanggal/Tahun: 2021
+Judul: Jadian
+Cerita: Resmi menjadi sepasang kekasih
+
+Momen 3:
+Tanggal/Tahun: 2023
+Judul: Lamaran
+Cerita: Di sebuah restoran favorit kami
+
+Momen 4:
+Tanggal/Tahun: 2026
+Judul: Hari Bahagia
+Cerita: Akhirnya kami menikah
+
 Silakan isi dan kirim kembali. Terima kasih! 🙏`;
 
 const labelMap = {
@@ -292,6 +315,34 @@ function parseClientResponse(text) {
         )
             data.streamingLink = value;
     }
+
+    // Parse Love Story moments
+    const loveStoryMatch = text.match(/═══ LOVE STORY ═══([\s\S]*?)(?=═══|Silakan isi|$)/i);
+    if (loveStoryMatch) {
+        const loveSection = loveStoryMatch[1];
+        const moments = [];
+        const momentBlocks = loveSection.split(/Momen\s*\d+\s*:/i).filter(b => b.trim());
+
+        for (const block of momentBlocks) {
+            const moment = { date: "", title: "", story: "" };
+            const blockLines = block.split("\n");
+            for (const bl of blockLines) {
+                const ci = bl.indexOf(":");
+                if (ci === -1) continue;
+                const k = bl.slice(0, ci).trim().toLowerCase();
+                const v = bl.slice(ci + 1).trim();
+                if (!v) continue;
+                if (k.includes("tanggal") || k.includes("tahun")) moment.date = v;
+                else if (k.includes("judul")) moment.title = v;
+                else if (k.includes("cerita")) moment.story = v;
+            }
+            if (moment.title || moment.story || moment.date) {
+                moments.push(moment);
+            }
+        }
+        if (moments.length > 0) data.loveStory = moments;
+    }
+
     return data;
 }
 
@@ -421,6 +472,9 @@ async function parseAndFill() {
                     groom: { fullAddress: data.groomAddress || "" },
                     bride: { fullAddress: data.brideAddress || "" },
                 };
+            }
+            if (data.loveStory) {
+                settingsPayload.loveStory = data.loveStory;
             }
             if (Object.keys(settingsPayload).length > 0) {
                 await axios.post(

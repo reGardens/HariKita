@@ -28,23 +28,12 @@
                 </Button>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="field-group">
-                    <Label>Tanggal / Tahun</Label>
-                    <Input
-                        v-model="item.date"
-                        placeholder="Contoh: 14 Februari 2022"
-                    />
-                </div>
-                <div class="field-group">
-                    <Label>Emoji Momen</Label>
-                    <Input
-                        v-model="item.emoji"
-                        maxlength="4"
-                        placeholder="💕"
-                        class="text-xl"
-                    />
-                </div>
+            <div class="field-group">
+                <Label>Tanggal / Tahun</Label>
+                <Input
+                    v-model="item.date"
+                    placeholder="Contoh: 14 Februari 2022"
+                />
             </div>
 
             <div class="field-group">
@@ -100,10 +89,10 @@ const saved = ref(false);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 
-const emptyMoment = () => ({ date: "", emoji: "💕", title: "", story: "" });
+const emptyMoment = () => ({ date: "", title: "", story: "" });
 
 const form = ref({
-    timeline: [emptyMoment(), { ...emptyMoment(), emoji: "💍" }],
+    timeline: [emptyMoment(), emptyMoment(), emptyMoment(), emptyMoment()],
 });
 
 async function loadLoveStory() {
@@ -114,7 +103,6 @@ async function loadLoveStory() {
         if (Array.isArray(data.loveStory) && data.loveStory.length > 0) {
             form.value.timeline = data.loveStory.map((item) => ({
                 date: item.date || "",
-                emoji: item.emoji || "💕",
                 title: item.title || "",
                 story: item.story || "",
             }));
