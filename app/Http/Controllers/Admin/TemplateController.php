@@ -285,8 +285,20 @@ class TemplateController extends Controller
             return response()->json(['message' => "Template '{$template->name}' berhasil dirilis ke Siap Pakai!"]);
         }
 
-        return redirect()->route('cms.templates.index')
+        return redirect()->route('cms.dashboard')
             ->with('success', "Template '{$template->name}' berhasil dirilis ke Siap Pakai!");
+    }
+
+    public function deactivate(CustomTemplate $template)
+    {
+        $template->update(['is_custom' => true]);
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['message' => "Template '{$template->name}' dipindahkan ke Dalam Pengembangan"]);
+        }
+
+        return redirect()->route('cms.dashboard')
+            ->with('success', "Template '{$template->name}' dipindahkan ke Dalam Pengembangan");
     }
 
     /**

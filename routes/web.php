@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:super-admin'])->group(function () {
         Route::post('/quick-create', [\App\Http\Controllers\Admin\TemplateController::class, 'quickCreate'])->name('cms.templates.quick-create');
         Route::get('/{template}/developer', [\App\Http\Controllers\Admin\TemplateController::class, 'developerStatus'])->name('cms.templates.developer-status');
         Route::put('/{template}/release', [\App\Http\Controllers\Admin\TemplateController::class, 'release'])->name('cms.templates.release');
+        Route::put('/{template}/deactivate', [\App\Http\Controllers\Admin\TemplateController::class, 'deactivate'])->name('cms.templates.deactivate');
         Route::get('/{template}/edit', [\App\Http\Controllers\Admin\TemplateController::class, 'edit'])->name('cms.templates.edit');
         Route::put('/{template}', [\App\Http\Controllers\Admin\TemplateController::class, 'update'])->name('cms.templates.update');
         Route::delete('/{template}', [\App\Http\Controllers\Admin\TemplateController::class, 'destroy'])->name('cms.templates.destroy');

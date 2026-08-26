@@ -39,7 +39,8 @@
                                 <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
-                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
+                                    <button type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-amber-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-amber-500 whitespace-nowrap" @click.stop="moveToOngoing(tmpl)">⏸ Nonaktifkan</button>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
                             </button>
@@ -73,7 +74,7 @@
                                 <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
-                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
                                     <button type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-emerald-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-emerald-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-emerald-500 whitespace-nowrap" @click.stop="moveToReady(tmpl)">✅ Siap Pakai</button>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
@@ -221,6 +222,26 @@ async function moveToReady(tmpl) {
         await axios.put(`/cms/templates/${tmpl.id}/release`);
         await store.dispatch("template/fetchTemplates");
         Swal.fire({ icon: "success", title: "Berhasil!", text: `${tmpl.name} sekarang Siap Pakai`, timer: 2000, showConfirmButton: false });
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Gagal", text: e.response?.data?.message || "Terjadi kesalahan" });
+    }
+}
+
+async function moveToOngoing(tmpl) {
+    const result = await Swal.fire({
+        title: `Nonaktifkan "${tmpl.name}"?`,
+        text: "Template akan dipindahkan ke Dalam Pengembangan",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Nonaktifkan",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#f59e0b",
+    });
+    if (!result.isConfirmed) return;
+    try {
+        await axios.put(`/cms/templates/${tmpl.id}/deactivate`);
+        await store.dispatch("template/fetchTemplates");
+        Swal.fire({ icon: "success", title: "Berhasil!", text: `${tmpl.name} dipindahkan ke Dalam Pengembangan`, timer: 2000, showConfirmButton: false });
     } catch (e) {
         Swal.fire({ icon: "error", title: "Gagal", text: e.response?.data?.message || "Terjadi kesalahan" });
     }
