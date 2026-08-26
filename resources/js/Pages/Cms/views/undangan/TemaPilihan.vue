@@ -40,7 +40,7 @@
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
                                     <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
-                                    <button type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-amber-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-amber-500 whitespace-nowrap" @click.stop="moveToOngoing(tmpl)">⏸ Nonaktifkan</button>
+                                    <button v-if="isSuperAdmin" type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-amber-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-amber-500 whitespace-nowrap" @click.stop="moveToOngoing(tmpl)">⏸ Nonaktifkan</button>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
                             </button>
@@ -75,7 +75,7 @@
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
                                     <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
-                                    <button type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-emerald-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-emerald-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-emerald-500 whitespace-nowrap" @click.stop="moveToReady(tmpl)">✅ Siap Pakai</button>
+                                    <button v-if="isSuperAdmin" type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-emerald-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-emerald-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-emerald-500 whitespace-nowrap" @click.stop="moveToReady(tmpl)">✅ Siap Pakai</button>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
                             </button>
@@ -115,6 +115,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import { usePage } from "@inertiajs/vue3";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
@@ -129,8 +130,10 @@ import { useAutoSavePreview } from "@/Composables/useAutoSavePreview";
 import "./section.css";
 
 const store = useStore();
+const page = usePage();
 const saving = ref(false);
 const saved = ref(false);
+const isSuperAdmin = computed(() => page.props.auth?.user?.roles?.includes("super-admin") || false);
 
 const templates = computed(() => store.getters["template/templates"]);
 const readyTemplates = computed(() => templates.value.filter((t) => !t.is_custom));

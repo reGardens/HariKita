@@ -3,13 +3,34 @@ import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Swal from 'sweetalert2';
 import AOS from 'aos';
+import axios from 'axios';
 import 'aos/dist/aos.css';
 import store from './store';
 
 import '../css/app.css';
 
+// ─── Axios: redirect to login on 401/419 ───
+axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 419)) {
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 // Global loading state
 const isLoading = ref(false);
+
+// ─── Inertia: redirect to login on expired session ───
+router.on('invalid', (event) => {
+    const status = event.detail.response?.status;
+    if (status === 401 || status === 419) {
+        event.preventDefault();
+        window.location.href = '/login';
+    }
+});
 
 router.on('start', () => {
     isLoading.value = true;
