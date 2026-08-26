@@ -69,7 +69,7 @@
                     <input
                         ref="xlsInput"
                         type="file"
-                        accept=".xlsx,.csv"
+                        accept=".xlsx"
                         class="hidden-input"
                     />
                     <Button variant="outline" @click="$refs.xlsInput.click()">
@@ -299,15 +299,31 @@ function catEmoji(c) {
 }
 
 function downloadTemplate() {
-    const header = "Nama,No HP,Prioritas\n";
-    const sample = "Budi Santoso,08123456789,Umum\nIbu Rahayu,08198765432,VIP\n";
-    const blob = new Blob([header + sample], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "template-daftar-tamu.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    import("xlsx").then((XLSX) => {
+        const data = [
+            ["Nama", "No HP", "Prioritas"],
+            ["Budi Santoso", "08123456789", "Umum"],
+            ["Ibu Rahayu", "08198765432", "VIP"],
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // Set column widths
+        ws["!cols"] = [{ wch: 25 }, { wch: 15 }, { wch: 12 }];
+
+        // Add data validation (dropdown) for Prioritas column (C2:C100)
+        ws["!dataValidation"] = [
+            {
+                sqref: "C2:C100",
+                type: "list",
+                formula1: '"Umum,VIP"',
+                showDropDown: true,
+            },
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Daftar Tamu");
+        XLSX.writeFile(wb, "template-daftar-tamu.xlsx");
+    });
 }
 
 function addGuest() {
