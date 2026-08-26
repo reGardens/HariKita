@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -95,10 +95,16 @@ if (csrfMeta)
 
 const store = useStore();
 const filling = ref(false);
-const clientResponse = ref("");
 const parsedData = ref(null);
 
 const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
+
+// Persist client response to localStorage
+const STORAGE_KEY = "cms-generate-text-response";
+const clientResponse = ref(localStorage.getItem(STORAGE_KEY) || "");
+watch(clientResponse, (val) => {
+    localStorage.setItem(STORAGE_KEY, val);
+});
 
 const templateText = `Mohon isi data berikut untuk undangan pernikahan Anda:
 
@@ -111,7 +117,8 @@ Nama Panggilan Wanita:
 ═══ INFORMASI ACARA ═══
 Nama Acara:
 Tanggal Acara: 2026-12-25
-Waktu Acara: 08:00
+Waktu Mulai: 08:00
+Waktu Selesai: 12:00
 Nama Tempat:
 Alamat Lengkap:
 Link Google Maps:
@@ -138,7 +145,8 @@ const labelMap = {
     brideNickname: "Nama Panggilan Wanita",
     eventName: "Nama Acara",
     eventDate: "Tanggal Acara",
-    eventTime: "Waktu Acara",
+    eventTimeStart: "Waktu Mulai",
+    eventTimeEnd: "Waktu Selesai",
     venueName: "Nama Tempat",
     venueAddress: "Alamat Lengkap",
     mapsLink: "Google Maps",
@@ -255,7 +263,9 @@ function parseClientResponse(text) {
             data.brideNickname = value;
         else if (label.includes("nama acara")) data.eventName = value;
         else if (label.includes("tanggal acara")) data.eventDate = normalizeDate(value);
-        else if (label.includes("waktu acara")) data.eventTime = normalizeTime(value);
+        else if (label.includes("waktu mulai")) data.eventTimeStart = normalizeTime(value);
+        else if (label.includes("waktu selesai")) data.eventTimeEnd = normalizeTime(value);
+        else if (label.includes("waktu acara")) data.eventTimeStart = normalizeTime(value);
         else if (label.includes("nama tempat")) data.venueName = value;
         else if (label.includes("alamat lengkap")) data.venueAddress = value;
         else if (label.includes("google maps") || label.includes("link google"))
@@ -361,8 +371,8 @@ async function parseAndFill() {
                 await axios.post(`/api/wedding/${slug}/events`, {
                     name: data.eventName || "Akad Nikah",
                     date: data.eventDate || "",
-                    timeStart: data.eventTime || "",
-                    timeEnd: "",
+                    timeStart: data.eventTimeStart || "",
+                    timeEnd: data.eventTimeEnd || "",
                     timezone: "WIB",
                     locationName: data.venueName || "",
                     locationAddress: data.venueAddress || "",
