@@ -11,65 +11,33 @@
         Doa dan restu Anda merupakan hadiah terindah bagi kami
       </p>
 
-      <!-- Bank Accounts -->
+      <!-- Bank Accounts — Debit Card Layout -->
       <div v-if="bankAccounts && bankAccounts.length" class="mb-6 space-y-4">
         <div
-          v-for="account in bankAccounts"
-          :key="account.id"
-          class="rounded-xl bg-white/90 p-5 shadow-md backdrop-blur-sm"
+          v-for="(account, idx) in bankAccounts"
+          :key="idx"
+          class="debit-card"
+          :style="{ background: idx === 0 ? `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` : 'linear-gradient(135deg, #334155, #1e293b)' }"
           data-aos="fade-up"
         >
-          <p class="text-sm font-semibold text-gray-800">
-            {{ account.bankName || "Bank" }}
-          </p>
-          <div class="mt-2 flex items-center justify-center gap-2">
-            <p class="text-lg font-bold tracking-wider text-gray-700">
-              {{ account.accountNumber || "-" }}
-            </p>
+          <div class="debit-card-top">
+            <span class="debit-card-bank">{{ account.bankName || 'Bank' }}</span>
+            <span class="debit-card-chip">💳</span>
+          </div>
+          <div class="debit-card-number">
+            <span>{{ account.number || account.accountNumber || '-' }}</span>
             <button
-              class="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-              :title="
-                copiedAccountId === account.id
-                  ? 'Tersalin!'
-                  : 'Salin nomor rekening'
-              "
-              @click="copyAccountNumber(account)"
+              class="debit-card-copy"
+              :title="copiedAccountId === idx ? 'Tersalin!' : 'Salin nomor'"
+              @click="copyNumber(account, idx)"
             >
-              <svg
-                v-if="copiedAccountId !== account.id"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              <svg
-                v-else
-                class="h-4 w-4 text-green-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+              <span v-if="copiedAccountId === idx">✓</span>
+              <span v-else>📋</span>
             </button>
           </div>
-          <p class="mt-1 text-sm text-gray-500">
-            a.n. {{ account.accountHolder || "-" }}
-          </p>
+          <div class="debit-card-holder">
+            a.n. {{ account.name || account.accountHolder || '-' }}
+          </div>
         </div>
       </div>
 
@@ -266,12 +234,13 @@ const { copy } = useClipboard();
 const copiedAccountId = ref(null);
 let copiedTimeout = null;
 
-async function copyAccountNumber(account) {
-  if (!account.accountNumber) return;
-  const success = await copy(account.accountNumber);
+async function copyNumber(account, idx) {
+  const num = account.number || account.accountNumber;
+  if (!num) return;
+  const success = await copy(num);
   if (success) {
     if (copiedTimeout) clearTimeout(copiedTimeout);
-    copiedAccountId.value = account.id;
+    copiedAccountId.value = idx;
     copiedTimeout = setTimeout(() => {
       copiedAccountId.value = null;
     }, 2000);
@@ -307,3 +276,71 @@ async function handleGiftSubmit() {
   }
 }
 </script>
+
+<style scoped>
+.debit-card {
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.debit-card::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.debit-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.debit-card-bank {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+.debit-card-chip {
+  font-size: 1.5rem;
+}
+.debit-card-number {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.75rem;
+}
+.debit-card-copy {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  color: white;
+}
+.debit-card-copy:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+.debit-card-holder {
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+</style>
