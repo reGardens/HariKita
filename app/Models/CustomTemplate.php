@@ -22,4 +22,9 @@ class CustomTemplate extends Model
         'config' => 'array',
         'is_custom' => 'boolean',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }
