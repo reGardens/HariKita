@@ -117,13 +117,6 @@
                 </div>
             </div>
 
-            <div class="save-bar">
-                <Button :disabled="saving" @click="handleSave">
-                    <span v-if="saving">Menyimpan…</span>
-                    <span v-else>💾 Simpan Daftar Tamu</span>
-                </Button>
-                <span v-if="saved" class="save-ok">✅ Tersimpan!</span>
-            </div>
         </div>
 
         <!-- Preview -->
@@ -290,8 +283,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import axios from "axios";
 import {
     Select,
     SelectTrigger,
@@ -307,6 +301,8 @@ const store = useStore();
 const saving = ref(false);
 const saved = ref(false);
 const xlsInput = ref(null);
+
+const activeSlug = computed(() => store.getters["wedding/activeSlug"]);
 
 const newGuest = ref({ name: "", phone: "", category: "umum" });
 
@@ -337,6 +333,26 @@ function catLabel(c) {
 function catEmoji(c) {
     return catEmojis[c] || "👤";
 }
+
+// Load guests from API
+onMounted(async () => {
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.get(`/api/wedding/${slug}/guests`);
+        if (Array.isArray(data)) {
+            form.value.guests = data.map((g) => ({
+                id: g.id,
+                name: g.name || "",
+                phone: g.phone || "",
+                category: g.is_vip ? "vip" : "umum",
+                opened: !!g.checked_in_at,
+            }));
+        }
+    } catch (err) {
+        console.error("Failed to load guests", err);
+    }
+});
 
 async function downloadTemplate() {
     const ExcelJS = await import("exceljs");
@@ -419,37 +435,78 @@ async function handleImport(event) {
 }
 
 async function confirmImport() {
+    const slug = activeSlug.value;
+    if (!slug) return;
     const valid = importPreview.value.filter(r => r.name.trim());
-    for (const row of valid) {
-        form.value.guests.push({ name: row.name.trim(), phone: row.phone, category: row.category, opened: false });
+    if (!valid.length) return;
+
+    saving.value = true;
+    try {
+        const payload = valid.map(r => ({
+            name: r.name.trim(),
+            phone: r.phone || "",
+            is_vip: r.category === "vip",
+            group: r.category,
+        }));
+        const { data } = await axios.post(`/api/wedding/${slug}/guests/batch`, { guests: payload });
+
+        // Add returned guests with IDs to local list
+        if (Array.isArray(data)) {
+            for (const g of data) {
+                form.value.guests.push({ id: g.id, name: g.name, phone: g.phone || "", category: g.is_vip ? "vip" : "umum", opened: false });
+            }
+        } else {
+            // Fallback: add locally without IDs
+            for (const r of valid) {
+                form.value.guests.push({ name: r.name.trim(), phone: r.phone, category: r.category, opened: false });
+            }
+        }
+
+        showImportModal.value = false;
+        importPreview.value = [];
+        store.commit("wedding/BUMP_PREVIEW");
+
+        const Swal = (await import("sweetalert2")).default;
+        Swal.fire({ icon: "success", title: `${valid.length} tamu tersimpan!`, timer: 2500, showConfirmButton: false });
+    } catch (err) {
+        const Swal = (await import("sweetalert2")).default;
+        Swal.fire({ icon: "error", title: "Gagal menyimpan", text: err.response?.data?.message || err.message });
+    } finally {
+        saving.value = false;
     }
-    showImportModal.value = false;
-    importPreview.value = [];
-
-    const Swal = (await import("sweetalert2")).default;
-    Swal.fire({ icon: "success", title: `${valid.length} tamu ditambahkan!`, timer: 2500, showConfirmButton: false });
 }
 
-function addGuest() {
+async function addGuest() {
     if (!newGuest.value.name.trim()) return;
-    form.value.guests.push({ ...newGuest.value, opened: false });
-    newGuest.value = { name: "", phone: "", category: "umum" };
+    const slug = activeSlug.value;
+    if (!slug) return;
+    try {
+        const { data } = await axios.post(`/api/wedding/${slug}/guests`, {
+            name: newGuest.value.name.trim(),
+            phone: newGuest.value.phone || "",
+            is_vip: newGuest.value.category === "vip",
+            group: newGuest.value.category,
+        });
+        form.value.guests.push({ id: data.id, name: data.name, phone: data.phone || "", category: data.is_vip ? "vip" : "umum", opened: false });
+        newGuest.value = { name: "", phone: "", category: "umum" };
+        store.commit("wedding/BUMP_PREVIEW");
+    } catch (err) {
+        const Swal = (await import("sweetalert2")).default;
+        Swal.fire({ icon: "error", title: "Gagal tambah tamu", text: err.response?.data?.message || err.message });
+    }
 }
 
-function removeGuest(i) {
+async function removeGuest(i) {
+    const guest = form.value.guests[i];
+    const slug = activeSlug.value;
+    if (guest.id && slug) {
+        try {
+            await axios.delete(`/api/wedding/${slug}/guests/${guest.id}`);
+        } catch { /* ignore */ }
+    }
     form.value.guests.splice(i, 1);
 }
 
-async function handleSave() {
-    saving.value = true;
-    await new Promise((r) => setTimeout(r, 800));
-    saving.value = false;
-    saved.value = true;
-    store.commit("wedding/BUMP_PREVIEW");
-    setTimeout(() => {
-        saved.value = false;
-    }, 2500);
-}
 </script>
 
 <style scoped>
