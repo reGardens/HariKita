@@ -71,6 +71,7 @@
                         type="file"
                         accept=".xlsx"
                         class="hidden-input"
+                        @change="handleImport"
                     />
                     <Button variant="outline" @click="$refs.xlsInput.click()">
                         📊 Upload Excel / CSV
@@ -335,6 +336,49 @@ async function downloadTemplate() {
     a.download = "template-daftar-tamu.xlsx";
     a.click();
     URL.revokeObjectURL(url);
+}
+
+async function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+        const XLSX = await import("xlsx");
+        const buffer = await file.arrayBuffer();
+        const wb = XLSX.read(buffer, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+        // Skip header row
+        let imported = 0;
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || !row[0]) continue;
+            const name = String(row[0]).trim();
+            const phone = row[1] ? String(row[1]).trim() : "";
+            const prioritas = row[2] ? String(row[2]).trim().toLowerCase() : "umum";
+            const category = prioritas === "vip" ? "vip" : "umum";
+
+            form.value.guests.push({ name, phone, category, opened: false });
+            imported++;
+        }
+
+        // Reset input
+        event.target.value = "";
+
+        if (imported > 0) {
+            const Swal = (await import("sweetalert2")).default;
+            Swal.fire({
+                icon: "success",
+                title: `${imported} tamu berhasil diimport!`,
+                timer: 2500,
+                showConfirmButton: false,
+            });
+        }
+    } catch (err) {
+        const Swal = (await import("sweetalert2")).default;
+        Swal.fire({ icon: "error", title: "Gagal import", text: err.message });
+    }
 }
 
 function addGuest() {
