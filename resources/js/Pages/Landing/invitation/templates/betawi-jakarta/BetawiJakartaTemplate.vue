@@ -8,19 +8,15 @@
         <template v-else>
             <MusicPlayer :src="couple?.musicUrl" />
 
-            <!-- Bunga ornament — pojok kiri atas (layered) -->
-            <div class="betawi-bunga-kiri-atas" aria-hidden="true">
-                <img
-                    src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 1.png"
-                    alt=""
-                    class="bunga-layer bunga-layer-1"
-                />
-                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 2.png" alt="" class="bunga-layer bunga-layer-2" />
-        <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 3.png" alt="" class="bunga-layer bunga-layer-3" />
-        <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 4.png" alt="" class="bunga-layer bunga-layer-4" />
-        <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 5.png" alt="" class="bunga-layer bunga-layer-5" />
-        <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png" alt="" class="bunga-layer bunga-layer-6" />
-        <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 7.png" alt="" class="bunga-layer bunga-layer-7" /> -->
+            <!-- Corner ornament — top left -->
+            <div class="ornament ornament--top-left" aria-hidden="true">
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 1.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 2.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 3.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 4.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 5.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png" alt="" />
+                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 7.png" alt="" />
             </div>
 
             <!-- COVER SECTION - Betawi festive with Ondel-ondel -->
