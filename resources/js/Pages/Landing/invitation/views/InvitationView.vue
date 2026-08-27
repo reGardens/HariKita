@@ -1,6 +1,6 @@
 <template>
     <div
-        class="invitation-view w-full"
+        class="invitation-view w-full max-w-[520px] mx-auto"
         :class="{ 'pt-[52px]': showDemoHeader }"
     >
         <!-- Sticky Demo Header -->

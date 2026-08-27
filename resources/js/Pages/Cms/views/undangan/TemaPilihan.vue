@@ -27,23 +27,28 @@
                         <span>{{ showReadyTemplates ? '⌃' : '⌄' }}</span>
                     </button>
                     <div v-show="showReadyTemplates" class="p-3">
+                        <!-- Batch action bar -->
+                        <div v-if="isSuperAdmin && selectedReady.length > 0" class="mb-2 flex items-center gap-2">
+                            <Button size="sm" variant="outline" class="text-xs border-amber-400 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30" @click="batchMoveToOngoing">⏸ Pindahkan {{ selectedReady.length }} ke Pengembangan</Button>
+                            <button class="text-xs text-muted-foreground hover:text-foreground" @click="selectedReady = []">Batal</button>
+                        </div>
                         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                            <button
+                            <div
                                 v-for="tmpl in readyTemplates"
                                 :key="tmpl.id"
-                                type="button"
                                 class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
-                                :class="form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border'"
+                                :class="[form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border', selectedReady.includes(tmpl.id) ? 'ring-2 ring-amber-400' : '']"
                                 @click="selectTemplate(tmpl.id)"
                             >
+                                <!-- Batch checkbox -->
+                                <input v-if="isSuperAdmin" type="checkbox" :checked="selectedReady.includes(tmpl.id)" class="absolute top-1.5 left-1.5 z-20 w-3.5 h-3.5 accent-amber-500 cursor-pointer" @click.stop="toggleSelect('ready', tmpl.id)" />
                                 <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
-                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
-                                    <button v-if="isSuperAdmin" type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-amber-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-amber-500 whitespace-nowrap" @click.stop="moveToOngoing(tmpl)">⏸ Nonaktifkan</button>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -62,23 +67,28 @@
                         <span>{{ showOngoingTemplates ? '⌃' : '⌄' }}</span>
                     </button>
                     <div v-show="showOngoingTemplates" class="p-3">
+                        <!-- Batch action bar -->
+                        <div v-if="isSuperAdmin && selectedOngoing.length > 0" class="mb-2 flex items-center gap-2">
+                            <Button size="sm" variant="outline" class="text-xs border-emerald-400 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30" @click="batchMoveToReady">✅ Pindahkan {{ selectedOngoing.length }} ke Siap Pakai</Button>
+                            <button class="text-xs text-muted-foreground hover:text-foreground" @click="selectedOngoing = []">Batal</button>
+                        </div>
                         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                            <button
+                            <div
                                 v-for="tmpl in ongoingTemplates"
                                 :key="tmpl.id"
-                                type="button"
                                 class="flex flex-col items-center gap-1.5 border-2 rounded-xl p-2 bg-card cursor-pointer transition-all hover:border-emerald-300 hover:-translate-y-0.5 group relative"
-                                :class="form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border'"
+                                :class="[form.templateId === tmpl.id ? 'border-emerald-500 ring-2 ring-emerald-500/25' : 'border-border', selectedOngoing.includes(tmpl.id) ? 'ring-2 ring-emerald-400' : '']"
                                 @click="selectTemplate(tmpl.id)"
                             >
+                                <!-- Batch checkbox -->
+                                <input v-if="isSuperAdmin" type="checkbox" :checked="selectedOngoing.includes(tmpl.id)" class="absolute top-1.5 left-1.5 z-20 w-3.5 h-3.5 accent-emerald-500 cursor-pointer" @click.stop="toggleSelect('ongoing', tmpl.id)" />
                                 <div class="w-full aspect-[3/4] rounded-lg relative overflow-hidden flex items-center justify-center" :style="{ background: getGradient(tmpl.id) }">
                                     <img v-if="tmpl.thumbnail_url" :src="tmpl.thumbnail_url" :alt="tmpl.name" class="absolute inset-0 w-full h-full object-cover rounded-lg" loading="lazy" @error="$event.target.style.display = 'none'" />
                                     <span class="text-2xl select-none relative">{{ getIcon(tmpl.id) }}</span>
-                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-9 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
-                                    <button v-if="isSuperAdmin" type="button" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-emerald-600/80 backdrop-blur-sm px-2.5 py-1 rounded-full border border-emerald-400/30 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-emerald-500 whitespace-nowrap" @click.stop="moveToReady(tmpl)">✅ Siap Pakai</button>
+                                    <a :href="`/wedding/demo-${tmpl.id}`" target="_blank" class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80 whitespace-nowrap" @click.stop>👁 Lihat Demo</a>
                                 </div>
                                 <span class="text-[10px] text-center text-foreground font-medium leading-tight truncate w-full">{{ tmpl.name }}</span>
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -245,6 +255,65 @@ async function moveToOngoing(tmpl) {
         await axios.put(`/cms/templates/${tmpl.id}/deactivate`);
         await store.dispatch("template/fetchTemplates");
         Swal.fire({ icon: "success", title: "Berhasil!", text: `${tmpl.name} dipindahkan ke Dalam Pengembangan`, timer: 2000, showConfirmButton: false });
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Gagal", text: e.response?.data?.message || "Terjadi kesalahan" });
+    }
+}
+
+// Batch select
+const selectedReady = ref([]);
+const selectedOngoing = ref([]);
+
+function toggleSelect(group, id) {
+    const arr = group === 'ready' ? selectedReady : selectedOngoing;
+    const idx = arr.value.indexOf(id);
+    if (idx === -1) arr.value.push(id);
+    else arr.value.splice(idx, 1);
+}
+
+async function batchMoveToOngoing() {
+    if (!selectedReady.value.length) return;
+    const result = await Swal.fire({
+        title: `Pindahkan ${selectedReady.value.length} template?`,
+        text: "Template terpilih akan dipindahkan ke Dalam Pengembangan",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Pindahkan",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#f59e0b",
+    });
+    if (!result.isConfirmed) return;
+    try {
+        for (const id of selectedReady.value) {
+            await axios.put(`/cms/templates/${id}/deactivate`);
+        }
+        selectedReady.value = [];
+        await store.dispatch("template/fetchTemplates");
+        Swal.fire({ icon: "success", title: "Berhasil!", text: "Template dipindahkan ke Dalam Pengembangan", timer: 2000, showConfirmButton: false });
+    } catch (e) {
+        Swal.fire({ icon: "error", title: "Gagal", text: e.response?.data?.message || "Terjadi kesalahan" });
+    }
+}
+
+async function batchMoveToReady() {
+    if (!selectedOngoing.value.length) return;
+    const result = await Swal.fire({
+        title: `Pindahkan ${selectedOngoing.value.length} template?`,
+        text: "Template terpilih akan dipindahkan ke Siap Pakai",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Pindahkan",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#10b981",
+    });
+    if (!result.isConfirmed) return;
+    try {
+        for (const id of selectedOngoing.value) {
+            await axios.put(`/cms/templates/${id}/release`);
+        }
+        selectedOngoing.value = [];
+        await store.dispatch("template/fetchTemplates");
+        Swal.fire({ icon: "success", title: "Berhasil!", text: "Template dipindahkan ke Siap Pakai", timer: 2000, showConfirmButton: false });
     } catch (e) {
         Swal.fire({ icon: "error", title: "Gagal", text: e.response?.data?.message || "Terjadi kesalahan" });
     }
