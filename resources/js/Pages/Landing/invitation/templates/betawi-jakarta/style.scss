@@ -61,3 +61,32 @@ $betawi-blue: #0055AA;
 .ondel-bounce { animation: ondelBounce 3s ease-in-out infinite; }
 .betawi-spin { animation: betawiSpin 4s ease-in-out infinite; }
 .color-pulse { animation: colorPulse 2s ease-in-out infinite; }
+
+
+// ─── Bunga Kiri Atas (corner ornament) ───
+.betawi-bunga-kiri-atas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: clamp(120px, 30vw, 220px);
+  height: auto;
+  pointer-events: none;
+  z-index: 50;
+
+  .bunga-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .bunga-layer-1 { z-index: 1; }
+  .bunga-layer-2 { z-index: 2; }
+  .bunga-layer-3 { z-index: 3; }
+  .bunga-layer-4 { z-index: 4; }
+  .bunga-layer-5 { z-index: 5; }
+  .bunga-layer-6 { z-index: 6; }
+  .bunga-layer-7 { z-index: 7; }
+}
