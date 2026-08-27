@@ -29,6 +29,14 @@
             <section
                 class="cover-section betawi-cover relative flex flex-col items-center justify-center px-4 text-center overflow-hidden"
             >
+                <!-- Rumah Betawi — background behind text -->
+                <img
+                    src="/assets/templates/betawi-jakarta/rumah-tengah/Rumah.png"
+                    alt=""
+                    class="betawi-rumah-bg"
+                    aria-hidden="true"
+                />
+
                 <!-- Decorated umbrella top (Payung Geulis) -->
                 <div class="betawi-umbrella-top" aria-hidden="true">
                     <svg
@@ -341,11 +349,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- Rumah Betawi ornament — center divider -->
-            <div class="ornament ornament--center" aria-hidden="true">
-                <img src="/assets/templates/betawi-jakarta/rumah-tengah/Rumah.png" alt="" />
-            </div>
 
             <CoupleSection
                 :couple="couple"

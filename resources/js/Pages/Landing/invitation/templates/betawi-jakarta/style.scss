@@ -28,6 +28,19 @@ $betawi-blue: #0055AA;
       linear-gradient(180deg, #FFF8E1 0%, #FFECB3 60%, #FFD54F 100%);
   }
 
+  .betawi-rumah-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 420px;
+    height: auto;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .betawi-title { @include heading(); font-family: "Abril Fatface", serif; color: var(--betawi-primary); text-shadow: 3px 3px 0 rgba(204, 34, 0, 0.2); letter-spacing: -0.02em; }
   .betawi-ampersand { color: var(--betawi-blue); text-shadow: 2px 2px 0 rgba(0, 85, 170, 0.2); }
 
@@ -104,14 +117,14 @@ $betawi-blue: #0055AA;
   &--top-right { top: 0; right: 0; transform-origin: top right; }
   &--bottom-left { bottom: 0; left: 0; transform-origin: bottom left; }
   &--bottom-right { bottom: 0; right: 0; transform-origin: bottom right; }
-  &--center {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    animation: none;
-    > img { position: relative; width: 60%; max-width: 280px; margin: 0 auto; }
-  }
+  // &--center {
+  //   position: relative;
+  //   width: 100%;
+  //   display: flex;
+  //   justify-content: center;
+  //   animation: none;
+  //   > img { position: relative; width: 60%; max-width: 280px; margin: 0 auto; }
+  // }
 }
 
 // ─── Config ornament top-left (bunga kiri atas) ───
@@ -126,4 +139,11 @@ $betawi-blue: #0055AA;
   > img:nth-child(5) { width: 70px; top: 40px; left: 25px; animation: leafFloat 5.2s ease-in-out 0.8s infinite; }
   > img:nth-child(6) { width: 85px; top: 10px; left: 15px; animation: leafFloat 4.8s ease-in-out 0.4s infinite; }
   > img:nth-child(7) { width: 75px; top: 35px; left: 30px; animation: leafFloat 5.3s ease-in-out 0.7s infinite; }
+}
+
+.ornament--center {
+  width: 400px;
+  height: 400px;
+
+  > img:nth-child(1) { width: 100%; top: 25%; left: 75%; }
 }
