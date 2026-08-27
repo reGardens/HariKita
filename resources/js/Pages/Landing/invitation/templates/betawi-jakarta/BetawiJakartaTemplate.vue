@@ -21,7 +21,10 @@
                 <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 3.png" alt="" /> -->
                 <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 4.png" alt="" /> -->
                 <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 5.png" alt="" /> -->
-                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png" alt="" /> -->
+                <img
+                    src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png"
+                    alt=""
+                />
                 <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 7.png" alt="" /> -->
             </div>
 
@@ -88,132 +91,18 @@
 
                 <!-- Ondel-ondel left -->
                 <div class="betawi-ondel-left ondel-bounce" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 70 180"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="60"
-                        height="160"
-                    >
-                        <g>
-                            <!-- Body (red dress) -->
-                            <path
-                                d="M20,80 Q10,120 15,170 L55,170 Q60,120 50,80 Z"
-                                fill="var(--betawi-primary)"
-                                opacity="0.75"
-                            />
-                            <!-- Head/face -->
-                            <circle
-                                cx="35"
-                                cy="50"
-                                r="28"
-                                fill="#FFCC88"
-                                opacity="0.8"
-                            />
-                            <!-- Hair/crown elaborate -->
-                            <path
-                                d="M12,38 Q35,5 58,38 Q50,25 35,22 Q20,25 12,38 Z"
-                                fill="var(--betawi-accent)"
-                                opacity="0.8"
-                            />
-                            <circle
-                                cx="35"
-                                cy="10"
-                                r="8"
-                                fill="var(--betawi-primary)"
-                                opacity="0.7"
-                            />
-                            <!-- Eyes -->
-                            <circle cx="26" cy="52" r="4" fill="#1A0505" />
-                            <circle cx="44" cy="52" r="4" fill="#1A0505" />
-                            <!-- Nose/mouth simplified -->
-                            <circle
-                                cx="35"
-                                cy="60"
-                                r="3"
-                                fill="#CC6644"
-                                opacity="0.6"
-                            />
-                            <!-- Arms -->
-                            <path
-                                d="M20,90 Q5,105 3,125"
-                                stroke="var(--betawi-primary)"
-                                stroke-width="8"
-                                fill="none"
-                                stroke-linecap="round"
-                                opacity="0.75"
-                            />
-                            <path
-                                d="M50,90 Q65,105 67,125"
-                                stroke="var(--betawi-primary)"
-                                stroke-width="8"
-                                fill="none"
-                                stroke-linecap="round"
-                                opacity="0.75"
-                            />
-                        </g>
-                    </svg>
+                    <img
+                        src="/assets/templates/betawi-jakarta/ondel-ondel/ondel-ondel-kiri.png"
+                        alt=""
+                    />
                 </div>
 
-                <!-- Ondel-ondel right (female, blue) -->
+                <!-- Ondel-ondel right -->
                 <div class="betawi-ondel-right ondel-bounce" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 70 180"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="60"
-                        height="160"
-                    >
-                        <g>
-                            <path
-                                d="M20,80 Q10,120 15,170 L55,170 Q60,120 50,80 Z"
-                                fill="var(--betawi-blue)"
-                                opacity="0.75"
-                            />
-                            <circle
-                                cx="35"
-                                cy="50"
-                                r="28"
-                                fill="#FFCC88"
-                                opacity="0.8"
-                            />
-                            <path
-                                d="M12,38 Q35,5 58,38 Q50,25 35,22 Q20,25 12,38 Z"
-                                fill="var(--betawi-blue)"
-                                opacity="0.8"
-                            />
-                            <circle
-                                cx="35"
-                                cy="10"
-                                r="8"
-                                fill="var(--betawi-accent)"
-                                opacity="0.8"
-                            />
-                            <circle cx="26" cy="52" r="4" fill="#1A0505" />
-                            <circle cx="44" cy="52" r="4" fill="#1A0505" />
-                            <circle
-                                cx="35"
-                                cy="60"
-                                r="3"
-                                fill="#CC6644"
-                                opacity="0.6"
-                            />
-                            <path
-                                d="M20,90 Q5,105 3,125"
-                                stroke="var(--betawi-blue)"
-                                stroke-width="8"
-                                fill="none"
-                                stroke-linecap="round"
-                                opacity="0.75"
-                            />
-                            <path
-                                d="M50,90 Q65,105 67,125"
-                                stroke="var(--betawi-blue)"
-                                stroke-width="8"
-                                fill="none"
-                                stroke-linecap="round"
-                                opacity="0.75"
-                            />
-                        </g>
-                    </svg>
+                    <img
+                        src="/assets/templates/betawi-jakarta/ondel-ondel/ondel-ondel-kanan.png"
+                        alt=""
+                    />
                 </div>
 
                 <!-- Lanterns -->
@@ -308,13 +197,7 @@
                 </div>
 
                 <!-- Text content -->
-                <div class="relative z-10">
-                    <p
-                        class="mb-1 text-xs uppercase tracking-[0.4em] opacity-70"
-                        style="color: var(--betawi-blue)"
-                    >
-                        Betawi Jakarta
-                    </p>
+                <div class="relative z-10 pb-[180px]">
                     <p
                         class="mb-4 text-xs uppercase tracking-[0.3em] opacity-50"
                     >
