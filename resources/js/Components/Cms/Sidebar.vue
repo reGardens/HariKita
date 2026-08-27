@@ -226,7 +226,7 @@ const menuGroups = computed(() => {
                         locale.value === "id" ? "Kelola Peran" : "Manage Roles",
                     href: "/cms/roles",
                     icon: "Shield",
-                    visible: hasRole("super-admin"),
+                    visible: hasRole("super-admin") || hasRole("admin"),
                 },
                 {
                     label:
@@ -235,7 +235,7 @@ const menuGroups = computed(() => {
                             : "Manage Users",
                     href: "/cms/users",
                     icon: "Users",
-                    visible: hasRole("super-admin"),
+                    visible: hasRole("super-admin") || hasRole("admin"),
                 },
                 {
                     label:
@@ -244,7 +244,7 @@ const menuGroups = computed(() => {
                             : "User Feature ACL",
                     href: "/cms/acl",
                     icon: "Lock",
-                    visible: hasRole("super-admin"),
+                    visible: hasRole("super-admin") || hasRole("admin"),
                 },
             ],
         },

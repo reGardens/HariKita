@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import CmsLayout from "@/Layouts/CmsLayout.vue";
 import { useI18n } from "@/Composables/useI18n";
 import {
@@ -23,10 +23,13 @@ import {
 defineOptions({ layout: CmsLayout });
 
 const { t } = useI18n();
+const page = usePage();
 
 const props = defineProps({
     roles: { type: Array, required: true },
 });
+
+const isSuperAdmin = computed(() => page.props.auth?.user?.roles?.includes("super-admin") || false);
 
 const showDeleteDialog = ref(false);
 const roleToDelete = ref(null);
@@ -56,7 +59,7 @@ function deleteRole() {
             <h1 class="text-2xl font-bold tracking-tight">
                 {{ t("role.title") }}
             </h1>
-            <Link href="/cms/roles/create">
+            <Link v-if="isSuperAdmin" href="/cms/roles/create">
                 <Button
                     class="bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-500 dark:hover:bg-emerald-600"
                 >
@@ -73,7 +76,7 @@ function deleteRole() {
                         <TableHead>{{ t("role.name") }}</TableHead>
                         <TableHead>{{ t("role.guard") }}</TableHead>
                         <TableHead>Users</TableHead>
-                        <TableHead class="text-right">{{
+                        <TableHead v-if="isSuperAdmin" class="text-right">{{
                             t("common.actions")
                         }}</TableHead>
                     </TableRow>
@@ -92,7 +95,7 @@ function deleteRole() {
                             role.guard_name
                         }}</TableCell>
                         <TableCell>{{ role.users_count }}</TableCell>
-                        <TableCell class="text-right space-x-2">
+                        <TableCell v-if="isSuperAdmin" class="text-right space-x-2">
                             <Link :href="`/cms/roles/${role.id}/edit`">
                                 <Button variant="outline" size="sm">{{
                                     t("common.edit")

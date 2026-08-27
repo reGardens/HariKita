@@ -29,6 +29,11 @@ function selectUser(user) {
     selectedUser.value = user;
 }
 
+function selectUserById(id) {
+    const user = props.users.find(u => u.id === Number(id));
+    if (user) selectedUser.value = user;
+}
+
 const features = [
     { key: "undangan_digital", label: "Undangan Digital", desc: "Template tema wedding, Nama tamu otomatis, Share via WhatsApp, QR Code undangan" },
     { key: "rsvp_online", label: "RSVP Online", desc: "Hadir / Tidak Hadir, Jumlah tamu pendamping, Konfirmasi kehadiran real-time, Reminder otomatis" },
@@ -83,32 +88,24 @@ function hasFeature(user, featureKey) {
             <!-- Left Side: Users list -->
             <div class="md:col-span-2 rounded-xl border border-border bg-card overflow-hidden h-fit">
                 <div class="p-4 border-b border-border bg-muted/20">
-                    <h2 class="font-semibold text-sm">Daftar Pengguna Standard</h2>
-                </div>
-                <div class="divide-y divide-border max-h-[60vh] overflow-y-auto">
-                    <div
-                        v-for="u in users"
-                        :key="u.id"
-                        @click="selectUser(u)"
-                        :class="[
-                            'p-4 cursor-pointer transition-colors flex items-center justify-between',
-                            selectedUser && selectedUser.id === u.id
-                                ? 'bg-emerald-500/10 dark:bg-emerald-950/30 border-l-4 border-emerald-600 dark:border-emerald-500'
-                                : 'hover:bg-muted/40 border-l-4 border-transparent'
-                        ]"
+                    <h2 class="font-semibold text-sm mb-2">Pilih Pengguna</h2>
+                    <select
+                        class="w-full rounded-lg border border-border bg-card text-foreground text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        :value="selectedUser?.id || ''"
+                        @change="selectUserById($event.target.value)"
                     >
-                        <div>
-                            <p class="font-semibold text-sm text-foreground">{{ u.name }}</p>
-                            <p class="text-xs text-muted-foreground">{{ u.email }}</p>
-                        </div>
-                        <Badge class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px]">
-                            {{ u.allowed_features ? u.allowed_features.length : 0 }} Fitur
-                        </Badge>
-                    </div>
-
-                    <div v-if="users.length === 0" class="p-8 text-center text-muted-foreground text-sm">
-                        Belum ada pengguna standard terdaftar.
-                    </div>
+                        <option value="" disabled>-- Pilih user --</option>
+                        <option v-for="u in users" :key="u.id" :value="u.id">
+                            {{ u.name }} ({{ u.email }})
+                        </option>
+                    </select>
+                </div>
+                <div v-if="selectedUser" class="p-4 border-b border-border bg-emerald-500/5">
+                    <p class="font-semibold text-sm text-foreground">{{ selectedUser.name }}</p>
+                    <p class="text-xs text-muted-foreground">{{ selectedUser.email }}</p>
+                    <Badge class="mt-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px]">
+                        {{ selectedUser.allowed_features ? selectedUser.allowed_features.length : 0 }} Fitur Aktif
+                    </Badge>
                 </div>
             </div>
 

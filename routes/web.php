@@ -37,9 +37,8 @@ Route::middleware(['auth', 'role:super-admin'])->group(function () {
         Route::delete('/{template}', [\App\Http\Controllers\Admin\TemplateController::class, 'destroy'])->name('cms.templates.destroy');
     });
 
-    // Roles CRUD
+    // Roles CRUD (super-admin only for write operations)
     Route::prefix('cms/roles')->group(function () {
-        Route::get('/', [\App\Http\Controllers\RoleController::class, 'index'])->name('cms.roles.index');
         Route::get('/create', [\App\Http\Controllers\RoleController::class, 'create'])->name('cms.roles.create');
         Route::post('/', [\App\Http\Controllers\RoleController::class, 'store'])->name('cms.roles.store');
         Route::get('/{role}/edit', [\App\Http\Controllers\RoleController::class, 'edit'])->name('cms.roles.edit');
@@ -47,17 +46,25 @@ Route::middleware(['auth', 'role:super-admin'])->group(function () {
         Route::delete('/{role}', [\App\Http\Controllers\RoleController::class, 'destroy'])->name('cms.roles.destroy');
     });
 
-    // Users CRUD
+    // Users CRUD (super-admin only for write operations)
     Route::prefix('cms/users')->group(function () {
-        Route::get('/', [\App\Http\Controllers\UserController::class, 'index'])->name('cms.users.index');
         Route::get('/create', [\App\Http\Controllers\UserController::class, 'create'])->name('cms.users.create');
         Route::post('/', [\App\Http\Controllers\UserController::class, 'store'])->name('cms.users.store');
         Route::get('/{user}/edit', [\App\Http\Controllers\UserController::class, 'edit'])->name('cms.users.edit');
         Route::put('/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('cms.users.update');
         Route::delete('/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('cms.users.destroy');
     });
+});
 
-    // ACL (Access Control List)
+// Authenticated Admin Routes (super-admin AND admin)
+Route::middleware(['auth', 'role:super-admin|admin'])->group(function () {
+    // Roles - read only for admin
+    Route::get('/cms/roles', [\App\Http\Controllers\RoleController::class, 'index'])->name('cms.roles.index');
+
+    // Users - read only for admin
+    Route::get('/cms/users', [\App\Http\Controllers\UserController::class, 'index'])->name('cms.users.index');
+
+    // ACL (Access Control List) - both can manage
     Route::prefix('cms/acl')->group(function () {
         Route::get('/', [\App\Http\Controllers\AclController::class, 'index'])->name('cms.acl.index');
         Route::post('/{user}/toggle', [\App\Http\Controllers\AclController::class, 'toggle'])->name('cms.acl.toggle');

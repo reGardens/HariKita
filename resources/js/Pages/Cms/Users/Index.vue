@@ -1,5 +1,6 @@
 <script setup>
-import { Head, Link, router } from "@inertiajs/vue3";
+import { computed } from "vue";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import CmsLayout from "@/Layouts/CmsLayout.vue";
 import { useI18n } from "@/Composables/useI18n";
 import { confirmDelete } from "@/Composables/useAlert";
@@ -16,9 +17,18 @@ import {
 
 defineOptions({ layout: CmsLayout });
 const { t } = useI18n();
+const page = usePage();
 
 const props = defineProps({
     users: { type: Object, required: true },
+});
+
+const isSuperAdmin = computed(() => page.props.auth?.user?.roles?.includes("super-admin") || false);
+
+// Filter out super-admin users when logged in as admin
+const filteredUsers = computed(() => {
+    if (isSuperAdmin.value) return props.users.data;
+    return props.users.data.filter(u => !u.roles?.some(r => r.name === 'super-admin'));
 });
 
 async function handleDelete(user) {
@@ -68,7 +78,7 @@ function formatDate(dateString) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="user in users.data" :key="user.id">
+                    <TableRow v-for="user in filteredUsers" :key="user.id">
                         <TableCell class="font-medium">{{
                             user.name
                         }}</TableCell>
@@ -100,7 +110,7 @@ function formatDate(dateString) {
                             <span v-else class="text-xs text-muted-foreground italic px-3">Protected</span>
                         </TableCell>
                     </TableRow>
-                    <TableRow v-if="users.data.length === 0">
+                    <TableRow v-if="filteredUsers.length === 0">
                         <TableCell
                             colspan="5"
                             class="text-center py-8 text-muted-foreground"
