@@ -30,9 +30,9 @@ $betawi-blue: #0055AA;
 
   .betawi-rumah-bg {
     position: absolute;
-    top: 50%;
+    bottom: -20px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     width: 90%;
     max-width: 420px;
     height: auto;
