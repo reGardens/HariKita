@@ -10,13 +10,19 @@
 
             <!-- Corner ornament — top left -->
             <div class="ornament ornament--top-left" aria-hidden="true">
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 1.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 2.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 3.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 4.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 5.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png" alt="" />
-                <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 7.png" alt="" />
+                <img
+                    src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 1.png"
+                    alt=""
+                />
+                <!-- <img
+                    src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 2.png"
+                    alt=""
+                /> -->
+                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 3.png" alt="" /> -->
+                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 4.png" alt="" /> -->
+                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 5.png" alt="" /> -->
+                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 6.png" alt="" /> -->
+                <!-- <img src="/assets/templates/betawi-jakarta/bunga-kiri-atas/Lapisan 7.png" alt="" /> -->
             </div>
 
             <!-- COVER SECTION - Betawi festive with Ondel-ondel -->
@@ -335,6 +341,11 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Rumah Betawi ornament — center divider -->
+            <div class="ornament ornament--center" aria-hidden="true">
+                <img src="/assets/templates/betawi-jakarta/rumah-tengah/Rumah.png" alt="" />
+            </div>
 
             <CoupleSection
                 :couple="couple"
